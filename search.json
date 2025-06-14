@@ -193,27 +193,27 @@
     "href": "index.html",
     "title": "Welcome to My Tech Blog",
     "section": "",
-    "text": "欢迎来到我的技术博客！这里记录我在农业数据科学领域的研究心得和技术解决方案。"
+    "text": "Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science."
   },
   {
-    "objectID": "index.html#研究方向",
-    "href": "index.html#研究方向",
+    "objectID": "index.html#research-focus",
+    "href": "index.html#research-focus",
     "title": "Welcome to My Tech Blog",
-    "section": "研究方向",
-    "text": "研究方向\n\n农业建模与模拟：传统作物模型与机器学习方法的结合\n遥感与GIS：农业监测与空间分析\n智慧农业设备：农业气象，灌溉，施肥，病虫害等农业传感器技术\n气候变化的适宜性：气候变化对农业的影响和缓解路径"
+    "section": "Research Focus",
+    "text": "Research Focus\n\nAgricultural Modeling & Simulation: Integration of traditional crop models with machine learning methods\nRemote Sensing & GIS: Agricultural monitoring and spatial analysis\nSmart Agriculture Devices: Agricultural sensors for weather, irrigation, fertilization, and pest control\nClimate Change Adaptation: Impact of climate change on agriculture and mitigation pathways"
   },
   {
-    "objectID": "index.html#技术栈",
-    "href": "index.html#技术栈",
+    "objectID": "index.html#technical-stack",
+    "href": "index.html#technical-stack",
     "title": "Welcome to My Tech Blog",
-    "section": "技术栈",
-    "text": "技术栈\n\n编程语言：Python, R, JavaScript\n数据科学：Pandas, NumPy, Scikit-learn\n地理信息：Google Earth Engine, QGIS\n可视化：Matplotlib, Seaborn, Plotly\n版本控制：Git, GitHub"
+    "section": "Technical Stack",
+    "text": "Technical Stack\n\nProgramming Languages: Python, R, JavaScript\nData Science: Pandas, NumPy, Scikit-learn\nGeospatial: Google Earth Engine, QGIS\nVisualization: Matplotlib, Seaborn, Plotly\nVersion Control: Git, GitHub"
   },
   {
-    "objectID": "index.html#联系方式",
-    "href": "index.html#联系方式",
+    "objectID": "index.html#contact-information",
+    "href": "index.html#contact-information",
     "title": "Welcome to My Tech Blog",
-    "section": "联系方式",
-    "text": "联系方式\n\nEmail: binc041208@gmail.com\nGitHub: chenbin98\nLinkedIn: Bin Chen\nORCID: 0009-0000-8266-940X\n\n\n“Looking for like-minded friends to do something different together.”"
+    "section": "Contact Information",
+    "text": "Contact Information\n\nEmail: binc041208@gmail.com\nGitHub: chenbin98\nLinkedIn: Bin Chen\nORCID: 0009-0000-8266-940X\n\n\n“Looking for like-minded friends to do something different together.”"
   }
 ]
