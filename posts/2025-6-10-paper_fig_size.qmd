@@ -1,0 +1,94 @@
+---
+title: "Python 论文图片尺寸规范指南"
+date: 2025-06-10
+categories: [技术教程, 数据可视化]
+tags: [Python, 论文写作, 数据可视化, 图片尺寸]
+---
+
+# Python 论文图片尺寸规范指南
+
+在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。
+
+## Elsevier 图片尺寸规范
+
+| 用途 | 宽度 × 高度（英寸） | 说明 |
+|------|-------------------|------|
+| 单栏图 | 3.5 × 2.5 | 常用于插图、简单图 |
+| 1.5 栏图 | 4.75 × 3.5 | 用于稍复杂的图 |
+| 全栏图 | 6.89 × 4.5 | 推荐用于双栏图或主图 |
+| 宽幅图（横图） | 6.89 × 2.5 | 常用于时间序列或宽图 |
+
+## Python 中设置图片尺寸
+
+### 使用 Matplotlib
+
+```python
+import matplotlib.pyplot as plt
+
+# 设置图片尺寸（英寸）
+plt.figure(figsize=(3.5, 2.5))  # 单栏图
+# 或
+plt.figure(figsize=(6.89, 4.5))  # 全栏图
+```
+
+### 使用 Seaborn
+
+```python
+import seaborn as sns
+
+# 设置图片尺寸
+plt.figure(figsize=(3.5, 2.5))
+sns.set(rc={'figure.figsize': (3.5, 2.5)})
+```
+
+## 其他注意事项
+
+1. 分辨率要求：
+   - 建议使用 300 DPI 或更高
+   - 保存时使用 `plt.savefig('figure.png', dpi=300)`
+
+2. 文件格式：
+   - 推荐使用 PDF 或 EPS 格式（矢量图）
+   - 或使用高分辨率 PNG 格式
+
+3. 字体大小：
+   - 标题：12-14pt
+   - 轴标签：10-12pt
+   - 图例：10pt
+   - 刻度标签：8-10pt
+
+## 代码示例
+
+```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 设置图片尺寸和样式
+plt.figure(figsize=(6.89, 4.5))  # 全栏图
+sns.set_style("whitegrid")
+sns.set_context("paper", font_scale=1.2)
+
+# 绘制图形
+# ... 你的绘图代码 ...
+
+# 保存图片
+plt.savefig('figure.pdf', 
+            dpi=300,
+            bbox_inches='tight',
+            pad_inches=0.1)
+```
+
+## 常见问题
+
+1. 图片模糊：
+   - 检查 DPI 设置
+   - 使用矢量格式（PDF/EPS）
+   - 确保原始数据分辨率足够
+
+2. 图片过大：
+   - 使用 `bbox_inches='tight'` 自动调整边距
+   - 适当调整 `pad_inches` 参数
+
+3. 文字不清晰：
+   - 使用 `plt.rcParams['font.size']` 调整字体大小
+   - 确保使用支持中文的字体（如 SimHei）
