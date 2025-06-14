@@ -4,7 +4,42 @@
     "href": "about.html",
     "title": "About Me",
     "section": "",
-    "text": "Hi! I’m a data science researcher. This is my personal blog to document solutions to technical challenges I encounter."
+    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work.\n\n\n\nMy research interests include: - Agricultural modeling and simulation - Machine learning applications in agriculture - Remote sensing and GIS in agricultural monitoring - Crop yield prediction and analysis - Climate-smart agriculture\n\n\n\nThis blog primarily focuses on: - Technical tutorials and solutions - Research methodology discussions - Data analysis techniques - Programming tips and tricks - Agricultural technology insights\n\n\n\nFeel free to reach out to me for: - Research collaborations - Technical discussions - Questions about blog posts - Professional networking\nEmail: binc041208@gmail.com\n\n\n\nYou can also find me on: - GitHub - LinkedIn - ORCID\n\n“Looking for like-minded friends to do something different together.”"
+  },
+  {
+    "objectID": "about.html#introduction",
+    "href": "about.html#introduction",
+    "title": "About Me",
+    "section": "",
+    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
+  },
+  {
+    "objectID": "about.html#research-focus",
+    "href": "about.html#research-focus",
+    "title": "About Me",
+    "section": "",
+    "text": "My research interests include: - Agricultural modeling and simulation - Machine learning applications in agriculture - Remote sensing and GIS in agricultural monitoring - Crop yield prediction and analysis - Climate-smart agriculture"
+  },
+  {
+    "objectID": "about.html#blog-content",
+    "href": "about.html#blog-content",
+    "title": "About Me",
+    "section": "",
+    "text": "This blog primarily focuses on: - Technical tutorials and solutions - Research methodology discussions - Data analysis techniques - Programming tips and tricks - Agricultural technology insights"
+  },
+  {
+    "objectID": "about.html#contact",
+    "href": "about.html#contact",
+    "title": "About Me",
+    "section": "",
+    "text": "Feel free to reach out to me for: - Research collaborations - Technical discussions - Questions about blog posts - Professional networking\nEmail: binc041208@gmail.com"
+  },
+  {
+    "objectID": "about.html#connect",
+    "href": "about.html#connect",
+    "title": "About Me",
+    "section": "",
+    "text": "You can also find me on: - GitHub - LinkedIn - ORCID\n\n“Looking for like-minded friends to do something different together.”"
   },
   {
     "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
@@ -158,6 +193,27 @@
     "href": "index.html",
     "title": "Welcome to My Tech Blog",
     "section": "",
-    "text": "This is the homepage of your personal technical blog powered by Quarto."
+    "text": "欢迎来到我的技术博客！这里记录我在农业数据科学领域的研究心得和技术解决方案。"
+  },
+  {
+    "objectID": "index.html#研究方向",
+    "href": "index.html#研究方向",
+    "title": "Welcome to My Tech Blog",
+    "section": "研究方向",
+    "text": "研究方向\n\n农业建模与模拟：传统作物模型与机器学习方法的结合\n遥感与GIS：农业监测与空间分析\n智慧农业设备：农业气象，灌溉，施肥，病虫害等农业传感器技术\n气候变化的适宜性：气候变化对农业的影响和缓解路径"
+  },
+  {
+    "objectID": "index.html#技术栈",
+    "href": "index.html#技术栈",
+    "title": "Welcome to My Tech Blog",
+    "section": "技术栈",
+    "text": "技术栈\n\n编程语言：Python, R, JavaScript\n数据科学：Pandas, NumPy, Scikit-learn\n地理信息：Google Earth Engine, QGIS\n可视化：Matplotlib, Seaborn, Plotly\n版本控制：Git, GitHub"
+  },
+  {
+    "objectID": "index.html#联系方式",
+    "href": "index.html#联系方式",
+    "title": "Welcome to My Tech Blog",
+    "section": "联系方式",
+    "text": "联系方式\n\nEmail: binc041208@gmail.com\nGitHub: chenbin98\nLinkedIn: Bin Chen\nORCID: 0009-0000-8266-940X\n\n\n“Looking for like-minded friends to do something different together.”"
   }
 ]
