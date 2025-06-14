@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2025-06-10">
 
-<title>All Posts – Binchen’s Tech Blog</title>
+<title>Python 论文图片尺寸规范指南 – Binchen’s Tech Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +21,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,8 +66,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -69,65 +103,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -171,22 +147,49 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#python-论文图片尺寸规范指南" id="toc-python-论文图片尺寸规范指南" class="nav-link active" data-scroll-target="#python-论文图片尺寸规范指南">Python 论文图片尺寸规范指南</a>
+  <ul class="collapse">
+  <li><a href="#elsevier-图片尺寸规范" id="toc-elsevier-图片尺寸规范" class="nav-link" data-scroll-target="#elsevier-图片尺寸规范">Elsevier 图片尺寸规范</a></li>
+  <li><a href="#python-中设置图片尺寸" id="toc-python-中设置图片尺寸" class="nav-link" data-scroll-target="#python-中设置图片尺寸">Python 中设置图片尺寸</a>
+  <ul class="collapse">
+  <li><a href="#使用-matplotlib" id="toc-使用-matplotlib" class="nav-link" data-scroll-target="#使用-matplotlib">使用 Matplotlib</a></li>
+  <li><a href="#使用-seaborn" id="toc-使用-seaborn" class="nav-link" data-scroll-target="#使用-seaborn">使用 Seaborn</a></li>
+  </ul></li>
+  <li><a href="#其他注意事项" id="toc-其他注意事项" class="nav-link" data-scroll-target="#其他注意事项">其他注意事项</a></li>
+  <li><a href="#代码示例" id="toc-代码示例" class="nav-link" data-scroll-target="#代码示例">代码示例</a></li>
+  <li><a href="#常见问题" id="toc-常见问题" class="nav-link" data-scroll-target="#常见问题">常见问题</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">All Posts</h1>
-</div>
+<h1 class="title">Python 论文图片尺寸规范指南</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">技术教程</div>
+    <div class="quarto-category">数据可视化</div>
+  </div>
+  </div>
 
 
 
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 10, 2025</p>
+    </div>
+  </div>
   
     
   </div>
@@ -196,104 +199,130 @@ window.Quarto = {
 </header>
 
 
-<p>欢迎查看我的所有技术文章。</p>
+<section id="python-论文图片尺寸规范指南" class="level1">
+<h1>Python 论文图片尺寸规范指南</h1>
+<p>在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。</p>
+<section id="elsevier-图片尺寸规范" class="level2">
+<h2 class="anchored" data-anchor-id="elsevier-图片尺寸规范">Elsevier 图片尺寸规范</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>用途</th>
+<th>宽度 × 高度（英寸）</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>单栏图</td>
+<td>3.5 × 2.5</td>
+<td>常用于插图、简单图</td>
+</tr>
+<tr class="even">
+<td>1.5 栏图</td>
+<td>4.75 × 3.5</td>
+<td>用于稍复杂的图</td>
+</tr>
+<tr class="odd">
+<td>全栏图</td>
+<td>6.89 × 4.5</td>
+<td>推荐用于双栏图或主图</td>
+</tr>
+<tr class="even">
+<td>宽幅图（横图）</td>
+<td>6.89 × 2.5</td>
+<td>常用于时间序列或宽图</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="python-中设置图片尺寸" class="level2">
+<h2 class="anchored" data-anchor-id="python-中设置图片尺寸">Python 中设置图片尺寸</h2>
+<section id="使用-matplotlib" class="level3">
+<h3 class="anchored" data-anchor-id="使用-matplotlib">使用 Matplotlib</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置图片尺寸（英寸）</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">3.5</span>, <span class="fl">2.5</span>))  <span class="co"># 单栏图</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 或</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.89</span>, <span class="fl">4.5</span>))  <span class="co"># 全栏图</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="使用-seaborn" class="level3">
+<h3 class="anchored" data-anchor-id="使用-seaborn">使用 Seaborn</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置图片尺寸</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">3.5</span>, <span class="fl">2.5</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(rc<span class="op">=</span>{<span class="st">'figure.figsize'</span>: (<span class="fl">3.5</span>, <span class="fl">2.5</span>)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="其他注意事项" class="level2">
+<h2 class="anchored" data-anchor-id="其他注意事项">其他注意事项</h2>
+<ol type="1">
+<li>分辨率要求：
+<ul>
+<li>建议使用 300 DPI 或更高</li>
+<li>保存时使用 <code>plt.savefig('figure.png', dpi=300)</code></li>
+</ul></li>
+<li>文件格式：
+<ul>
+<li>推荐使用 PDF 或 EPS 格式（矢量图）</li>
+<li>或使用高分辨率 PNG 格式</li>
+</ul></li>
+<li>字体大小：
+<ul>
+<li>标题：12-14pt</li>
+<li>轴标签：10-12pt</li>
+<li>图例：10pt</li>
+<li>刻度标签：8-10pt</li>
+</ul></li>
+</ol>
+</section>
+<section id="代码示例" class="level2">
+<h2 class="anchored" data-anchor-id="代码示例">代码示例</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置图片尺寸和样式</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.89</span>, <span class="fl">4.5</span>))  <span class="co"># 全栏图</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>sns.set_context(<span class="st">"paper"</span>, font_scale<span class="op">=</span><span class="fl">1.2</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制图形</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ... 你的绘图代码 ...</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 保存图片</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'figure.pdf'</span>, </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            dpi<span class="op">=</span><span class="dv">300</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>            bbox_inches<span class="op">=</span><span class="st">'tight'</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            pad_inches<span class="op">=</span><span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="常见问题" class="level2">
+<h2 class="anchored" data-anchor-id="常见问题">常见问题</h2>
+<ol type="1">
+<li>图片模糊：
+<ul>
+<li>检查 DPI 设置</li>
+<li>使用矢量格式（PDF/EPS）</li>
+<li>确保原始数据分辨率足够</li>
+</ul></li>
+<li>图片过大：
+<ul>
+<li>使用 <code>bbox_inches='tight'</code> 自动调整边距</li>
+<li>适当调整 <code>pad_inches</code> 参数</li>
+</ul></li>
+<li>文字不清晰：
+<ul>
+<li>使用 <code>plt.rcParams['font.size']</code> 调整字体大小</li>
+<li>确保使用支持中文的字体（如 SimHei）</li>
+</ul></li>
+</ol>
 
 
+</section>
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDUHl0aG9u" data-listing-date-sort="1749340800000" data-listing-file-modified-sort="1749882666394" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="81">
-<div class="thumbnail"><a href="../posts/2025-6-8-local_package_install.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-8-local_package_install.html" class="no-external">Python 本地包安装与更新指南</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-8-local_package_install.html" class="no-external">
-本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-8-local_package_install.html" class="no-external">
-<div class="listing-date">
-Jun 8, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDJUU2JTk1JUIwJUU2JThEJUFFJUU1JThGJUFGJUU4JUE3JTg2JUU1JThDJTk2" data-listing-date-sort="1749513600000" data-listing-file-modified-sort="1749882666394" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="216">
-<div class="thumbnail"><a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">Python 论文图片尺寸规范指南</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">
-在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">
-<div class="listing-date">
-Jun 10, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="JUU1JTg2JTlDJUU0JUI4JTlBJUU2JThBJTgwJUU2JTlDJUFGJTJDJUU2JTlDJUJBJUU1JTk5JUE4JUU1JUFEJUE2JUU0JUI5JUEw" data-listing-date-sort="1748736000000" data-listing-file-modified-sort="1749882666394" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="41">
-<div class="thumbnail"><a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">机器学习与传统作物模型的未来展望</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">
-农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">
-<div class="listing-date">
-Jun 1, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDR0VF" data-listing-date-sort="1749772800000" data-listing-file-modified-sort="1749882666394" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="77">
-<div class="thumbnail"><a href="../posts/2025-6-13-geedownload.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-13-geedownload.html" class="no-external">解决 Google Earth Engine 认证问题的最新方法</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-13-geedownload.html" class="no-external">
-最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-13-geedownload.html" class="no-external">
-<div class="listing-date">
-Jun 13, 2025
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
