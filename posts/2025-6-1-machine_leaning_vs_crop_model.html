@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-06-14">
+<meta name="dcterms.date" content="2025-06-01">
 
-<title>Pandas groupby + agg 多函数聚合错误 – Binchen’s Tech Blog</title>
+<title>机器学习与传统作物模型的未来展望 – Binchen’s Tech Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,61 +21,26 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-a98ec624fb63d9b712fc3a6f62e2b305.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -114,7 +79,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">Binchen’s Tech Blog</span>
     </a>
   </div>
@@ -125,15 +90,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../index.html"> 
+    <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../posts/"> 
+    <a class="nav-link" href="../posts/"> 
 <span class="menu-text">Posts</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../about.html"> 
+    <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
 </ul>
@@ -152,10 +117,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#问题背景" id="toc-问题背景" class="nav-link active" data-scroll-target="#问题背景">问题背景</a></li>
-  <li><a href="#错误提示" id="toc-错误提示" class="nav-link" data-scroll-target="#错误提示">错误提示</a></li>
-  <li><a href="#正确写法" id="toc-正确写法" class="nav-link" data-scroll-target="#正确写法">正确写法</a></li>
-  <li><a href="#参考链接" id="toc-参考链接" class="nav-link" data-scroll-target="#参考链接">参考链接</a></li>
+  <li><a href="#机器学习与传统作物模型的未来展望" id="toc-机器学习与传统作物模型的未来展望" class="nav-link active" data-scroll-target="#机器学习与传统作物模型的未来展望">机器学习与传统作物模型的未来展望</a>
+  <ul class="collapse">
+  <li><a href="#传统作物模型的现状与挑战" id="toc-传统作物模型的现状与挑战" class="nav-link" data-scroll-target="#传统作物模型的现状与挑战">传统作物模型的现状与挑战</a></li>
+  <li><a href="#机器学习在农业建模中的兴起" id="toc-机器学习在农业建模中的兴起" class="nav-link" data-scroll-target="#机器学习在农业建模中的兴起">机器学习在农业建模中的兴起</a></li>
+  <li><a href="#物理知识引导的机器学习模型" id="toc-物理知识引导的机器学习模型" class="nav-link" data-scroll-target="#物理知识引导的机器学习模型">物理知识引导的机器学习模型</a></li>
+  <li><a href="#未来展望" id="toc-未来展望" class="nav-link" data-scroll-target="#未来展望">未来展望</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -164,10 +132,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Pandas groupby + agg 多函数聚合错误</h1>
+<h1 class="title">机器学习与传统作物模型的未来展望</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">Python</div>
-    <div class="quarto-category">Pandas</div>
+    <div class="quarto-category">农业技术</div>
+    <div class="quarto-category">机器学习</div>
   </div>
   </div>
 
@@ -179,7 +147,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 14, 2025</p>
+      <p class="date">June 1, 2025</p>
     </div>
   </div>
   
@@ -191,30 +159,61 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="问题背景" class="level2">
-<h2 class="anchored" data-anchor-id="问题背景">问题背景</h2>
-<p>在聚合多个列时希望对不同列使用不同的函数。</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>df.groupby(<span class="st">'col1'</span>).agg({<span class="st">'col2'</span>: [<span class="st">'mean'</span>, <span class="st">'max'</span>], <span class="st">'col3'</span>: <span class="st">'sum'</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="机器学习与传统作物模型的未来展望" class="level1">
+<h1>机器学习与传统作物模型的未来展望</h1>
+<section id="传统作物模型的现状与挑战" class="level2">
+<h2 class="anchored" data-anchor-id="传统作物模型的现状与挑战">传统作物模型的现状与挑战</h2>
+<p>农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。</p>
+<p>然而，传统作物模型在实际应用中面临诸多挑战：</p>
+<ol type="1">
+<li>预测精度不足：在实际条件下往往难以准确预测</li>
+<li>实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用</li>
+<li>理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限</li>
+</ol>
 </section>
-<section id="错误提示" class="level2">
-<h2 class="anchored" data-anchor-id="错误提示">错误提示</h2>
-<pre class="text"><code>SpecificationError: nested renamer is not supported</code></pre>
-</section>
-<section id="正确写法" class="level2">
-<h2 class="anchored" data-anchor-id="正确写法">正确写法</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df.groupby(<span class="st">'col1'</span>).agg(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    col2_mean<span class="op">=</span>(<span class="st">'col2'</span>, <span class="st">'mean'</span>),</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    col2_max<span class="op">=</span>(<span class="st">'col2'</span>, <span class="st">'max'</span>),</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    col3_sum<span class="op">=</span>(<span class="st">'col3'</span>, <span class="st">'sum'</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="参考链接" class="level2">
-<h2 class="anchored" data-anchor-id="参考链接">参考链接</h2>
+<section id="机器学习在农业建模中的兴起" class="level2">
+<h2 class="anchored" data-anchor-id="机器学习在农业建模中的兴起">机器学习在农业建模中的兴起</h2>
+<p>在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。</p>
+<p>一个理想的农业模型架构应该：</p>
 <ul>
-<li><a href="https://pandas.pydata.org/docs/">Pandas 官方文档</a></li>
+<li>符合人们对作物长势的直观感知</li>
+<li>以天为单位动态输出关键指标</li>
+<li>包含以下要素：
+<ul>
+<li>生育期</li>
+<li>叶面积</li>
+<li>株高</li>
+<li>生物量</li>
+<li>产量</li>
+<li>健康状态</li>
+</ul></li>
 </ul>
+<p>这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标</p>
+</section>
+<section id="物理知识引导的机器学习模型" class="level2">
+<h2 class="anchored" data-anchor-id="物理知识引导的机器学习模型">物理知识引导的机器学习模型</h2>
+<p>目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：</p>
+<ol type="1">
+<li>利用传统作物模型的知识作为引导</li>
+<li>让机器学习模型先学习基础知识</li>
+<li>减少后续训练所需的数据量</li>
+</ol>
+<p>这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。</p>
+</section>
+<section id="未来展望" class="level2">
+<h2 class="anchored" data-anchor-id="未来展望">未来展望</h2>
+<p>未来的作物模型发展趋势将是：</p>
+<ul>
+<li>以机器学习为主导</li>
+<li>面向实际农业生产问题</li>
+<li>具备自适应和自学习能力</li>
+<li>能够独立输出关键决策信息</li>
+<li>真正成为智慧农业的”大脑”</li>
+</ul>
+<p>这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
