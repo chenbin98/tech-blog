@@ -7,83 +7,6 @@
     "text": "Hi! I’m a data science researcher. This is my personal blog to document solutions to technical challenges I encounter."
   },
   {
-    "objectID": "posts/2025-06-14-pandas-agg.html",
-    "href": "posts/2025-06-14-pandas-agg.html",
-    "title": "Pandas groupby + agg 多函数聚合错误",
-    "section": "",
-    "text": "在聚合多个列时希望对不同列使用不同的函数。\ndf.groupby('col1').agg({'col2': ['mean', 'max'], 'col3': 'sum'})"
-  },
-  {
-    "objectID": "posts/2025-06-14-pandas-agg.html#问题背景",
-    "href": "posts/2025-06-14-pandas-agg.html#问题背景",
-    "title": "Pandas groupby + agg 多函数聚合错误",
-    "section": "",
-    "text": "在聚合多个列时希望对不同列使用不同的函数。\ndf.groupby('col1').agg({'col2': ['mean', 'max'], 'col3': 'sum'})"
-  },
-  {
-    "objectID": "posts/2025-06-14-pandas-agg.html#错误提示",
-    "href": "posts/2025-06-14-pandas-agg.html#错误提示",
-    "title": "Pandas groupby + agg 多函数聚合错误",
-    "section": "错误提示",
-    "text": "错误提示\nSpecificationError: nested renamer is not supported"
-  },
-  {
-    "objectID": "posts/2025-06-14-pandas-agg.html#正确写法",
-    "href": "posts/2025-06-14-pandas-agg.html#正确写法",
-    "title": "Pandas groupby + agg 多函数聚合错误",
-    "section": "正确写法",
-    "text": "正确写法\ndf.groupby('col1').agg(\n    col2_mean=('col2', 'mean'),\n    col2_max=('col2', 'max'),\n    col3_sum=('col3', 'sum')\n)"
-  },
-  {
-    "objectID": "posts/2025-06-14-pandas-agg.html#参考链接",
-    "href": "posts/2025-06-14-pandas-agg.html#参考链接",
-    "title": "Pandas groupby + agg 多函数聚合错误",
-    "section": "参考链接",
-    "text": "参考链接\n\nPandas 官方文档"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Welcome to My Tech Blog",
-    "section": "",
-    "text": "This is the homepage of your personal technical blog powered by Quarto."
-  },
-  {
-    "objectID": "posts/index.qmd/2025-06-14-pandas-agg.html",
-    "href": "posts/index.qmd/2025-06-14-pandas-agg.html",
-    "title": "Pandas groupby + agg 多函数聚合错误",
-    "section": "",
-    "text": "在聚合多个列时希望对不同列使用不同的函数。\ndf.groupby('col1').agg({'col2': ['mean', 'max'], 'col3': 'sum'})"
-  },
-  {
-    "objectID": "posts/index.qmd/2025-06-14-pandas-agg.html#问题背景",
-    "href": "posts/index.qmd/2025-06-14-pandas-agg.html#问题背景",
-    "title": "Pandas groupby + agg 多函数聚合错误",
-    "section": "",
-    "text": "在聚合多个列时希望对不同列使用不同的函数。\ndf.groupby('col1').agg({'col2': ['mean', 'max'], 'col3': 'sum'})"
-  },
-  {
-    "objectID": "posts/index.qmd/2025-06-14-pandas-agg.html#错误提示",
-    "href": "posts/index.qmd/2025-06-14-pandas-agg.html#错误提示",
-    "title": "Pandas groupby + agg 多函数聚合错误",
-    "section": "错误提示",
-    "text": "错误提示\nSpecificationError: nested renamer is not supported"
-  },
-  {
-    "objectID": "posts/index.qmd/2025-06-14-pandas-agg.html#正确写法",
-    "href": "posts/index.qmd/2025-06-14-pandas-agg.html#正确写法",
-    "title": "Pandas groupby + agg 多函数聚合错误",
-    "section": "正确写法",
-    "text": "正确写法\ndf.groupby('col1').agg(\n    col2_mean=('col2', 'mean'),\n    col2_max=('col2', 'max'),\n    col3_sum=('col3', 'sum')\n)"
-  },
-  {
-    "objectID": "posts/index.qmd/2025-06-14-pandas-agg.html#参考链接",
-    "href": "posts/index.qmd/2025-06-14-pandas-agg.html#参考链接",
-    "title": "Pandas groupby + agg 多函数聚合错误",
-    "section": "参考链接",
-    "text": "参考链接\n\nPandas 官方文档"
-  },
-  {
     "objectID": "posts/index.html",
     "href": "posts/index.html",
     "title": "All Posts",
@@ -152,5 +75,12 @@
     "title": "解决 Google Earth Engine 认证问题的最新方法",
     "section": "",
     "text": "如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to My Tech Blog",
+    "section": "",
+    "text": "This is the homepage of your personal technical blog powered by Quarto."
   }
 ]
