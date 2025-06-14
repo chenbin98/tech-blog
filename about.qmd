@@ -3,8 +3,6 @@ title: "About Me"
 format: html
 ---
 
-# About Me
-
 ## Introduction
 
 I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work.
