@@ -3,4 +3,46 @@ title: "About Me"
 format: html
 ---
 
-Hi! I'm a data science researcher. This is my personal blog to document solutions to technical challenges I encounter.
+# About Me
+
+## Introduction
+
+I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work.
+
+## Research Focus
+
+My research interests include:
+- Agricultural modeling and simulation
+- Machine learning applications in agriculture
+- Remote sensing and GIS in agricultural monitoring
+- Crop yield prediction and analysis
+- Climate-smart agriculture
+
+## Blog Content
+
+This blog primarily focuses on:
+- Technical tutorials and solutions
+- Research methodology discussions
+- Data analysis techniques
+- Programming tips and tricks
+- Agricultural technology insights
+
+## Contact
+
+Feel free to reach out to me for:
+- Research collaborations
+- Technical discussions
+- Questions about blog posts
+- Professional networking
+
+Email: binc041208@gmail.com
+
+## Connect
+
+You can also find me on:
+- [GitHub](https://github.com/chenbin98)
+- [LinkedIn](https://www.linkedin.com/in/bin-chen-49292b312/)
+- [ORCID](https://orcid.org/my-orcid?orcid=0009-0000-8266-940X)
+
+---
+*"Looking for like-minded friends to do something different together."*

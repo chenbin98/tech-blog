@@ -3,4 +3,30 @@ title: "Welcome to My Tech Blog"
 format: html
 ---
 
-This is the homepage of your personal technical blog powered by Quarto.
+欢迎来到我的技术博客！这里记录我在农业数据科学领域的研究心得和技术解决方案。
+
+## 研究方向
+
+- **农业建模与模拟**：传统作物模型与机器学习方法的结合
+- **遥感与GIS**：农业监测与空间分析
+- **智慧农业设备**：农业气象，灌溉，施肥，病虫害等农业传感器技术
+- **气候变化的适宜性**：气候变化对农业的影响和缓解路径
+
+## 技术栈
+
+- 编程语言：Python, R, JavaScript
+- 数据科学：Pandas, NumPy, Scikit-learn
+- 地理信息：Google Earth Engine, QGIS
+- 可视化：Matplotlib, Seaborn, Plotly
+- 版本控制：Git, GitHub
+
+## 联系方式
+
+- Email: binc041208@gmail.com
+- GitHub: [chenbin98](https://github.com/chenbin98)
+- LinkedIn: [Bin Chen](https://www.linkedin.com/in/bin-chen-49292b312/)
+- ORCID: [0009-0000-8266-940X](https://orcid.org/my-orcid?orcid=0009-0000-8266-940X)
+
+---
+
+*"Looking for like-minded friends to do something different together."*
