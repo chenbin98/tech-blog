@@ -1,0 +1,6 @@
+---
+title: "About Me"
+format: html
+---
+
+Hi! I'm a data science researcher. This is my personal blog to document solutions to technical challenges I encounter.

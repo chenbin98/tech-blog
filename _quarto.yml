@@ -1,0 +1,28 @@
+project:
+  type: website
+
+website:
+  title: "Binchen's Tech Blog"
+  navbar:
+    left:
+      - text: Home
+        href: index.qmd
+      - text: Posts
+        href: posts/
+      - text: About
+        href: about.qmd
+  page-footer:
+    left: "© 2025 Binchen Chen"
+    right: "Built with Quarto"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+
+collections:
+  posts:
+    categories: true
+    exclude:
+      - index.qmd
+      - about.qmd

@@ -1,0 +1,82 @@
+---
+title: "Python 本地包安装与更新指南"
+date: 2025-06-08
+categories: [技术教程, Python]
+tags: [Python, pip, conda, 包管理]
+---
+
+# Python 本地包安装与更新指南
+
+本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。
+
+## 标准安装流程
+
+### 1. 构建包
+
+首先，在 cbgeo 目录下使用 base 环境构建包：
+
+```bash
+conda activate base
+python setup.py sdist bdist_wheel
+```
+
+### 2. 安装包
+
+使用 pip 安装构建好的包：
+
+```bash
+pip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl
+```
+
+### 3. 更新包
+
+如果需要更新已安装的包，使用 `--force-reinstall` 参数：
+
+```bash
+pip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall
+```
+
+## 临时安装方法
+
+如果只需要临时使用包，可以采用以下方法：
+
+1. 创建新的 conda 环境（可选）：
+```bash
+conda create -n myenv python=3.x
+conda activate myenv
+```
+
+2. 进入 setup.py 所在目录：
+```bash
+cd path/to/package/directory
+```
+
+3. 使用 pip 直接安装：
+```bash
+pip install -e .
+```
+
+## 注意事项
+
+- 确保已安装 `wheel` 和 `setuptools` 包
+- 使用 `-e` 参数进行开发模式安装，方便调试和修改
+- 安装前检查 Python 环境版本兼容性
+- 建议在虚拟环境中进行安装，避免影响系统 Python 环境
+
+## 常见问题
+
+如果遇到安装问题，可以尝试：
+
+1. 清理构建文件：
+```bash
+rm -rf build/ dist/ *.egg-info/
+```
+
+2. 重新构建并安装：
+```bash
+python setup.py clean --all
+python setup.py sdist bdist_wheel
+pip install -e .
+```
+
+

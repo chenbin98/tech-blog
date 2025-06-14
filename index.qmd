@@ -1,0 +1,6 @@
+---
+title: "Welcome to My Tech Blog"
+format: html
+---
+
+This is the homepage of your personal technical blog powered by Quarto.
