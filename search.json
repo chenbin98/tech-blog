@@ -4,28 +4,14 @@
     "href": "index.html",
     "title": "Welcome to My Tech Blog",
     "section": "",
-    "text": "Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science.\n\n\nCheck out my latest technical articles in the Posts section.\n\n\n\n\nAgricultural Modeling & Simulation\nRemote Sensing & GIS\nSmart Agriculture Devices\nClimate Change Adaptation\n\n\n\n\nEmail: binc041208@gmail.com"
+    "text": "Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science."
   },
   {
     "objectID": "index.html#latest-posts",
     "href": "index.html#latest-posts",
     "title": "Welcome to My Tech Blog",
-    "section": "",
-    "text": "Check out my latest technical articles in the Posts section."
-  },
-  {
-    "objectID": "index.html#research-focus",
-    "href": "index.html#research-focus",
-    "title": "Welcome to My Tech Blog",
-    "section": "",
-    "text": "Agricultural Modeling & Simulation\nRemote Sensing & GIS\nSmart Agriculture Devices\nClimate Change Adaptation"
-  },
-  {
-    "objectID": "index.html#contact",
-    "href": "index.html#contact",
-    "title": "Welcome to My Tech Blog",
-    "section": "",
-    "text": "Email: binc041208@gmail.com"
+    "section": "1 Latest Posts",
+    "text": "1 Latest Posts\nHere are my most recent technical articles:\n\n1.1 🚀 使用 Geemap 从 GEE 下载全球栅格数据\nDate: Sep 1, 2025\n使用 geemap Python 库从谷歌地球引擎下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n阅读更多 →\n\n\n1.2 🔧 Python 论文图片尺寸规范指南\nDate: Jun 10, 2025\n详细介绍如何在 Python 中设置符合学术期刊要求的图片尺寸和格式，适用于 Elsevier 等出版社的论文投稿。\n阅读更多 →\n\n\n1.3 🌱 机器学习与传统作物模型的未来展望\nDate: Jun 1, 2025\n探讨机器学习如何改变传统作物模型的发展方向，以及未来农业建模的趋势和挑战。\n阅读更多 →\n\n📚 View All Posts → - 查看更多技术文档"
   },
   {
     "objectID": "posts/2025-6-8-local_package_install.html",
