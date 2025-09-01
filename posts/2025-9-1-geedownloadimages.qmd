@@ -1,0 +1,308 @@
+# 原文摘要
+本文重点介绍了使用 `geemap` 库（由吴秋生教授开发）从谷歌地球引擎（GEE）下载全球 MOD17A3HGF 净初级生产力（NPP）数据（2001-2024年，500米分辨率）的技术实现，以及后续的图像镶嵌处理。文章解决了直接下载 GEE 数据的局限性（如高分辨率全球数据的像素数量限制），并提供了实用的解决方案，包括**基于网格的分段下载与断点续传功能**和**使用 GDAL 的并行图像镶嵌**以提高效率。核心内容包括：
+1. 环境初始化和数据预览：加载 `geemap`、`ee`（GEE API）和 `geopandas` 库；在云端预览 NPP 数据并应用缩放因子（乘以 0.0001）将 GEE 数据转换为实际值。
+2. 支持断点续传的分段下载：使用预分割的全球网格（GeoPackage 格式）将全球数据分割为可管理的块，跳过已下载的文件以支持中断后恢复，并配置批处理大小和分辨率等参数。
+3. 图像镶嵌：使用 `rasterio` 和 GDAL 多线程镶嵌分段年度 NPP 数据，通过限制并行处理为单年数据来优化内存使用（避免多年并行处理导致的内存不足问题），并对输出文件使用 LZW 压缩。
+
+
+# 使用 Geemap 从 GEE 下载全球栅格数据
+## 1. 概述
+本技术文档提供了使用 `geemap` Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的通用工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。
+
+
+## 2. 前置要求
+### 2.1 软件和库
+确保安装以下工具和库：
+| 工具/库 | 用途 | 安装命令 |
+|---------|------|----------|
+| Python | 核心编程环境 | 从 [python.org](https://python.org/) 下载 |
+| `geemap` | GEE 可视化和数据下载 | `pip install geemap` |
+| `earthengine-api` (ee) | GEE Python API | `pip install earthengine-api`（然后通过 `earthengine authenticate` 进行身份验证） |
+| `geopandas` | 读取矢量网格数据（用于分段） | `pip install geopandas` |
+| `rasterio` | 图像镶嵌和栅格处理 | `pip install rasterio` |
+| GDAL | 栅格操作后端（多线程） | 随 `rasterio` 包含（或通过 `conda install gdal` 安装以获得完整支持） |
+
+### 2.2 数据准备
+- **GEE 栅格数据集 ID**：在 GEE 中识别目标数据集 ID（如 NPP 的 `MODIS/061/MOD17A3HGF`，Landsat 8 的 `LANDSAT/LC08/C02/T1_L2`）。
+- **全球矢量网格**：准备预分割的矢量网格（如 GeoPackage `.gpkg` 格式），将全球研究区域分割为较小的、可下载的块。示例：`WorldFishnet.gpkg`（可根据数据分辨率自定义网格大小）。
+
+
+## 3. 步骤 1：初始化环境和预览数据
+### 3.1 加载库
+```python
+import ee
+import geemap
+import os
+import geopandas as gpd
+```
+
+### 3.2 身份验证和初始化 GEE
+```python
+# 身份验证 GEE（运行一次；如果已经身份验证则跳过）
+# ee.Authenticate()
+
+# 初始化 GEE API
+ee.Initialize()
+```
+
+### 3.3 加载和预处理 GEE 数据
+#### 3.3.1 定义核心参数
+```python
+# 为您的目标数据集自定义这些参数
+GEE_DATA_ID = "MODIS/061/MOD17A3HGF"  # 示例：MODIS NPP 数据集
+BAND_NAME = "Npp"  # 目标波段名称
+TIME_RANGE = ["2001-01-01", "2025-01-01"]  # 时间范围（开始，结束）
+SCALING_FACTOR = 0.0001  # 缩放因子，将 GEE 数据转换为实际值（查看数据集文档）
+VIS_PARAMS = {
+    "min": 0,
+    "max": 3,
+    "palette": ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", 
+                "99b718", "74a901", "66a000", "529400", "3e8601", 
+                "207401", "056201", "004c00", "023b01", "012e01", 
+                "011d01", "011301"]  # 根据数据集范围调整
+}
+```
+
+#### 3.3.2 加载和预处理数据
+```python
+# 加载 GEE 图像集合
+image_collection = ee.ImageCollection(GEE_DATA_ID)\
+    .filterDate(TIME_RANGE[0], TIME_RANGE[1])\
+    .select(BAND_NAME)
+
+# 定义应用缩放因子的函数
+def apply_scaling(image):
+    return image.multiply(SCALING_FACTOR)
+
+# 将缩放应用到集合
+scaled_collection = image_collection.map(apply_scaling)
+```
+
+### 3.4 在 Geemap 中预览数据
+```python
+# 初始化 geemap 界面
+Map = geemap.Map(center=(40, 100), zoom=4)  # 以欧亚大陆为中心（根据需要调整）
+
+# 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）
+preview_image = scaled_collection.median()
+
+# 将图像添加到地图
+Map.addLayer(preview_image, VIS_PARAMS, f"{GEE_DATA_ID.split('/')[-1]}_Preview")
+
+# 添加颜色条图例
+Map.add_colorbar_branca(
+    colors=VIS_PARAMS["palette"],
+    vmin=VIS_PARAMS["min"],
+    vmax=VIS_PARAMS["max"],
+    label=BAND_NAME,
+    position="bottomright"
+)
+
+# 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）
+Map
+```
+
+
+## 4. 步骤 2：支持断点续传的分段下载
+直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。
+
+### 4.1 定义下载参数
+```python
+# 文件路径（自定义这些）
+GRID_PATH = "I:/geemap/roi/WorldFishnet.gpkg"  # 矢量网格路径
+GRID_LAYER = "WorldFish30"  # GeoPackage 中的图层名称
+OUTPUT_DIR = "I:/geemap/GEE_Global_Data/"  # 保存分段文件的目录
+RESOLUTION = 500  # 数据集分辨率（米；如 Landsat 为 30，MODIS 为 500）
+BATCH_SIZE = 5  # 每批处理的网格块数量（避免内存过载）
+START_YEAR = 2001  # 从此年开始恢复（如果下载被中断）
+START_GRID_INDEX = 0  # 从此网格索引恢复（如果下载被中断）
+CRS = "EPSG:4326"  # 目标坐标系（WGS84）
+```
+
+### 4.2 加载矢量网格和创建输出目录
+```python
+# 使用 geopandas 加载矢量网格
+grid_gdf = gpd.read_file(GRID_PATH, layer=GRID_LAYER)
+
+# 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection
+grid_ee = geemap.gdf_to_ee(grid_gdf)
+
+# 创建输出目录（如果不存在）
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+```
+
+### 4.3 支持断点续传的批处理下载
+```python
+# 从时间范围获取年份列表（根据数据集的时间频率调整）
+years = range(int(TIME_RANGE[0].split("-")[0]), int(TIME_RANGE[1].split("-")[0]))
+
+# 遍历每一年
+for year in years:
+    # 跳过恢复开始年份之前的年份
+    if year < START_YEAR:
+        continue
+    print(f"正在处理 {year} 年的数据...")
+
+    # 提取年度数据（对非年度数据集使用 filterDate）
+    annual_image = scaled_collection\
+        .filter(ee.Filter.calendarRange(year, year, "year"))\
+        .median()  # 如果数据集每年是单图像，使用 "first()"
+
+    # 获取网格块总数
+    total_grids = grid_ee.size().getInfo()
+
+    # 计算批次数
+    num_batches = (total_grids - START_GRID_INDEX + BATCH_SIZE - 1) // BATCH_SIZE
+
+    # 处理每批
+    for batch in range(num_batches):
+        batch_start = START_GRID_INDEX + batch * BATCH_SIZE
+        batch_end = min(batch_start + BATCH_SIZE, total_grids)
+        current_batch = grid_ee.toList(BATCH_SIZE, batch_start)  # 获取当前批次的网格
+
+        # 处理批次中的每个网格块
+        for i in range(batch_end - batch_start):
+            # 获取当前网格要素和几何形状
+            grid_feature = ee.Feature(current_batch.get(i))
+            grid_geom = grid_feature.geometry()
+
+            # 生成唯一文件名（如 "NPP_2001_grid_0001.tif"）
+            grid_index = batch_start + i + 1
+            filename = f"{BAND_NAME}_{year}_grid_{grid_index:04d}.tif"
+            file_path = os.path.join(OUTPUT_DIR, filename)
+
+            # 如果文件已存在则跳过（断点续传功能）
+            if os.path.exists(file_path):
+                print(f"跳过现有文件: {filename}")
+                continue
+
+            # 下载裁剪后的图像
+            try:
+                # 将年度图像裁剪到当前网格
+                clipped_image = annual_image.clip(grid_geom)
+
+                # 使用 geemap 下载
+                geemap.download_ee_image(
+                    image=clipped_image,
+                    filename=file_path,
+                    scale=RESOLUTION,
+                    region=grid_geom,
+                    crs=CRS,
+                    max_tile_size=1024  # 根据内存调整（1024 = 每块 1024x1024 像素）
+                )
+                print(f"成功下载: {filename}")
+
+            except Exception as e:
+                print(f"下载 {filename} 失败: {str(e)}")
+                continue
+
+    # 为下一年重置网格索引（对多年下载至关重要）
+    START_GRID_INDEX = 0
+
+print("所有下载任务完成！")
+```
+
+
+## 5. 步骤 3：镶嵌分段文件
+使用 `rasterio` 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。
+
+### 5.1 定义镶嵌参数
+```python
+# 文件路径（自定义这些）
+INPUT_DIR = OUTPUT_DIR  # 与下载输出目录相同
+MOSAIC_OUTPUT_DIR = "I:/geemap/GEE_Global_Data/Mosaicked/"  # 镶嵌文件的目录
+COMPRESSION = "LZW"  # 压缩方法（减少文件大小；选项：LZW、DEFLATE、None）
+```
+
+### 5.2 启用 GDAL 多线程
+```python
+# 启用 GDAL 多线程以加速镶嵌
+os.environ["GDAL_NUM_THREADS"] = "ALL_CPUS"  # 使用所有可用 CPU（或设置为数字如 "4"）
+```
+
+### 5.3 镶嵌年度文件
+```python
+import re
+from rasterio.merge import merge
+from rasterio.enums import Resampling
+
+# 为镶嵌文件创建输出目录
+os.makedirs(MOSAIC_OUTPUT_DIR, exist_ok=True)
+
+# 按年份分组分段文件（使用正则表达式从文件名中提取年份）
+file_pattern = re.compile(rf"{BAND_NAME}_(\d{{4}})_grid_\d{{4}}\.tif$")
+yearly_files = {}
+
+for filename in os.listdir(INPUT_DIR):
+    match = file_pattern.match(filename)
+    if match:
+        year = match.group(1)
+        file_path = os.path.join(INPUT_DIR, filename)
+        yearly_files.setdefault(year, []).append(file_path)
+
+# 镶嵌每年的文件
+for year, file_list in yearly_files.items():
+    print(f"正在镶嵌 {year} 年的 {len(file_list)} 个文件...")
+    datasets = []
+
+    try:
+        # 打开所有分段文件（确保一致的 CRS/分辨率）
+        for file_path in file_list:
+            src = rasterio.open(file_path)
+            datasets.append(src)
+
+        # 执行镶嵌（对离散数据使用最近邻重采样；对连续数据进行调整）
+        mosaic_array, out_transform = merge(
+            datasets,
+            resampling=Resampling.nearest  # 选项：nearest、bilinear、cubic（用于连续数据）
+        )
+
+        # 更新镶嵌文件的元数据
+        out_meta = datasets[0].meta.copy()
+        out_meta.update({
+            "driver": "GTiff",
+            "height": mosaic_array.shape[1],  # 栅格高度（行）
+            "width": mosaic_array.shape[2],   # 栅格宽度（列）
+            "transform": out_transform,
+            "compress": COMPRESSION,
+            "bigtiff": "YES"  # 对大文件启用（>4GB）
+        })
+
+        # 保存镶嵌文件
+        output_path = os.path.join(MOSAIC_OUTPUT_DIR, f"{BAND_NAME}_{year}_Global.tif")
+        with rasterio.open(output_path, "w", **out_meta) as dest:
+            dest.write(mosaic_array)
+
+        print(f"成功镶嵌: {output_path}")
+
+    except Exception as e:
+        print(f"镶嵌 {year} 年数据失败: {str(e)}")
+        continue
+
+    finally:
+        # 关闭所有打开的栅格数据集以释放内存
+        for ds in datasets:
+            ds.close()
+
+print("所有镶嵌任务完成！")
+```
+
+
+## 6. 注意事项和故障排除
+### 6.1 常见问题
+1. **GEE 身份验证错误**：重新运行 `ee.Authenticate()` 并按照浏览器提示重新进行身份验证。
+2. **下载中断**：工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复。
+3. **内存过载**：减少下载步骤中的 `BATCH_SIZE`（如从 5 到 3）或 `max_tile_size`（如从 1024 到 512）。
+4. **镶嵌失败**：确保所有分段文件具有相同的 CRS 和分辨率（通过 `rasterio.open(file_path).crs` 检查）。
+
+### 6.2 自定义提示
+- **非年度数据**：对于月度/季节性数据，修改时间过滤器（如 `ee.Filter.calendarRange(year, year, "year").filter(ee.Filter.calendarRange(6, 8, "month"))` 用于夏季数据）。
+- **不同数据集**：更新 `GEE_DATA_ID`、`BAND_NAME`、`SCALING_FACTOR` 和 `VIS_PARAMS`（参考 [GEE 数据集目录](https://developers.google.com/earth-engine/datasets) 了解详情）。
+- **网格调整**：根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）—更细的网格减少下载大小但增加文件数量。
+
+
+## 7. 参考资料
+- `geemap` 文档：[geemap.org](https://geemap.org/)
+- GEE Python API 文档：[developers.google.com/earth-engine](https://developers.google.com/earth-engine/guides/python_install)
+- `rasterio` 镶嵌指南：[rasterio.readthedocs.io](https://rasterio.readthedocs.io/en/latest/topics/merge.html)
+- MODIS MOD17A3HGF 数据集：[GEE MOD17A3HGF 文档](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD17A3HGF)
