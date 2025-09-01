@@ -22,8 +22,6 @@ format:
     toc-location: left
     toc-depth: 3
     page-layout: full
-    code-fold: true
-    code-tools: true
     fig-cap-location: bottom
     number-sections: true
     css: styles.css

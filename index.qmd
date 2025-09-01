@@ -3,21 +3,30 @@ title: "Welcome to My Tech Blog"
 format: html
 ---
 
-# Welcome to My Tech Blog
-
 Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science.
 
 ## Latest Posts
 
-Check out my latest technical articles in the [Posts](/posts/) section.
+Here are my most recent technical articles:
 
-## Research Focus
+### 🚀 使用 Geemap 从 GEE 下载全球栅格数据
+**Date:** Sep 1, 2025  
+使用 geemap Python 库从谷歌地球引擎下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。
 
-- Agricultural Modeling & Simulation
-- Remote Sensing & GIS
-- Smart Agriculture Devices
-- Climate Change Adaptation
+[阅读更多 →](/posts/2025-9-1-geedownloadimages.html)
 
-## Contact
+### 🔧 Python 论文图片尺寸规范指南
+**Date:** Jun 10, 2025  
+详细介绍如何在 Python 中设置符合学术期刊要求的图片尺寸和格式，适用于 Elsevier 等出版社的论文投稿。
 
-Email: binc041208@gmail.com
+[阅读更多 →](/posts/2025-6-10-paper_fig_size.html)
+
+### 🌱 机器学习与传统作物模型的未来展望
+**Date:** Jun 1, 2025  
+探讨机器学习如何改变传统作物模型的发展方向，以及未来农业建模的趋势和挑战。
+
+[阅读更多 →](/posts/2025-6-1-machine_leaning_vs_crop_model.html)
+
+---
+
+📚 **[View All Posts →](/posts/)** - 查看更多技术文档
