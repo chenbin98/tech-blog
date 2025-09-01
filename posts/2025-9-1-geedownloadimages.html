@@ -151,8 +151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#原文摘要" id="toc-原文摘要" class="nav-link active" data-scroll-target="#原文摘要">原文摘要</a></li>
-  <li><a href="#使用-geemap-从-gee-下载全球栅格数据" id="toc-使用-geemap-从-gee-下载全球栅格数据" class="nav-link" data-scroll-target="#使用-geemap-从-gee-下载全球栅格数据">使用 Geemap 从 GEE 下载全球栅格数据</a>
+  <li><a href="#使用-geemap-从-gee-下载全球栅格数据" id="toc-使用-geemap-从-gee-下载全球栅格数据" class="nav-link active" data-scroll-target="#使用-geemap-从-gee-下载全球栅格数据">使用 Geemap 从 GEE 下载全球栅格数据</a>
   <ul class="collapse">
   <li><a href="#概述" id="toc-概述" class="nav-link" data-scroll-target="#概述">1. 概述</a></li>
   <li><a href="#前置要求" id="toc-前置要求" class="nav-link" data-scroll-target="#前置要求">2. 前置要求</a>
@@ -195,10 +194,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="原文摘要" class="level1">
-<h1>原文摘要</h1>
-<p>本文重点介绍了使用 <code>geemap</code> 库（由吴秋生教授开发）从谷歌地球引擎（GEE）下载全球 MOD17A3HGF 净初级生产力（NPP）数据（2001-2024年，500米分辨率）的技术实现，以及后续的图像镶嵌处理。文章解决了直接下载 GEE 数据的局限性（如高分辨率全球数据的像素数量限制），并提供了实用的解决方案，包括<strong>基于网格的分段下载与断点续传功能</strong>和<strong>使用 GDAL 的并行图像镶嵌</strong>以提高效率。核心内容包括： 1. 环境初始化和数据预览：加载 <code>geemap</code>、<code>ee</code>（GEE API）和 <code>geopandas</code> 库；在云端预览 NPP 数据并应用缩放因子（乘以 0.0001）将 GEE 数据转换为实际值。 2. 支持断点续传的分段下载：使用预分割的全球网格（GeoPackage 格式）将全球数据分割为可管理的块，跳过已下载的文件以支持中断后恢复，并配置批处理大小和分辨率等参数。 3. 图像镶嵌：使用 <code>rasterio</code> 和 GDAL 多线程镶嵌分段年度 NPP 数据，通过限制并行处理为单年数据来优化内存使用（避免多年并行处理导致的内存不足问题），并对输出文件使用 LZW 压缩。</p>
-</section>
 <section id="使用-geemap-从-gee-下载全球栅格数据" class="level1">
 <h1>使用 Geemap 从 GEE 下载全球栅格数据</h1>
 <section id="概述" class="level2">
