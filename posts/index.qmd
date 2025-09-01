@@ -1,5 +1,20 @@
 ---
-title: "All Posts"
+title: "技术文档"
 listing: default
 ---
-Welcome to my collection of technical articles.
+
+# 技术文档
+
+这里收录了我在农业数据科学领域的技术笔记和解决方案。文档按时间倒序排列，最新的内容在最前面。
+
+## 按分类浏览
+
+- **技术教程**: 实用的技术操作指南
+- **GEE**: Google Earth Engine 相关技术
+- **Python**: Python 编程技巧
+- **机器学习**: 机器学习在农业中的应用
+- **数据可视化**: 科研图表制作技巧
+
+---
+
+*持续更新中，欢迎关注！*

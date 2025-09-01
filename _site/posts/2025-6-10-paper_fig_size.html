@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-06-13">
+<meta name="dcterms.date" content="2025-06-10">
 
-<title>解决 Google Earth Engine 认证问题的最新方法 – Binchen’s Tech Blog</title>
+<title>Python 论文图片尺寸规范指南 – Binchen’s Tech Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -152,17 +152,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#解决-google-earth-engine-认证问题的最新方法" id="toc-解决-google-earth-engine-认证问题的最新方法" class="nav-link active" data-scroll-target="#解决-google-earth-engine-认证问题的最新方法"><span class="header-section-number">1</span> 解决 Google Earth Engine 认证问题的最新方法</a>
+  <li><a href="#python-论文图片尺寸规范指南" id="toc-python-论文图片尺寸规范指南" class="nav-link active" data-scroll-target="#python-论文图片尺寸规范指南"><span class="header-section-number">1</span> Python 论文图片尺寸规范指南</a>
   <ul class="collapse">
-  <li><a href="#认证步骤" id="toc-认证步骤" class="nav-link" data-scroll-target="#认证步骤"><span class="header-section-number">1.1</span> 认证步骤</a>
+  <li><a href="#elsevier-图片尺寸规范" id="toc-elsevier-图片尺寸规范" class="nav-link" data-scroll-target="#elsevier-图片尺寸规范"><span class="header-section-number">1.1</span> Elsevier 图片尺寸规范</a></li>
+  <li><a href="#python-中设置图片尺寸" id="toc-python-中设置图片尺寸" class="nav-link" data-scroll-target="#python-中设置图片尺寸"><span class="header-section-number">1.2</span> Python 中设置图片尺寸</a>
   <ul class="collapse">
-  <li><a href="#安装-google-cloud-sdk-gcloud" id="toc-安装-google-cloud-sdk-gcloud" class="nav-link" data-scroll-target="#安装-google-cloud-sdk-gcloud"><span class="header-section-number">1.1.1</span> 1. 安装 Google Cloud SDK (gcloud)</a></li>
-  <li><a href="#配置-gcloud" id="toc-配置-gcloud" class="nav-link" data-scroll-target="#配置-gcloud"><span class="header-section-number">1.1.2</span> 2. 配置 gcloud</a></li>
-  <li><a href="#启用-earth-engine-api" id="toc-启用-earth-engine-api" class="nav-link" data-scroll-target="#启用-earth-engine-api"><span class="header-section-number">1.1.3</span> 3. 启用 Earth Engine API</a></li>
-  <li><a href="#重新认证-earth-engine" id="toc-重新认证-earth-engine" class="nav-link" data-scroll-target="#重新认证-earth-engine"><span class="header-section-number">1.1.4</span> 4. 重新认证 Earth Engine</a></li>
+  <li><a href="#使用-matplotlib" id="toc-使用-matplotlib" class="nav-link" data-scroll-target="#使用-matplotlib"><span class="header-section-number">1.2.1</span> 使用 Matplotlib</a></li>
+  <li><a href="#使用-seaborn" id="toc-使用-seaborn" class="nav-link" data-scroll-target="#使用-seaborn"><span class="header-section-number">1.2.2</span> 使用 Seaborn</a></li>
   </ul></li>
-  <li><a href="#注意事项" id="toc-注意事项" class="nav-link" data-scroll-target="#注意事项"><span class="header-section-number">1.2</span> 注意事项</a></li>
-  <li><a href="#常见问题" id="toc-常见问题" class="nav-link" data-scroll-target="#常见问题"><span class="header-section-number">1.3</span> 常见问题</a></li>
+  <li><a href="#其他注意事项" id="toc-其他注意事项" class="nav-link" data-scroll-target="#其他注意事项"><span class="header-section-number">1.3</span> 其他注意事项</a></li>
+  <li><a href="#代码示例" id="toc-代码示例" class="nav-link" data-scroll-target="#代码示例"><span class="header-section-number">1.4</span> 代码示例</a></li>
+  <li><a href="#常见问题" id="toc-常见问题" class="nav-link" data-scroll-target="#常见问题"><span class="header-section-number">1.5</span> 常见问题</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -176,10 +176,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">解决 Google Earth Engine 认证问题的最新方法</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">Python 论文图片尺寸规范指南</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
   <div class="quarto-categories">
     <div class="quarto-category">技术教程</div>
-    <div class="quarto-category">GEE</div>
+    <div class="quarto-category">数据可视化</div>
   </div>
   </div>
 
@@ -191,7 +191,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 13, 2025</p>
+      <p class="date">June 10, 2025</p>
     </div>
   </div>
   
@@ -203,53 +203,123 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="解决-google-earth-engine-认证问题的最新方法" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> 解决 Google Earth Engine 认证问题的最新方法</h1>
-<p>最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。</p>
-<section id="认证步骤" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="认证步骤"><span class="header-section-number">1.1</span> 认证步骤</h2>
-<section id="安装-google-cloud-sdk-gcloud" class="level3" data-number="1.1.1">
-<h3 data-number="1.1.1" class="anchored" data-anchor-id="安装-google-cloud-sdk-gcloud"><span class="header-section-number">1.1.1</span> 1. 安装 Google Cloud SDK (gcloud)</h3>
-<p>首先需要安装 Google Cloud SDK，这是进行认证的必要工具。</p>
+<section id="python-论文图片尺寸规范指南" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Python 论文图片尺寸规范指南</h1>
+<p>在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。</p>
+<section id="elsevier-图片尺寸规范" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="elsevier-图片尺寸规范"><span class="header-section-number">1.1</span> Elsevier 图片尺寸规范</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>用途</th>
+<th>宽度 × 高度（英寸）</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>单栏图</td>
+<td>3.5 × 2.5</td>
+<td>常用于插图、简单图</td>
+</tr>
+<tr class="even">
+<td>1.5 栏图</td>
+<td>4.75 × 3.5</td>
+<td>用于稍复杂的图</td>
+</tr>
+<tr class="odd">
+<td>全栏图</td>
+<td>6.89 × 4.5</td>
+<td>推荐用于双栏图或主图</td>
+</tr>
+<tr class="even">
+<td>宽幅图（横图）</td>
+<td>6.89 × 2.5</td>
+<td>常用于时间序列或宽图</td>
+</tr>
+</tbody>
+</table>
 </section>
-<section id="配置-gcloud" class="level3" data-number="1.1.2">
-<h3 data-number="1.1.2" class="anchored" data-anchor-id="配置-gcloud"><span class="header-section-number">1.1.2</span> 2. 配置 gcloud</h3>
+<section id="python-中设置图片尺寸" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="python-中设置图片尺寸"><span class="header-section-number">1.2</span> Python 中设置图片尺寸</h2>
+<section id="使用-matplotlib" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="使用-matplotlib"><span class="header-section-number">1.2.1</span> 使用 Matplotlib</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置图片尺寸（英寸）</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">3.5</span>, <span class="fl">2.5</span>))  <span class="co"># 单栏图</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 或</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.89</span>, <span class="fl">4.5</span>))  <span class="co"># 全栏图</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="使用-seaborn" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="使用-seaborn"><span class="header-section-number">1.2.2</span> 使用 Seaborn</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置图片尺寸</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">3.5</span>, <span class="fl">2.5</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(rc<span class="op">=</span>{<span class="st">'figure.figsize'</span>: (<span class="fl">3.5</span>, <span class="fl">2.5</span>)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="其他注意事项" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="其他注意事项"><span class="header-section-number">1.3</span> 其他注意事项</h2>
 <ol type="1">
-<li>打开终端，运行以下命令登录：</li>
-</ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> auth login</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<ol start="2" type="1">
-<li>设置项目：</li>
-</ol>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> config set project <span class="pp">[</span><span class="ss">你的项目ID</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="启用-earth-engine-api" class="level3" data-number="1.1.3">
-<h3 data-number="1.1.3" class="anchored" data-anchor-id="启用-earth-engine-api"><span class="header-section-number">1.1.3</span> 3. 启用 Earth Engine API</h3>
-<p>运行以下命令启用 Earth Engine API 服务：</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> services enable earthengine.googleapis.com</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="重新认证-earth-engine" class="level3" data-number="1.1.4">
-<h3 data-number="1.1.4" class="anchored" data-anchor-id="重新认证-earth-engine"><span class="header-section-number">1.1.4</span> 4. 重新认证 Earth Engine</h3>
-<p>最后，使用以下命令进行 Earth Engine 的重新认证：</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">earthengine</span> authenticate <span class="at">--force</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>系统会自动使用 gcloud 的方式进行认证。</p>
-</section>
-</section>
-<section id="注意事项" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="注意事项"><span class="header-section-number">1.2</span> 注意事项</h2>
+<li>分辨率要求：
 <ul>
-<li>确保已经安装了最新版本的 Google Cloud SDK</li>
-<li>确保有正确的 Google Cloud 项目权限</li>
-<li>如果遇到问题，可以尝试先运行 <code>gcloud auth revoke</code> 清除旧的认证信息</li>
-</ul>
+<li>建议使用 300 DPI 或更高</li>
+<li>保存时使用 <code>plt.savefig('figure.png', dpi=300)</code></li>
+</ul></li>
+<li>文件格式：
+<ul>
+<li>推荐使用 PDF 或 EPS 格式（矢量图）</li>
+<li>或使用高分辨率 PNG 格式</li>
+</ul></li>
+<li>字体大小：
+<ul>
+<li>标题：12-14pt</li>
+<li>轴标签：10-12pt</li>
+<li>图例：10pt</li>
+<li>刻度标签：8-10pt</li>
+</ul></li>
+</ol>
 </section>
-<section id="常见问题" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="常见问题"><span class="header-section-number">1.3</span> 常见问题</h2>
-<p>如果认证过程中遇到问题，可以：</p>
+<section id="代码示例" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="代码示例"><span class="header-section-number">1.4</span> 代码示例</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置图片尺寸和样式</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.89</span>, <span class="fl">4.5</span>))  <span class="co"># 全栏图</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>sns.set_context(<span class="st">"paper"</span>, font_scale<span class="op">=</span><span class="fl">1.2</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制图形</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ... 你的绘图代码 ...</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 保存图片</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'figure.pdf'</span>, </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            dpi<span class="op">=</span><span class="dv">300</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>            bbox_inches<span class="op">=</span><span class="st">'tight'</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            pad_inches<span class="op">=</span><span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="常见问题" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="常见问题"><span class="header-section-number">1.5</span> 常见问题</h2>
 <ol type="1">
-<li>检查 gcloud 是否正确安装：<code>gcloud --version</code></li>
-<li>确认项目设置：<code>gcloud config list</code></li>
-<li>验证 API 是否已启用：<code>gcloud services list --enabled</code></li>
+<li>图片模糊：
+<ul>
+<li>检查 DPI 设置</li>
+<li>使用矢量格式（PDF/EPS）</li>
+<li>确保原始数据分辨率足够</li>
+</ul></li>
+<li>图片过大：
+<ul>
+<li>使用 <code>bbox_inches='tight'</code> 自动调整边距</li>
+<li>适当调整 <code>pad_inches</code> 参数</li>
+</ul></li>
+<li>文字不清晰：
+<ul>
+<li>使用 <code>plt.rcParams['font.size']</code> 调整字体大小</li>
+<li>确保使用支持中文的字体（如 SimHei）</li>
+</ul></li>
 </ol>
 
 
@@ -709,64 +779,100 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     }
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "解决 Google Earth Engine 认证问题的最新方法"</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 2025-06-13</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [技术教程, GEE]</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [Google Earth Engine, 认证, gcloud]</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu"># 解决 Google Earth Engine 认证问题的最新方法</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## 认证步骤</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. 安装 Google Cloud SDK (gcloud)</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>首先需要安装 Google Cloud SDK，这是进行认证的必要工具。</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. 配置 gcloud</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>打开终端，运行以下命令登录：</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> auth login</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>设置项目：</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> config set project <span class="pp">[</span><span class="ss">你的项目ID</span><span class="pp">]</span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3. 启用 Earth Engine API</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>运行以下命令启用 Earth Engine API 服务：</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> services enable earthengine.googleapis.com</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4. 重新认证 Earth Engine</span></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>最后，使用以下命令进行 Earth Engine 的重新认证：</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="ex">earthengine</span> authenticate <span class="at">--force</span></span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>系统会自动使用 gcloud 的方式进行认证。</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="fu">## 注意事项</span></span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>确保已经安装了最新版本的 Google Cloud SDK</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>确保有正确的 Google Cloud 项目权限</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>如果遇到问题，可以尝试先运行 <span class="in">`gcloud auth revoke`</span> 清除旧的认证信息</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## 常见问题</span></span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>如果认证过程中遇到问题，可以：</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>检查 gcloud 是否正确安装：<span class="in">`gcloud --version`</span></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>确认项目设置：<span class="in">`gcloud config list`</span></span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>验证 API 是否已启用：<span class="in">`gcloud services list --enabled`</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Python 论文图片尺寸规范指南"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 2025-06-10</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [技术教程, 数据可视化]</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [Python, 论文写作, 数据可视化, 图片尺寸]</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu"># Python 论文图片尺寸规范指南</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## Elsevier 图片尺寸规范</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 用途 <span class="pp">|</span> 宽度 × 高度（英寸） <span class="pp">|</span> 说明 <span class="pp">|</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="pp">|------|-------------------|------|</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 单栏图 <span class="pp">|</span> 3.5 × 2.5 <span class="pp">|</span> 常用于插图、简单图 <span class="pp">|</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 1.5 栏图 <span class="pp">|</span> 4.75 × 3.5 <span class="pp">|</span> 用于稍复杂的图 <span class="pp">|</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 全栏图 <span class="pp">|</span> 6.89 × 4.5 <span class="pp">|</span> 推荐用于双栏图或主图 <span class="pp">|</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 宽幅图（横图） <span class="pp">|</span> 6.89 × 2.5 <span class="pp">|</span> 常用于时间序列或宽图 <span class="pp">|</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="fu">## Python 中设置图片尺寸</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="fu">### 使用 Matplotlib</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置图片尺寸（英寸）</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">3.5</span>, <span class="fl">2.5</span>))  <span class="co"># 单栏图</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 或</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.89</span>, <span class="fl">4.5</span>))  <span class="co"># 全栏图</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="fu">### 使用 Seaborn</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置图片尺寸</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">3.5</span>, <span class="fl">2.5</span>))</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(rc<span class="op">=</span>{<span class="st">'figure.figsize'</span>: (<span class="fl">3.5</span>, <span class="fl">2.5</span>)})</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="fu">## 其他注意事项</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>分辨率要求：</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>建议使用 300 DPI 或更高</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>保存时使用 <span class="in">`plt.savefig('figure.png', dpi=300)`</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>文件格式：</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>推荐使用 PDF 或 EPS 格式（矢量图）</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>或使用高分辨率 PNG 格式</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>字体大小：</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>标题：12-14pt</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>轴标签：10-12pt</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>图例：10pt</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>刻度标签：8-10pt</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## 代码示例</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置图片尺寸和样式</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.89</span>, <span class="fl">4.5</span>))  <span class="co"># 全栏图</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>sns.set_context(<span class="st">"paper"</span>, font_scale<span class="op">=</span><span class="fl">1.2</span>)</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制图形</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a><span class="co"># ... 你的绘图代码 ...</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a><span class="co"># 保存图片</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'figure.pdf'</span>, </span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>            dpi<span class="op">=</span><span class="dv">300</span>,</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>            bbox_inches<span class="op">=</span><span class="st">'tight'</span>,</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>            pad_inches<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a><span class="fu">## 常见问题</span></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>图片模糊：</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>检查 DPI 设置</span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>使用矢量格式（PDF/EPS）</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>确保原始数据分辨率足够</span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>图片过大：</span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>使用 <span class="in">`bbox_inches='tight'`</span> 自动调整边距</span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>适当调整 <span class="in">`pad_inches`</span> 参数</span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>文字不清晰：</span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>使用 <span class="in">`plt.rcParams['font.size']`</span> 调整字体大小</span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>确保使用支持中文的字体（如 SimHei）</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">

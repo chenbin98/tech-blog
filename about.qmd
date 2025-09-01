@@ -3,6 +3,8 @@ title: "About Me"
 format: html
 ---
 
+# About Me
+
 ## Introduction
 
 I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work.
@@ -10,37 +12,65 @@ I am an agricultural data science researcher passionate about applying modern da
 ## Research Focus
 
 My research interests include:
-- Agricultural modeling and simulation
-- Machine learning applications in agriculture
-- Remote sensing and GIS in agricultural monitoring
-- Crop yield prediction and analysis
-- Climate-smart agriculture
+
+- **Agricultural Modeling & Simulation**  
+  Integration of traditional crop models with machine learning methods
+
+- **Remote Sensing & GIS**  
+  Agricultural monitoring and spatial analysis
+
+- **Smart Agriculture Devices**  
+  Agricultural sensors for weather, irrigation, fertilization, and pest control
+
+- **Crop Yield Prediction & Analysis**  
+  Machine learning approaches for yield forecasting
+
+- **Climate-Smart Agriculture**  
+  Impact of climate change on agriculture and mitigation pathways
 
 ## Blog Content
 
 This blog primarily focuses on:
-- Technical tutorials and solutions
-- Research methodology discussions
-- Data analysis techniques
-- Programming tips and tricks
-- Agricultural technology insights
+
+- **Technical Tutorials & Solutions**  
+  Step-by-step guides for common technical challenges
+
+- **Research Methodology Discussions**  
+  Insights into agricultural research approaches
+
+- **Data Analysis Techniques**  
+  Practical methods for agricultural data processing
+
+- **Programming Tips & Tricks**  
+  Python, R, and other tools in agricultural research
+
+- **Agricultural Technology Insights**  
+  Latest developments in agricultural technology
 
 ## Contact
 
 Feel free to reach out to me for:
+
 - Research collaborations
-- Technical discussions
+- Technical discussions  
 - Questions about blog posts
 - Professional networking
 
-Email: binc041208@gmail.com
+**Email:** binc041208@gmail.com
 
 ## Connect
 
 You can also find me on:
-- [GitHub](https://github.com/chenbin98)
-- [LinkedIn](https://www.linkedin.com/in/bin-chen-49292b312/)
-- [ORCID](https://orcid.org/my-orcid?orcid=0009-0000-8266-940X)
+
+- **[GitHub](https://github.com/chenbin98)**  
+  Check out my open-source projects and code repositories
+
+- **[LinkedIn](https://www.linkedin.com/in/bin-chen-49292b312/)**  
+  Connect with me professionally
+
+- **[ORCID](https://orcid.org/my-orcid?orcid=0009-0000-8266-940X)**  
+  View my research publications and contributions
 
 ---
+
 *"Looking for like-minded friends to do something different together."*

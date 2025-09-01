@@ -2,29 +2,22 @@
 title: "Welcome to My Tech Blog"
 format: html
 ---
+
+# Welcome to My Tech Blog
+
 Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science.
+
+## Latest Posts
+
+Check out my latest technical articles in the [Posts](/posts/) section.
 
 ## Research Focus
 
-- **Agricultural Modeling & Simulation**: Integration of traditional crop models with machine learning methods
-- **Remote Sensing & GIS**: Agricultural monitoring and spatial analysis
-- **Smart Agriculture Devices**: Agricultural sensors for weather, irrigation, fertilization, and pest control
-- **Climate Change Adaptation**: Impact of climate change on agriculture and mitigation pathways
+- Agricultural Modeling & Simulation
+- Remote Sensing & GIS
+- Smart Agriculture Devices
+- Climate Change Adaptation
 
-## Technical Stack
+## Contact
 
-- Programming Languages: Python, R, JavaScript
-- Data Science: Pandas, NumPy, Scikit-learn
-- Geospatial: Google Earth Engine, QGIS
-- Visualization: Matplotlib, Seaborn, Plotly
-- Version Control: Git, GitHub
-
-## Contact Information
-
-- Email: binc041208@gmail.com
-- GitHub: [chenbin98](https://github.com/chenbin98)
-- LinkedIn: [Bin Chen](https://www.linkedin.com/in/bin-chen-49292b312/)
-- ORCID: [0009-0000-8266-940X](https://orcid.org/my-orcid?orcid=0009-0000-8266-940X)
-
----
-*"Looking for like-minded friends to do something different together."*
+Email: binc041208@gmail.com
