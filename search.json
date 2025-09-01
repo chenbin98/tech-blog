@@ -1,80 +1,150 @@
 [
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About Me",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to My Tech Blog",
     "section": "",
-    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
+    "text": "Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science."
   },
   {
-    "objectID": "about.html#introduction",
-    "href": "about.html#introduction",
-    "title": "About Me",
-    "section": "",
-    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
-  },
-  {
-    "objectID": "about.html#research-focus",
-    "href": "about.html#research-focus",
-    "title": "About Me",
+    "objectID": "index.html#research-focus",
+    "href": "index.html#research-focus",
+    "title": "Welcome to My Tech Blog",
     "section": "Research Focus",
-    "text": "Research Focus\nMy research interests include: - Agricultural modeling and simulation - Machine learning applications in agriculture - Remote sensing and GIS in agricultural monitoring - Crop yield prediction and analysis - Climate-smart agriculture"
+    "text": "Research Focus\n\nAgricultural Modeling & Simulation: Integration of traditional crop models with machine learning methods\nRemote Sensing & GIS: Agricultural monitoring and spatial analysis\nSmart Agriculture Devices: Agricultural sensors for weather, irrigation, fertilization, and pest control\nClimate Change Adaptation: Impact of climate change on agriculture and mitigation pathways"
   },
   {
-    "objectID": "about.html#blog-content",
-    "href": "about.html#blog-content",
-    "title": "About Me",
-    "section": "Blog Content",
-    "text": "Blog Content\nThis blog primarily focuses on: - Technical tutorials and solutions - Research methodology discussions - Data analysis techniques - Programming tips and tricks - Agricultural technology insights"
+    "objectID": "index.html#technical-stack",
+    "href": "index.html#technical-stack",
+    "title": "Welcome to My Tech Blog",
+    "section": "Technical Stack",
+    "text": "Technical Stack\n\nProgramming Languages: Python, R, JavaScript\nData Science: Pandas, NumPy, Scikit-learn\nGeospatial: Google Earth Engine, QGIS\nVisualization: Matplotlib, Seaborn, Plotly\nVersion Control: Git, GitHub"
   },
   {
-    "objectID": "about.html#contact",
-    "href": "about.html#contact",
-    "title": "About Me",
-    "section": "Contact",
-    "text": "Contact\nFeel free to reach out to me for: - Research collaborations - Technical discussions - Questions about blog posts - Professional networking\nEmail: binc041208@gmail.com"
+    "objectID": "index.html#contact-information",
+    "href": "index.html#contact-information",
+    "title": "Welcome to My Tech Blog",
+    "section": "Contact Information",
+    "text": "Contact Information\n\nEmail: binc041208@gmail.com\nGitHub: chenbin98\nLinkedIn: Bin Chen\nORCID: 0009-0000-8266-940X\n\n\n“Looking for like-minded friends to do something different together.”"
   },
   {
-    "objectID": "about.html#connect",
-    "href": "about.html#connect",
-    "title": "About Me",
-    "section": "Connect",
-    "text": "Connect\nYou can also find me on: - GitHub - LinkedIn - ORCID\n\n“Looking for like-minded friends to do something different together.”"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-8-local_package_install.html",
+    "href": "posts/2025-6-8-local_package_install.html",
+    "title": "Python 本地包安装与更新指南",
     "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+    "text": "本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。\n\n\n\n\n首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall\n\n\n\n\n如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e .\n\n\n\n\n确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境\n\n\n\n\n如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-8-local_package_install.html#标准安装流程",
+    "href": "posts/2025-6-8-local_package_install.html#标准安装流程",
+    "title": "Python 本地包安装与更新指南",
     "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
+    "text": "首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-8-local_package_install.html#临时安装方法",
+    "href": "posts/2025-6-8-local_package_install.html#临时安装方法",
+    "title": "Python 本地包安装与更新指南",
     "section": "",
-    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
+    "text": "如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e ."
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-8-local_package_install.html#注意事项",
+    "href": "posts/2025-6-8-local_package_install.html#注意事项",
+    "title": "Python 本地包安装与更新指南",
     "section": "",
-    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
+    "text": "确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-8-local_package_install.html#常见问题",
+    "href": "posts/2025-6-8-local_package_install.html#常见问题",
+    "title": "Python 本地包安装与更新指南",
     "section": "",
-    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+    "text": "如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html",
+    "href": "posts/2025-9-1-geedownloadimages.html",
+    "title": "原文摘要",
+    "section": "",
+    "text": "本文重点介绍了使用 geemap 库（由吴秋生教授开发）从谷歌地球引擎（GEE）下载全球 MOD17A3HGF 净初级生产力（NPP）数据（2001-2024年，500米分辨率）的技术实现，以及后续的图像镶嵌处理。文章解决了直接下载 GEE 数据的局限性（如高分辨率全球数据的像素数量限制），并提供了实用的解决方案，包括基于网格的分段下载与断点续传功能和使用 GDAL 的并行图像镶嵌以提高效率。核心内容包括： 1. 环境初始化和数据预览：加载 geemap、ee（GEE API）和 geopandas 库；在云端预览 NPP 数据并应用缩放因子（乘以 0.0001）将 GEE 数据转换为实际值。 2. 支持断点续传的分段下载：使用预分割的全球网格（GeoPackage 格式）将全球数据分割为可管理的块，跳过已下载的文件以支持中断后恢复，并配置批处理大小和分辨率等参数。 3. 图像镶嵌：使用 rasterio 和 GDAL 多线程镶嵌分段年度 NPP 数据，通过限制并行处理为单年数据来优化内存使用（避免多年并行处理导致的内存不足问题），并对输出文件使用 LZW 压缩。"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#概述",
+    "href": "posts/2025-9-1-geedownloadimages.html#概述",
+    "title": "原文摘要",
+    "section": "1. 概述",
+    "text": "1. 概述\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的通用工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#前置要求",
+    "href": "posts/2025-9-1-geedownloadimages.html#前置要求",
+    "title": "原文摘要",
+    "section": "2. 前置要求",
+    "text": "2. 前置要求\n\n2.1 软件和库\n确保安装以下工具和库： | 工具/库 | 用途 | 安装命令 | |———|——|———-| | Python | 核心编程环境 | 从 python.org 下载 | | geemap | GEE 可视化和数据下载 | pip install geemap | | earthengine-api (ee) | GEE Python API | pip install earthengine-api（然后通过 earthengine authenticate 进行身份验证） | | geopandas | 读取矢量网格数据（用于分段） | pip install geopandas | | rasterio | 图像镶嵌和栅格处理 | pip install rasterio | | GDAL | 栅格操作后端（多线程） | 随 rasterio 包含（或通过 conda install gdal 安装以获得完整支持） |\n\n\n2.2 数据准备\n\nGEE 栅格数据集 ID：在 GEE 中识别目标数据集 ID（如 NPP 的 MODIS/061/MOD17A3HGF，Landsat 8 的 LANDSAT/LC08/C02/T1_L2）。\n全球矢量网格：准备预分割的矢量网格（如 GeoPackage .gpkg 格式），将全球研究区域分割为较小的、可下载的块。示例：WorldFishnet.gpkg（可根据数据分辨率自定义网格大小）。"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-1初始化环境和预览数据",
+    "href": "posts/2025-9-1-geedownloadimages.html#步骤-1初始化环境和预览数据",
+    "title": "原文摘要",
+    "section": "3. 步骤 1：初始化环境和预览数据",
+    "text": "3. 步骤 1：初始化环境和预览数据\n\n3.1 加载库\nimport ee\nimport geemap\nimport os\nimport geopandas as gpd\n\n\n3.2 身份验证和初始化 GEE\n# 身份验证 GEE（运行一次；如果已经身份验证则跳过）\n# ee.Authenticate()\n\n# 初始化 GEE API\nee.Initialize()\n\n\n3.3 加载和预处理 GEE 数据\n\n3.3.1 定义核心参数\n# 为您的目标数据集自定义这些参数\nGEE_DATA_ID = \"MODIS/061/MOD17A3HGF\"  # 示例：MODIS NPP 数据集\nBAND_NAME = \"Npp\"  # 目标波段名称\nTIME_RANGE = [\"2001-01-01\", \"2025-01-01\"]  # 时间范围（开始，结束）\nSCALING_FACTOR = 0.0001  # 缩放因子，将 GEE 数据转换为实际值（查看数据集文档）\nVIS_PARAMS = {\n    \"min\": 0,\n    \"max\": 3,\n    \"palette\": [\"ffffff\", \"ce7e45\", \"df923d\", \"f1b555\", \"fcd163\", \n                \"99b718\", \"74a901\", \"66a000\", \"529400\", \"3e8601\", \n                \"207401\", \"056201\", \"004c00\", \"023b01\", \"012e01\", \n                \"011d01\", \"011301\"]  # 根据数据集范围调整\n}\n\n\n3.3.2 加载和预处理数据\n# 加载 GEE 图像集合\nimage_collection = ee.ImageCollection(GEE_DATA_ID)\\\n    .filterDate(TIME_RANGE[0], TIME_RANGE[1])\\\n    .select(BAND_NAME)\n\n# 定义应用缩放因子的函数\ndef apply_scaling(image):\n    return image.multiply(SCALING_FACTOR)\n\n# 将缩放应用到集合\nscaled_collection = image_collection.map(apply_scaling)\n\n\n\n3.4 在 Geemap 中预览数据\n# 初始化 geemap 界面\nMap = geemap.Map(center=(40, 100), zoom=4)  # 以欧亚大陆为中心（根据需要调整）\n\n# 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）\npreview_image = scaled_collection.median()\n\n# 将图像添加到地图\nMap.addLayer(preview_image, VIS_PARAMS, f\"{GEE_DATA_ID.split('/')[-1]}_Preview\")\n\n# 添加颜色条图例\nMap.add_colorbar_branca(\n    colors=VIS_PARAMS[\"palette\"],\n    vmin=VIS_PARAMS[\"min\"],\n    vmax=VIS_PARAMS[\"max\"],\n    label=BAND_NAME,\n    position=\"bottomright\"\n)\n\n# 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）\nMap"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-2支持断点续传的分段下载",
+    "href": "posts/2025-9-1-geedownloadimages.html#步骤-2支持断点续传的分段下载",
+    "title": "原文摘要",
+    "section": "4. 步骤 2：支持断点续传的分段下载",
+    "text": "4. 步骤 2：支持断点续传的分段下载\n直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。\n\n4.1 定义下载参数\n# 文件路径（自定义这些）\nGRID_PATH = \"I:/geemap/roi/WorldFishnet.gpkg\"  # 矢量网格路径\nGRID_LAYER = \"WorldFish30\"  # GeoPackage 中的图层名称\nOUTPUT_DIR = \"I:/geemap/GEE_Global_Data/\"  # 保存分段文件的目录\nRESOLUTION = 500  # 数据集分辨率（米；如 Landsat 为 30，MODIS 为 500）\nBATCH_SIZE = 5  # 每批处理的网格块数量（避免内存过载）\nSTART_YEAR = 2001  # 从此年开始恢复（如果下载被中断）\nSTART_GRID_INDEX = 0  # 从此网格索引恢复（如果下载被中断）\nCRS = \"EPSG:4326\"  # 目标坐标系（WGS84）\n\n\n4.2 加载矢量网格和创建输出目录\n# 使用 geopandas 加载矢量网格\ngrid_gdf = gpd.read_file(GRID_PATH, layer=GRID_LAYER)\n\n# 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection\ngrid_ee = geemap.gdf_to_ee(grid_gdf)\n\n# 创建输出目录（如果不存在）\nos.makedirs(OUTPUT_DIR, exist_ok=True)\n\n\n4.3 支持断点续传的批处理下载\n# 从时间范围获取年份列表（根据数据集的时间频率调整）\nyears = range(int(TIME_RANGE[0].split(\"-\")[0]), int(TIME_RANGE[1].split(\"-\")[0]))\n\n# 遍历每一年\nfor year in years:\n    # 跳过恢复开始年份之前的年份\n    if year &lt; START_YEAR:\n        continue\n    print(f\"正在处理 {year} 年的数据...\")\n\n    # 提取年度数据（对非年度数据集使用 filterDate）\n    annual_image = scaled_collection\\\n        .filter(ee.Filter.calendarRange(year, year, \"year\"))\\\n        .median()  # 如果数据集每年是单图像，使用 \"first()\"\n\n    # 获取网格块总数\n    total_grids = grid_ee.size().getInfo()\n\n    # 计算批次数\n    num_batches = (total_grids - START_GRID_INDEX + BATCH_SIZE - 1) // BATCH_SIZE\n\n    # 处理每批\n    for batch in range(num_batches):\n        batch_start = START_GRID_INDEX + batch * BATCH_SIZE\n        batch_end = min(batch_start + BATCH_SIZE, total_grids)\n        current_batch = grid_ee.toList(BATCH_SIZE, batch_start)  # 获取当前批次的网格\n\n        # 处理批次中的每个网格块\n        for i in range(batch_end - batch_start):\n            # 获取当前网格要素和几何形状\n            grid_feature = ee.Feature(current_batch.get(i))\n            grid_geom = grid_feature.geometry()\n\n            # 生成唯一文件名（如 \"NPP_2001_grid_0001.tif\"）\n            grid_index = batch_start + i + 1\n            filename = f\"{BAND_NAME}_{year}_grid_{grid_index:04d}.tif\"\n            file_path = os.path.join(OUTPUT_DIR, filename)\n\n            # 如果文件已存在则跳过（断点续传功能）\n            if os.path.exists(file_path):\n                print(f\"跳过现有文件: {filename}\")\n                continue\n\n            # 下载裁剪后的图像\n            try:\n                # 将年度图像裁剪到当前网格\n                clipped_image = annual_image.clip(grid_geom)\n\n                # 使用 geemap 下载\n                geemap.download_ee_image(\n                    image=clipped_image,\n                    filename=file_path,\n                    scale=RESOLUTION,\n                    region=grid_geom,\n                    crs=CRS,\n                    max_tile_size=1024  # 根据内存调整（1024 = 每块 1024x1024 像素）\n                )\n                print(f\"成功下载: {filename}\")\n\n            except Exception as e:\n                print(f\"下载 {filename} 失败: {str(e)}\")\n                continue\n\n    # 为下一年重置网格索引（对多年下载至关重要）\n    START_GRID_INDEX = 0\n\nprint(\"所有下载任务完成！\")"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-3镶嵌分段文件",
+    "href": "posts/2025-9-1-geedownloadimages.html#步骤-3镶嵌分段文件",
+    "title": "原文摘要",
+    "section": "5. 步骤 3：镶嵌分段文件",
+    "text": "5. 步骤 3：镶嵌分段文件\n使用 rasterio 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。\n\n5.1 定义镶嵌参数\n# 文件路径（自定义这些）\nINPUT_DIR = OUTPUT_DIR  # 与下载输出目录相同\nMOSAIC_OUTPUT_DIR = \"I:/geemap/GEE_Global_Data/Mosaicked/\"  # 镶嵌文件的目录\nCOMPRESSION = \"LZW\"  # 压缩方法（减少文件大小；选项：LZW、DEFLATE、None）\n\n\n5.2 启用 GDAL 多线程\n# 启用 GDAL 多线程以加速镶嵌\nos.environ[\"GDAL_NUM_THREADS\"] = \"ALL_CPUS\"  # 使用所有可用 CPU（或设置为数字如 \"4\"）\n\n\n5.3 镶嵌年度文件\nimport re\nfrom rasterio.merge import merge\nfrom rasterio.enums import Resampling\n\n# 为镶嵌文件创建输出目录\nos.makedirs(MOSAIC_OUTPUT_DIR, exist_ok=True)\n\n# 按年份分组分段文件（使用正则表达式从文件名中提取年份）\nfile_pattern = re.compile(rf\"{BAND_NAME}_(\\d{{4}})_grid_\\d{{4}}\\.tif$\")\nyearly_files = {}\n\nfor filename in os.listdir(INPUT_DIR):\n    match = file_pattern.match(filename)\n    if match:\n        year = match.group(1)\n        file_path = os.path.join(INPUT_DIR, filename)\n        yearly_files.setdefault(year, []).append(file_path)\n\n# 镶嵌每年的文件\nfor year, file_list in yearly_files.items():\n    print(f\"正在镶嵌 {year} 年的 {len(file_list)} 个文件...\")\n    datasets = []\n\n    try:\n        # 打开所有分段文件（确保一致的 CRS/分辨率）\n        for file_path in file_list:\n            src = rasterio.open(file_path)\n            datasets.append(src)\n\n        # 执行镶嵌（对离散数据使用最近邻重采样；对连续数据进行调整）\n        mosaic_array, out_transform = merge(\n            datasets,\n            resampling=Resampling.nearest  # 选项：nearest、bilinear、cubic（用于连续数据）\n        )\n\n        # 更新镶嵌文件的元数据\n        out_meta = datasets[0].meta.copy()\n        out_meta.update({\n            \"driver\": \"GTiff\",\n            \"height\": mosaic_array.shape[1],  # 栅格高度（行）\n            \"width\": mosaic_array.shape[2],   # 栅格宽度（列）\n            \"transform\": out_transform,\n            \"compress\": COMPRESSION,\n            \"bigtiff\": \"YES\"  # 对大文件启用（&gt;4GB）\n        })\n\n        # 保存镶嵌文件\n        output_path = os.path.join(MOSAIC_OUTPUT_DIR, f\"{BAND_NAME}_{year}_Global.tif\")\n        with rasterio.open(output_path, \"w\", **out_meta) as dest:\n            dest.write(mosaic_array)\n\n        print(f\"成功镶嵌: {output_path}\")\n\n    except Exception as e:\n        print(f\"镶嵌 {year} 年数据失败: {str(e)}\")\n        continue\n\n    finally:\n        # 关闭所有打开的栅格数据集以释放内存\n        for ds in datasets:\n            ds.close()\n\nprint(\"所有镶嵌任务完成！\")"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#注意事项和故障排除",
+    "href": "posts/2025-9-1-geedownloadimages.html#注意事项和故障排除",
+    "title": "原文摘要",
+    "section": "6. 注意事项和故障排除",
+    "text": "6. 注意事项和故障排除\n\n6.1 常见问题\n\nGEE 身份验证错误：重新运行 ee.Authenticate() 并按照浏览器提示重新进行身份验证。\n下载中断：工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复。\n内存过载：减少下载步骤中的 BATCH_SIZE（如从 5 到 3）或 max_tile_size（如从 1024 到 512）。\n镶嵌失败：确保所有分段文件具有相同的 CRS 和分辨率（通过 rasterio.open(file_path).crs 检查）。\n\n\n\n6.2 自定义提示\n\n非年度数据：对于月度/季节性数据，修改时间过滤器（如 ee.Filter.calendarRange(year, year, \"year\").filter(ee.Filter.calendarRange(6, 8, \"month\")) 用于夏季数据）。\n不同数据集：更新 GEE_DATA_ID、BAND_NAME、SCALING_FACTOR 和 VIS_PARAMS（参考 GEE 数据集目录 了解详情）。\n网格调整：根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）—更细的网格减少下载大小但增加文件数量。"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#参考资料",
+    "href": "posts/2025-9-1-geedownloadimages.html#参考资料",
+    "title": "原文摘要",
+    "section": "7. 参考资料",
+    "text": "7. 参考资料\n\ngeemap 文档：geemap.org\nGEE Python API 文档：developers.google.com/earth-engine\nrasterio 镶嵌指南：rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集：GEE MOD17A3HGF 文档"
+  },
+  {
+    "objectID": "posts/2025-6-13-geedownload.html",
+    "href": "posts/2025-6-13-geedownload.html",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "section": "",
+    "text": "最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。\n\n\n\n\n首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。\n\n\n\n\n\n确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息\n\n\n\n\n如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
+  },
+  {
+    "objectID": "posts/2025-6-13-geedownload.html#认证步骤",
+    "href": "posts/2025-6-13-geedownload.html#认证步骤",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "section": "",
+    "text": "首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。"
+  },
+  {
+    "objectID": "posts/2025-6-13-geedownload.html#注意事项",
+    "href": "posts/2025-6-13-geedownload.html#注意事项",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "section": "",
+    "text": "确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息"
+  },
+  {
+    "objectID": "posts/2025-6-13-geedownload.html#常见问题",
+    "href": "posts/2025-6-13-geedownload.html#常见问题",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "section": "",
+    "text": "如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
   },
   {
     "objectID": "posts/2025-6-10-paper_fig_size.html",
@@ -119,101 +189,87 @@
     "text": "图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html",
-    "href": "posts/2025-6-13-geedownload.html",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。\n\n\n\n\n首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。\n\n\n\n\n\n确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息\n\n\n\n\n如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html#认证步骤",
-    "href": "posts/2025-6-13-geedownload.html#认证步骤",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。"
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html#注意事项",
-    "href": "posts/2025-6-13-geedownload.html#注意事项",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息"
+    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html#常见问题",
-    "href": "posts/2025-6-13-geedownload.html#常见问题",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
+    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
   },
   {
     "objectID": "posts/index.html",
     "href": "posts/index.html",
     "title": "All Posts",
     "section": "",
-    "text": "Welcome to my collection of technical articles.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\nNo matching items"
+    "text": "Welcome to my collection of technical articles.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n原文摘要\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\nNo matching items"
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html",
-    "href": "posts/2025-6-8-local_package_install.html",
-    "title": "Python 本地包安装与更新指南",
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About Me",
     "section": "",
-    "text": "本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。\n\n\n\n\n首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall\n\n\n\n\n如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e .\n\n\n\n\n确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境\n\n\n\n\n如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
+    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html#标准安装流程",
-    "href": "posts/2025-6-8-local_package_install.html#标准安装流程",
-    "title": "Python 本地包安装与更新指南",
+    "objectID": "about.html#introduction",
+    "href": "about.html#introduction",
+    "title": "About Me",
     "section": "",
-    "text": "首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall"
+    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html#临时安装方法",
-    "href": "posts/2025-6-8-local_package_install.html#临时安装方法",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e ."
-  },
-  {
-    "objectID": "posts/2025-6-8-local_package_install.html#注意事项",
-    "href": "posts/2025-6-8-local_package_install.html#注意事项",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境"
-  },
-  {
-    "objectID": "posts/2025-6-8-local_package_install.html#常见问题",
-    "href": "posts/2025-6-8-local_package_install.html#常见问题",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Welcome to My Tech Blog",
-    "section": "",
-    "text": "Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science."
-  },
-  {
-    "objectID": "index.html#research-focus",
-    "href": "index.html#research-focus",
-    "title": "Welcome to My Tech Blog",
+    "objectID": "about.html#research-focus",
+    "href": "about.html#research-focus",
+    "title": "About Me",
     "section": "Research Focus",
-    "text": "Research Focus\n\nAgricultural Modeling & Simulation: Integration of traditional crop models with machine learning methods\nRemote Sensing & GIS: Agricultural monitoring and spatial analysis\nSmart Agriculture Devices: Agricultural sensors for weather, irrigation, fertilization, and pest control\nClimate Change Adaptation: Impact of climate change on agriculture and mitigation pathways"
+    "text": "Research Focus\nMy research interests include: - Agricultural modeling and simulation - Machine learning applications in agriculture - Remote sensing and GIS in agricultural monitoring - Crop yield prediction and analysis - Climate-smart agriculture"
   },
   {
-    "objectID": "index.html#technical-stack",
-    "href": "index.html#technical-stack",
-    "title": "Welcome to My Tech Blog",
-    "section": "Technical Stack",
-    "text": "Technical Stack\n\nProgramming Languages: Python, R, JavaScript\nData Science: Pandas, NumPy, Scikit-learn\nGeospatial: Google Earth Engine, QGIS\nVisualization: Matplotlib, Seaborn, Plotly\nVersion Control: Git, GitHub"
+    "objectID": "about.html#blog-content",
+    "href": "about.html#blog-content",
+    "title": "About Me",
+    "section": "Blog Content",
+    "text": "Blog Content\nThis blog primarily focuses on: - Technical tutorials and solutions - Research methodology discussions - Data analysis techniques - Programming tips and tricks - Agricultural technology insights"
   },
   {
-    "objectID": "index.html#contact-information",
-    "href": "index.html#contact-information",
-    "title": "Welcome to My Tech Blog",
-    "section": "Contact Information",
-    "text": "Contact Information\n\nEmail: binc041208@gmail.com\nGitHub: chenbin98\nLinkedIn: Bin Chen\nORCID: 0009-0000-8266-940X\n\n\n“Looking for like-minded friends to do something different together.”"
+    "objectID": "about.html#contact",
+    "href": "about.html#contact",
+    "title": "About Me",
+    "section": "Contact",
+    "text": "Contact\nFeel free to reach out to me for: - Research collaborations - Technical discussions - Questions about blog posts - Professional networking\nEmail: binc041208@gmail.com"
+  },
+  {
+    "objectID": "about.html#connect",
+    "href": "about.html#connect",
+    "title": "About Me",
+    "section": "Connect",
+    "text": "Connect\nYou can also find me on: - GitHub - LinkedIn - ORCID\n\n“Looking for like-minded friends to do something different together.”"
   }
 ]
