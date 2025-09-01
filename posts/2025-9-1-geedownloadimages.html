@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2025-09-01">
+<meta name="description" content="本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。">
 
-<title>geedownloadimages – Binchen's Tech Blog</title>
+<title>使用 Geemap 从 GEE 下载全球栅格数据 – Binchen’s Tech Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -104,9 +106,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
+<link rel="stylesheet" href="../styles.css">
 </head>
 
-<body class="nav-fixed quarto-light">
+<body class="floating nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -143,114 +146,205 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
-<!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#使用-geemap-从-gee-下载全球栅格数据" id="toc-使用-geemap-从-gee-下载全球栅格数据" class="nav-link active" data-scroll-target="#使用-geemap-从-gee-下载全球栅格数据">使用 Geemap 从 GEE 下载全球栅格数据</a>
+  <li><a href="#使用-geemap-从-gee-下载全球栅格数据" id="toc-使用-geemap-从-gee-下载全球栅格数据" class="nav-link active" data-scroll-target="#使用-geemap-从-gee-下载全球栅格数据"><span class="header-section-number">1</span> 使用 Geemap 从 GEE 下载全球栅格数据</a>
   <ul class="collapse">
-  <li><a href="#概述" id="toc-概述" class="nav-link" data-scroll-target="#概述">1. 概述</a></li>
-  <li><a href="#前置要求" id="toc-前置要求" class="nav-link" data-scroll-target="#前置要求">2. 前置要求</a>
+  <li><a href="#概述" id="toc-概述" class="nav-link" data-scroll-target="#概述"><span class="header-section-number">1.1</span> 📋 概述</a></li>
+  <li><a href="#前置要求" id="toc-前置要求" class="nav-link" data-scroll-target="#前置要求"><span class="header-section-number">1.2</span> 🛠️ 前置要求</a>
   <ul class="collapse">
-  <li><a href="#软件和库" id="toc-软件和库" class="nav-link" data-scroll-target="#软件和库">2.1 软件和库</a></li>
-  <li><a href="#数据准备" id="toc-数据准备" class="nav-link" data-scroll-target="#数据准备">2.2 数据准备</a></li>
+  <li><a href="#软件和库" id="toc-软件和库" class="nav-link" data-scroll-target="#软件和库"><span class="header-section-number">1.2.1</span> 2.1 软件和库</a></li>
+  <li><a href="#数据准备" id="toc-数据准备" class="nav-link" data-scroll-target="#数据准备"><span class="header-section-number">1.2.2</span> 2.2 数据准备</a></li>
   </ul></li>
-  <li><a href="#步骤-1初始化环境和预览数据" id="toc-步骤-1初始化环境和预览数据" class="nav-link" data-scroll-target="#步骤-1初始化环境和预览数据">3. 步骤 1：初始化环境和预览数据</a>
+  <li><a href="#步骤-1初始化环境和预览数据" id="toc-步骤-1初始化环境和预览数据" class="nav-link" data-scroll-target="#步骤-1初始化环境和预览数据"><span class="header-section-number">1.3</span> 🚀 步骤 1：初始化环境和预览数据</a>
   <ul class="collapse">
-  <li><a href="#加载库" id="toc-加载库" class="nav-link" data-scroll-target="#加载库">3.1 加载库</a></li>
-  <li><a href="#身份验证和初始化-gee" id="toc-身份验证和初始化-gee" class="nav-link" data-scroll-target="#身份验证和初始化-gee">3.2 身份验证和初始化 GEE</a></li>
-  <li><a href="#加载和预处理-gee-数据" id="toc-加载和预处理-gee-数据" class="nav-link" data-scroll-target="#加载和预处理-gee-数据">3.3 加载和预处理 GEE 数据</a></li>
-  <li><a href="#在-geemap-中预览数据" id="toc-在-geemap-中预览数据" class="nav-link" data-scroll-target="#在-geemap-中预览数据">3.4 在 Geemap 中预览数据</a></li>
+  <li><a href="#加载库" id="toc-加载库" class="nav-link" data-scroll-target="#加载库"><span class="header-section-number">1.3.1</span> 3.1 加载库</a></li>
+  <li><a href="#身份验证和初始化-gee" id="toc-身份验证和初始化-gee" class="nav-link" data-scroll-target="#身份验证和初始化-gee"><span class="header-section-number">1.3.2</span> 3.2 身份验证和初始化 GEE</a></li>
+  <li><a href="#加载和预处理-gee-数据" id="toc-加载和预处理-gee-数据" class="nav-link" data-scroll-target="#加载和预处理-gee-数据"><span class="header-section-number">1.3.3</span> 3.3 加载和预处理 GEE 数据</a></li>
+  <li><a href="#在-geemap-中预览数据" id="toc-在-geemap-中预览数据" class="nav-link" data-scroll-target="#在-geemap-中预览数据"><span class="header-section-number">1.3.4</span> 3.4 在 Geemap 中预览数据</a></li>
   </ul></li>
-  <li><a href="#步骤-2支持断点续传的分段下载" id="toc-步骤-2支持断点续传的分段下载" class="nav-link" data-scroll-target="#步骤-2支持断点续传的分段下载">4. 步骤 2：支持断点续传的分段下载</a>
+  <li><a href="#步骤-2支持断点续传的分段下载" id="toc-步骤-2支持断点续传的分段下载" class="nav-link" data-scroll-target="#步骤-2支持断点续传的分段下载"><span class="header-section-number">1.4</span> 📥 步骤 2：支持断点续传的分段下载</a>
   <ul class="collapse">
-  <li><a href="#定义下载参数" id="toc-定义下载参数" class="nav-link" data-scroll-target="#定义下载参数">4.1 定义下载参数</a></li>
-  <li><a href="#加载矢量网格和创建输出目录" id="toc-加载矢量网格和创建输出目录" class="nav-link" data-scroll-target="#加载矢量网格和创建输出目录">4.2 加载矢量网格和创建输出目录</a></li>
-  <li><a href="#支持断点续传的批处理下载" id="toc-支持断点续传的批处理下载" class="nav-link" data-scroll-target="#支持断点续传的批处理下载">4.3 支持断点续传的批处理下载</a></li>
+  <li><a href="#定义下载参数" id="toc-定义下载参数" class="nav-link" data-scroll-target="#定义下载参数"><span class="header-section-number">1.4.1</span> 4.1 定义下载参数</a></li>
+  <li><a href="#加载矢量网格和创建输出目录" id="toc-加载矢量网格和创建输出目录" class="nav-link" data-scroll-target="#加载矢量网格和创建输出目录"><span class="header-section-number">1.4.2</span> 4.2 加载矢量网格和创建输出目录</a></li>
+  <li><a href="#支持断点续传的批处理下载" id="toc-支持断点续传的批处理下载" class="nav-link" data-scroll-target="#支持断点续传的批处理下载"><span class="header-section-number">1.4.3</span> 4.3 支持断点续传的批处理下载</a></li>
   </ul></li>
-  <li><a href="#步骤-3镶嵌分段文件" id="toc-步骤-3镶嵌分段文件" class="nav-link" data-scroll-target="#步骤-3镶嵌分段文件">5. 步骤 3：镶嵌分段文件</a>
+  <li><a href="#步骤-3镶嵌分段文件" id="toc-步骤-3镶嵌分段文件" class="nav-link" data-scroll-target="#步骤-3镶嵌分段文件"><span class="header-section-number">1.5</span> 🔗 步骤 3：镶嵌分段文件</a>
   <ul class="collapse">
-  <li><a href="#定义镶嵌参数" id="toc-定义镶嵌参数" class="nav-link" data-scroll-target="#定义镶嵌参数">5.1 定义镶嵌参数</a></li>
-  <li><a href="#启用-gdal-多线程" id="toc-启用-gdal-多线程" class="nav-link" data-scroll-target="#启用-gdal-多线程">5.2 启用 GDAL 多线程</a></li>
-  <li><a href="#镶嵌年度文件" id="toc-镶嵌年度文件" class="nav-link" data-scroll-target="#镶嵌年度文件">5.3 镶嵌年度文件</a></li>
+  <li><a href="#定义镶嵌参数" id="toc-定义镶嵌参数" class="nav-link" data-scroll-target="#定义镶嵌参数"><span class="header-section-number">1.5.1</span> 5.1 定义镶嵌参数</a></li>
+  <li><a href="#启用-gdal-多线程" id="toc-启用-gdal-多线程" class="nav-link" data-scroll-target="#启用-gdal-多线程"><span class="header-section-number">1.5.2</span> 5.2 启用 GDAL 多线程</a></li>
+  <li><a href="#镶嵌年度文件" id="toc-镶嵌年度文件" class="nav-link" data-scroll-target="#镶嵌年度文件"><span class="header-section-number">1.5.3</span> 5.3 镶嵌年度文件</a></li>
   </ul></li>
-  <li><a href="#注意事项和故障排除" id="toc-注意事项和故障排除" class="nav-link" data-scroll-target="#注意事项和故障排除">6. 注意事项和故障排除</a>
+  <li><a href="#注意事项和故障排除" id="toc-注意事项和故障排除" class="nav-link" data-scroll-target="#注意事项和故障排除"><span class="header-section-number">1.6</span> ⚠️ 注意事项和故障排除</a>
   <ul class="collapse">
-  <li><a href="#常见问题" id="toc-常见问题" class="nav-link" data-scroll-target="#常见问题">6.1 常见问题</a></li>
-  <li><a href="#自定义提示" id="toc-自定义提示" class="nav-link" data-scroll-target="#自定义提示">6.2 自定义提示</a></li>
+  <li><a href="#常见问题" id="toc-常见问题" class="nav-link" data-scroll-target="#常见问题"><span class="header-section-number">1.6.1</span> 6.1 常见问题</a></li>
+  <li><a href="#自定义提示" id="toc-自定义提示" class="nav-link" data-scroll-target="#自定义提示"><span class="header-section-number">1.6.2</span> 6.2 自定义提示</a></li>
   </ul></li>
-  <li><a href="#参考资料" id="toc-参考资料" class="nav-link" data-scroll-target="#参考资料">7. 参考资料</a></li>
+  <li><a href="#参考资料" id="toc-参考资料" class="nav-link" data-scroll-target="#参考资料"><span class="header-section-number">1.7</span> 📚 参考资料</a></li>
   </ul></li>
   </ul>
 </nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">使用 Geemap 从 GEE 下载全球栅格数据</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+  <div class="quarto-categories">
+    <div class="quarto-category">技术教程</div>
+    <div class="quarto-category">GEE</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。
+  </div>
+</div>
 
 
+<div class="quarto-title-meta column-page-right">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 1, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
 
 
-<section id="使用-geemap-从-gee-下载全球栅格数据" class="level1">
-<h1>使用 Geemap 从 GEE 下载全球栅格数据</h1>
-<section id="概述" class="level2">
-<h2 class="anchored" data-anchor-id="概述">1. 概述</h2>
-<p>本技术文档提供了使用 <code>geemap</code> Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的通用工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。</p>
+</header>
+
+
+<section id="使用-geemap-从-gee-下载全球栅格数据" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> 使用 Geemap 从 GEE 下载全球栅格数据</h1>
+<section id="概述" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="概述"><span class="header-section-number">1.1</span> 📋 概述</h2>
+<p>本技术文档提供了使用 <code>geemap</code> Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的<strong>完整工作流程</strong>。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。</p>
+<p>该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。</p>
 </section>
-<section id="前置要求" class="level2">
-<h2 class="anchored" data-anchor-id="前置要求">2. 前置要求</h2>
-<section id="软件和库" class="level3">
-<h3 class="anchored" data-anchor-id="软件和库">2.1 软件和库</h3>
-<p>确保安装以下工具和库： | 工具/库 | 用途 | 安装命令 | |———|——|———-| | Python | 核心编程环境 | 从 <a href="https://python.org/">python.org</a> 下载 | | <code>geemap</code> | GEE 可视化和数据下载 | <code>pip install geemap</code> | | <code>earthengine-api</code> (ee) | GEE Python API | <code>pip install earthengine-api</code>（然后通过 <code>earthengine authenticate</code> 进行身份验证） | | <code>geopandas</code> | 读取矢量网格数据（用于分段） | <code>pip install geopandas</code> | | <code>rasterio</code> | 图像镶嵌和栅格处理 | <code>pip install rasterio</code> | | GDAL | 栅格操作后端（多线程） | 随 <code>rasterio</code> 包含（或通过 <code>conda install gdal</code> 安装以获得完整支持） |</p>
+<section id="前置要求" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="前置要求"><span class="header-section-number">1.2</span> 🛠️ 前置要求</h2>
+<section id="软件和库" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="软件和库"><span class="header-section-number">1.2.1</span> 2.1 软件和库</h3>
+<p>确保安装以下工具和库：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>工具/库</th>
+<th>用途</th>
+<th>安装命令</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Python</strong></td>
+<td>核心编程环境</td>
+<td>从 <a href="https://python.org/">python.org</a> 下载</td>
+</tr>
+<tr class="even">
+<td><strong><code>geemap</code></strong></td>
+<td>GEE 可视化和数据下载</td>
+<td><code>pip install geemap</code></td>
+</tr>
+<tr class="odd">
+<td><strong><code>earthengine-api</code> (ee)</strong></td>
+<td>GEE Python API</td>
+<td><code>pip install earthengine-api</code></td>
+</tr>
+<tr class="even">
+<td><strong><code>geopandas</code></strong></td>
+<td>读取矢量网格数据（用于分段）</td>
+<td><code>pip install geopandas</code></td>
+</tr>
+<tr class="odd">
+<td><strong><code>rasterio</code></strong></td>
+<td>图像镶嵌和栅格处理</td>
+<td><code>pip install rasterio</code></td>
+</tr>
+<tr class="even">
+<td><strong>GDAL</strong></td>
+<td>栅格操作后端（多线程）</td>
+<td>随 <code>rasterio</code> 包含</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p><strong>注意</strong>: 安装 <code>earthengine-api</code> 后，需要通过 <code>earthengine authenticate</code> 进行身份验证。</p>
+</blockquote>
 </section>
-<section id="数据准备" class="level3">
-<h3 class="anchored" data-anchor-id="数据准备">2.2 数据准备</h3>
+<section id="数据准备" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="数据准备"><span class="header-section-number">1.2.2</span> 2.2 数据准备</h3>
 <ul>
-<li><strong>GEE 栅格数据集 ID</strong>：在 GEE 中识别目标数据集 ID（如 NPP 的 <code>MODIS/061/MOD17A3HGF</code>，Landsat 8 的 <code>LANDSAT/LC08/C02/T1_L2</code>）。</li>
-<li><strong>全球矢量网格</strong>：准备预分割的矢量网格（如 GeoPackage <code>.gpkg</code> 格式），将全球研究区域分割为较小的、可下载的块。示例：<code>WorldFishnet.gpkg</code>（可根据数据分辨率自定义网格大小）。</li>
+<li><strong>GEE 栅格数据集 ID</strong>: 在 GEE 中识别目标数据集 ID
+<ul>
+<li>示例：NPP 数据 <code>MODIS/061/MOD17A3HGF</code></li>
+<li>示例：Landsat 8 数据 <code>LANDSAT/LC08/C02/T1_L2</code></li>
+</ul></li>
+<li><strong>全球矢量网格</strong>: 准备预分割的矢量网格（GeoPackage <code>.gpkg</code> 格式）
+<ul>
+<li>将全球研究区域分割为较小的、可下载的块</li>
+<li>示例：<code>WorldFishnet.gpkg</code>（可根据数据分辨率自定义网格大小）</li>
+</ul></li>
 </ul>
 </section>
 </section>
-<section id="步骤-1初始化环境和预览数据" class="level2">
-<h2 class="anchored" data-anchor-id="步骤-1初始化环境和预览数据">3. 步骤 1：初始化环境和预览数据</h2>
-<section id="加载库" class="level3">
-<h3 class="anchored" data-anchor-id="加载库">3.1 加载库</h3>
+<section id="步骤-1初始化环境和预览数据" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="步骤-1初始化环境和预览数据"><span class="header-section-number">1.3</span> 🚀 步骤 1：初始化环境和预览数据</h2>
+<section id="加载库" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="加载库"><span class="header-section-number">1.3.1</span> 3.1 加载库</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geemap</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="身份验证和初始化-gee" class="level3">
-<h3 class="anchored" data-anchor-id="身份验证和初始化-gee">3.2 身份验证和初始化 GEE</h3>
+<section id="身份验证和初始化-gee" class="level3" data-number="1.3.2">
+<h3 data-number="1.3.2" class="anchored" data-anchor-id="身份验证和初始化-gee"><span class="header-section-number">1.3.2</span> 3.2 身份验证和初始化 GEE</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 身份验证 GEE（运行一次；如果已经身份验证则跳过）</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ee.Authenticate()</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 初始化 GEE API</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ee.Initialize()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="加载和预处理-gee-数据" class="level3">
-<h3 class="anchored" data-anchor-id="加载和预处理-gee-数据">3.3 加载和预处理 GEE 数据</h3>
-<section id="定义核心参数" class="level4">
-<h4 class="anchored" data-anchor-id="定义核心参数">3.3.1 定义核心参数</h4>
+<section id="加载和预处理-gee-数据" class="level3" data-number="1.3.3">
+<h3 data-number="1.3.3" class="anchored" data-anchor-id="加载和预处理-gee-数据"><span class="header-section-number">1.3.3</span> 3.3 加载和预处理 GEE 数据</h3>
+<section id="定义核心参数" class="level4" data-number="1.3.3.1">
+<h4 data-number="1.3.3.1" class="anchored" data-anchor-id="定义核心参数"><span class="header-section-number">1.3.3.1</span> 3.3.1 定义核心参数</h4>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 为您的目标数据集自定义这些参数</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>GEE_DATA_ID <span class="op">=</span> <span class="st">"MODIS/061/MOD17A3HGF"</span>  <span class="co"># 示例：MODIS NPP 数据集</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>BAND_NAME <span class="op">=</span> <span class="st">"Npp"</span>  <span class="co"># 目标波段名称</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>BAND_NAME <span class="op">=</span> <span class="st">"Npp"</span>                       <span class="co"># 目标波段名称</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>TIME_RANGE <span class="op">=</span> [<span class="st">"2001-01-01"</span>, <span class="st">"2025-01-01"</span>]  <span class="co"># 时间范围（开始，结束）</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>SCALING_FACTOR <span class="op">=</span> <span class="fl">0.0001</span>  <span class="co"># 缩放因子，将 GEE 数据转换为实际值（查看数据集文档）</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>VIS_PARAMS <span class="op">=</span> {</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"min"</span>: <span class="dv">0</span>,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"max"</span>: <span class="dv">3</span>,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"palette"</span>: [<span class="st">"ffffff"</span>, <span class="st">"ce7e45"</span>, <span class="st">"df923d"</span>, <span class="st">"f1b555"</span>, <span class="st">"fcd163"</span>, </span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                <span class="st">"99b718"</span>, <span class="st">"74a901"</span>, <span class="st">"66a000"</span>, <span class="st">"529400"</span>, <span class="st">"3e8601"</span>, </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                <span class="st">"207401"</span>, <span class="st">"056201"</span>, <span class="st">"004c00"</span>, <span class="st">"023b01"</span>, <span class="st">"012e01"</span>, </span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                <span class="st">"011d01"</span>, <span class="st">"011301"</span>]  <span class="co"># 根据数据集范围调整</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>SCALING_FACTOR <span class="op">=</span> <span class="fl">0.0001</span>                 <span class="co"># 缩放因子，将 GEE 数据转换为实际值</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 可视化参数</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>VIS_PARAMS <span class="op">=</span> {</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"min"</span>: <span class="dv">0</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"max"</span>: <span class="dv">3</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"palette"</span>: [</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"ffffff"</span>, <span class="st">"ce7e45"</span>, <span class="st">"df923d"</span>, <span class="st">"f1b555"</span>, <span class="st">"fcd163"</span>, </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"99b718"</span>, <span class="st">"74a901"</span>, <span class="st">"66a000"</span>, <span class="st">"529400"</span>, <span class="st">"3e8601"</span>, </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"207401"</span>, <span class="st">"056201"</span>, <span class="st">"004c00"</span>, <span class="st">"023b01"</span>, <span class="st">"012e01"</span>, </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"011d01"</span>, <span class="st">"011301"</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    ]  <span class="co"># 根据数据集范围调整</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="加载和预处理数据" class="level4">
-<h4 class="anchored" data-anchor-id="加载和预处理数据">3.3.2 加载和预处理数据</h4>
+<section id="加载和预处理数据" class="level4" data-number="1.3.3.2">
+<h4 data-number="1.3.3.2" class="anchored" data-anchor-id="加载和预处理数据"><span class="header-section-number">1.3.3.2</span> 3.3.2 加载和预处理数据</h4>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 加载 GEE 图像集合</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>image_collection <span class="op">=</span> ee.ImageCollection(GEE_DATA_ID)<span class="op">\</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .filterDate(TIME_RANGE[<span class="dv">0</span>], TIME_RANGE[<span class="dv">1</span>])<span class="op">\</span></span>
@@ -264,10 +358,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>scaled_collection <span class="op">=</span> image_collection.<span class="bu">map</span>(apply_scaling)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
-<section id="在-geemap-中预览数据" class="level3">
-<h3 class="anchored" data-anchor-id="在-geemap-中预览数据">3.4 在 Geemap 中预览数据</h3>
+<section id="在-geemap-中预览数据" class="level3" data-number="1.3.4">
+<h3 data-number="1.3.4" class="anchored" data-anchor-id="在-geemap-中预览数据"><span class="header-section-number">1.3.4</span> 3.4 在 Geemap 中预览数据</h3>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 初始化 geemap 界面</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>Map <span class="op">=</span> geemap.Map(center<span class="op">=</span>(<span class="dv">40</span>, <span class="dv">100</span>), zoom<span class="op">=</span><span class="dv">4</span>)  <span class="co"># 以欧亚大陆为中心（根据需要调整）</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>Map <span class="op">=</span> geemap.Map(center<span class="op">=</span>(<span class="dv">40</span>, <span class="dv">100</span>), zoom<span class="op">=</span><span class="dv">4</span>)  <span class="co"># 以欧亚大陆为中心</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>preview_image <span class="op">=</span> scaled_collection.median()</span>
@@ -288,23 +382,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>Map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
-<section id="步骤-2支持断点续传的分段下载" class="level2">
-<h2 class="anchored" data-anchor-id="步骤-2支持断点续传的分段下载">4. 步骤 2：支持断点续传的分段下载</h2>
-<p>直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。</p>
-<section id="定义下载参数" class="level3">
-<h3 class="anchored" data-anchor-id="定义下载参数">4.1 定义下载参数</h3>
+<section id="步骤-2支持断点续传的分段下载" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="步骤-2支持断点续传的分段下载"><span class="header-section-number">1.4</span> 📥 步骤 2：支持断点续传的分段下载</h2>
+<p>直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有<strong>跳过现有文件的断点续传功能</strong>。</p>
+<section id="定义下载参数" class="level3" data-number="1.4.1">
+<h3 data-number="1.4.1" class="anchored" data-anchor-id="定义下载参数"><span class="header-section-number">1.4.1</span> 4.1 定义下载参数</h3>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 文件路径（自定义这些）</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>GRID_PATH <span class="op">=</span> <span class="st">"I:/geemap/roi/WorldFishnet.gpkg"</span>  <span class="co"># 矢量网格路径</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>GRID_LAYER <span class="op">=</span> <span class="st">"WorldFish30"</span>  <span class="co"># GeoPackage 中的图层名称</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>OUTPUT_DIR <span class="op">=</span> <span class="st">"I:/geemap/GEE_Global_Data/"</span>  <span class="co"># 保存分段文件的目录</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>RESOLUTION <span class="op">=</span> <span class="dv">500</span>  <span class="co"># 数据集分辨率（米；如 Landsat 为 30，MODIS 为 500）</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>BATCH_SIZE <span class="op">=</span> <span class="dv">5</span>  <span class="co"># 每批处理的网格块数量（避免内存过载）</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>START_YEAR <span class="op">=</span> <span class="dv">2001</span>  <span class="co"># 从此年开始恢复（如果下载被中断）</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>START_GRID_INDEX <span class="op">=</span> <span class="dv">0</span>  <span class="co"># 从此网格索引恢复（如果下载被中断）</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>CRS <span class="op">=</span> <span class="st">"EPSG:4326"</span>  <span class="co"># 目标坐标系（WGS84）</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>GRID_LAYER <span class="op">=</span> <span class="st">"WorldFish30"</span>                       <span class="co"># GeoPackage 中的图层名称</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>OUTPUT_DIR <span class="op">=</span> <span class="st">"I:/geemap/GEE_Global_Data/"</span>        <span class="co"># 保存分段文件的目录</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>RESOLUTION <span class="op">=</span> <span class="dv">500</span>                                  <span class="co"># 数据集分辨率（米）</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>BATCH_SIZE <span class="op">=</span> <span class="dv">5</span>                                    <span class="co"># 每批处理的网格块数量</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>START_YEAR <span class="op">=</span> <span class="dv">2001</span>                                 <span class="co"># 从此年开始恢复（如果下载被中断）</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>START_GRID_INDEX <span class="op">=</span> <span class="dv">0</span>                             <span class="co"># 从此网格索引恢复（如果下载被中断）</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>CRS <span class="op">=</span> <span class="st">"EPSG:4326"</span>                                <span class="co"># 目标坐标系（WGS84）</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="加载矢量网格和创建输出目录" class="level3">
-<h3 class="anchored" data-anchor-id="加载矢量网格和创建输出目录">4.2 加载矢量网格和创建输出目录</h3>
+<section id="加载矢量网格和创建输出目录" class="level3" data-number="1.4.2">
+<h3 data-number="1.4.2" class="anchored" data-anchor-id="加载矢量网格和创建输出目录"><span class="header-section-number">1.4.2</span> 4.2 加载矢量网格和创建输出目录</h3>
 <div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 geopandas 加载矢量网格</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>grid_gdf <span class="op">=</span> gpd.read_file(GRID_PATH, layer<span class="op">=</span>GRID_LAYER)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -314,9 +408,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建输出目录（如果不存在）</span></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>os.makedirs(OUTPUT_DIR, exist_ok<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="支持断点续传的批处理下载" class="level3">
-<h3 class="anchored" data-anchor-id="支持断点续传的批处理下载">4.3 支持断点续传的批处理下载</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 从时间范围获取年份列表（根据数据集的时间频率调整）</span></span>
+<section id="支持断点续传的批处理下载" class="level3" data-number="1.4.3">
+<h3 data-number="1.4.3" class="anchored" data-anchor-id="支持断点续传的批处理下载"><span class="header-section-number">1.4.3</span> 4.3 支持断点续传的批处理下载</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 从时间范围获取年份列表</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> <span class="bu">range</span>(<span class="bu">int</span>(TIME_RANGE[<span class="dv">0</span>].split(<span class="st">"-"</span>)[<span class="dv">0</span>]), <span class="bu">int</span>(TIME_RANGE[<span class="dv">1</span>].split(<span class="st">"-"</span>)[<span class="dv">0</span>]))</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 遍历每一年</span></span>
@@ -324,12 +418,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 跳过恢复开始年份之前的年份</span></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> year <span class="op">&lt;</span> START_YEAR:</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"正在处理 </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> 年的数据..."</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"🔄 正在处理 </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> 年的数据..."</span>)</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 提取年度数据（对非年度数据集使用 filterDate）</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 提取年度数据</span></span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    annual_image <span class="op">=</span> scaled_collection<span class="op">\</span></span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        .<span class="bu">filter</span>(ee.Filter.calendarRange(year, year, <span class="st">"year"</span>))<span class="op">\</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        .median()  <span class="co"># 如果数据集每年是单图像，使用 "first()"</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        .median()</span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 获取网格块总数</span></span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    total_grids <span class="op">=</span> grid_ee.size().getInfo()</span>
@@ -341,7 +435,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch <span class="kw">in</span> <span class="bu">range</span>(num_batches):</span>
 <span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        batch_start <span class="op">=</span> START_GRID_INDEX <span class="op">+</span> batch <span class="op">*</span> BATCH_SIZE</span>
 <span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        batch_end <span class="op">=</span> <span class="bu">min</span>(batch_start <span class="op">+</span> BATCH_SIZE, total_grids)</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        current_batch <span class="op">=</span> grid_ee.toList(BATCH_SIZE, batch_start)  <span class="co"># 获取当前批次的网格</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        current_batch <span class="op">=</span> grid_ee.toList(BATCH_SIZE, batch_start)</span>
 <span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 处理批次中的每个网格块</span></span>
 <span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(batch_end <span class="op">-</span> batch_start):</span>
@@ -349,14 +443,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>            grid_feature <span class="op">=</span> ee.Feature(current_batch.get(i))</span>
 <span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>            grid_geom <span class="op">=</span> grid_feature.geometry()</span>
 <span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 生成唯一文件名（如 "NPP_2001_grid_0001.tif"）</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 生成唯一文件名</span></span>
 <span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>            grid_index <span class="op">=</span> batch_start <span class="op">+</span> i <span class="op">+</span> <span class="dv">1</span></span>
 <span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>            filename <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>BAND_NAME<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">_grid_</span><span class="sc">{</span>grid_index<span class="sc">:04d}</span><span class="ss">.tif"</span></span>
 <span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>            file_path <span class="op">=</span> os.path.join(OUTPUT_DIR, filename)</span>
 <span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 如果文件已存在则跳过（断点续传功能）</span></span>
 <span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> os.path.exists(file_path):</span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"跳过现有文件: </span><span class="sc">{</span>filename<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"⏭️  跳过现有文件: </span><span class="sc">{</span>filename<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
 <span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 下载裁剪后的图像</span></span>
@@ -371,37 +465,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>                    scale<span class="op">=</span>RESOLUTION,</span>
 <span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>                    region<span class="op">=</span>grid_geom,</span>
 <span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>                    crs<span class="op">=</span>CRS,</span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>                    max_tile_size<span class="op">=</span><span class="dv">1024</span>  <span class="co"># 根据内存调整（1024 = 每块 1024x1024 像素）</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>                    max_tile_size<span class="op">=</span><span class="dv">1024</span>  <span class="co"># 根据内存调整</span></span>
 <span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>                )</span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"成功下载: </span><span class="sc">{</span>filename<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"✅ 成功下载: </span><span class="sc">{</span>filename<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"下载 </span><span class="sc">{</span>filename<span class="sc">}</span><span class="ss"> 失败: </span><span class="sc">{</span><span class="bu">str</span>(e)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"❌ 下载 </span><span class="sc">{</span>filename<span class="sc">}</span><span class="ss"> 失败: </span><span class="sc">{</span><span class="bu">str</span>(e)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
 <span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 为下一年重置网格索引（对多年下载至关重要）</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 为下一年重置网格索引</span></span>
 <span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>    START_GRID_INDEX <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"所有下载任务完成！"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"🎉 所有下载任务完成！"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
-<section id="步骤-3镶嵌分段文件" class="level2">
-<h2 class="anchored" data-anchor-id="步骤-3镶嵌分段文件">5. 步骤 3：镶嵌分段文件</h2>
+<section id="步骤-3镶嵌分段文件" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="步骤-3镶嵌分段文件"><span class="header-section-number">1.5</span> 🔗 步骤 3：镶嵌分段文件</h2>
 <p>使用 <code>rasterio</code> 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。</p>
-<section id="定义镶嵌参数" class="level3">
-<h3 class="anchored" data-anchor-id="定义镶嵌参数">5.1 定义镶嵌参数</h3>
+<section id="定义镶嵌参数" class="level3" data-number="1.5.1">
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="定义镶嵌参数"><span class="header-section-number">1.5.1</span> 5.1 定义镶嵌参数</h3>
 <div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 文件路径（自定义这些）</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>INPUT_DIR <span class="op">=</span> OUTPUT_DIR  <span class="co"># 与下载输出目录相同</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>INPUT_DIR <span class="op">=</span> OUTPUT_DIR                    <span class="co"># 与下载输出目录相同</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>MOSAIC_OUTPUT_DIR <span class="op">=</span> <span class="st">"I:/geemap/GEE_Global_Data/Mosaicked/"</span>  <span class="co"># 镶嵌文件的目录</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>COMPRESSION <span class="op">=</span> <span class="st">"LZW"</span>  <span class="co"># 压缩方法（减少文件大小；选项：LZW、DEFLATE、None）</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>COMPRESSION <span class="op">=</span> <span class="st">"LZW"</span>                       <span class="co"># 压缩方法（减少文件大小）</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="启用-gdal-多线程" class="level3">
-<h3 class="anchored" data-anchor-id="启用-gdal-多线程">5.2 启用 GDAL 多线程</h3>
+<section id="启用-gdal-多线程" class="level3" data-number="1.5.2">
+<h3 data-number="1.5.2" class="anchored" data-anchor-id="启用-gdal-多线程"><span class="header-section-number">1.5.2</span> 5.2 启用 GDAL 多线程</h3>
 <div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 启用 GDAL 多线程以加速镶嵌</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"GDAL_NUM_THREADS"</span>] <span class="op">=</span> <span class="st">"ALL_CPUS"</span>  <span class="co"># 使用所有可用 CPU（或设置为数字如 "4"）</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"GDAL_NUM_THREADS"</span>] <span class="op">=</span> <span class="st">"ALL_CPUS"</span>  <span class="co"># 使用所有可用 CPU</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="镶嵌年度文件" class="level3">
-<h3 class="anchored" data-anchor-id="镶嵌年度文件">5.3 镶嵌年度文件</h3>
+<section id="镶嵌年度文件" class="level3" data-number="1.5.3">
+<h3 data-number="1.5.3" class="anchored" data-anchor-id="镶嵌年度文件"><span class="header-section-number">1.5.3</span> 5.3 镶嵌年度文件</h3>
 <div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rasterio.merge <span class="im">import</span> merge</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rasterio.enums <span class="im">import</span> Resampling</span>
@@ -409,7 +503,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 为镶嵌文件创建输出目录</span></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>os.makedirs(MOSAIC_OUTPUT_DIR, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 按年份分组分段文件（使用正则表达式从文件名中提取年份）</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 按年份分组分段文件</span></span>
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>file_pattern <span class="op">=</span> re.<span class="bu">compile</span>(<span class="vs">rf"</span><span class="sc">{</span>BAND_NAME<span class="sc">}</span><span class="vs">_</span><span class="kw">(</span><span class="dv">\d</span><span class="ch">{{</span><span class="op">4</span><span class="ch">}}</span><span class="kw">)</span><span class="vs">_grid_</span><span class="dv">\d</span><span class="ch">{{</span><span class="op">4</span><span class="ch">}}\.</span><span class="vs">tif</span><span class="dv">$</span><span class="vs">"</span>)</span>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>yearly_files <span class="op">=</span> {}</span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
@@ -422,27 +516,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 镶嵌每年的文件</span></span>
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year, file_list <span class="kw">in</span> yearly_files.items():</span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"正在镶嵌 </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> 年的 </span><span class="sc">{</span><span class="bu">len</span>(file_list)<span class="sc">}</span><span class="ss"> 个文件..."</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"🔗 正在镶嵌 </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> 年的 </span><span class="sc">{</span><span class="bu">len</span>(file_list)<span class="sc">}</span><span class="ss"> 个文件..."</span>)</span>
 <span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    datasets <span class="op">=</span> []</span>
 <span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 打开所有分段文件（确保一致的 CRS/分辨率）</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 打开所有分段文件</span></span>
 <span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> file_path <span class="kw">in</span> file_list:</span>
 <span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>            src <span class="op">=</span> rasterio.<span class="bu">open</span>(file_path)</span>
 <span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>            datasets.append(src)</span>
 <span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 执行镶嵌（对离散数据使用最近邻重采样；对连续数据进行调整）</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 执行镶嵌</span></span>
 <span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>        mosaic_array, out_transform <span class="op">=</span> merge(</span>
 <span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>            datasets,</span>
-<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>            resampling<span class="op">=</span>Resampling.nearest  <span class="co"># 选项：nearest、bilinear、cubic（用于连续数据）</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>            resampling<span class="op">=</span>Resampling.nearest  <span class="co"># 对离散数据使用最近邻重采样</span></span>
 <span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>        )</span>
 <span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 更新镶嵌文件的元数据</span></span>
 <span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>        out_meta <span class="op">=</span> datasets[<span class="dv">0</span>].meta.copy()</span>
 <span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>        out_meta.update({</span>
 <span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>            <span class="st">"driver"</span>: <span class="st">"GTiff"</span>,</span>
-<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>            <span class="st">"height"</span>: mosaic_array.shape[<span class="dv">1</span>],  <span class="co"># 栅格高度（行）</span></span>
-<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>            <span class="st">"width"</span>: mosaic_array.shape[<span class="dv">2</span>],   <span class="co"># 栅格宽度（列）</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>            <span class="st">"height"</span>: mosaic_array.shape[<span class="dv">1</span>],</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>            <span class="st">"width"</span>: mosaic_array.shape[<span class="dv">2</span>],</span>
 <span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>            <span class="st">"transform"</span>: out_transform,</span>
 <span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>            <span class="st">"compress"</span>: COMPRESSION,</span>
 <span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>            <span class="st">"bigtiff"</span>: <span class="st">"YES"</span>  <span class="co"># 对大文件启用（&gt;4GB）</span></span>
@@ -453,10 +547,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> rasterio.<span class="bu">open</span>(output_path, <span class="st">"w"</span>, <span class="op">**</span>out_meta) <span class="im">as</span> dest:</span>
 <span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>            dest.write(mosaic_array)</span>
 <span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"成功镶嵌: </span><span class="sc">{</span>output_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"✅ 成功镶嵌: </span><span class="sc">{</span>output_path<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"镶嵌 </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> 年数据失败: </span><span class="sc">{</span><span class="bu">str</span>(e)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"❌ 镶嵌 </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> 年数据失败: </span><span class="sc">{</span><span class="bu">str</span>(e)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
 <span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">finally</span>:</span>
@@ -464,38 +558,69 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> ds <span class="kw">in</span> datasets:</span>
 <span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>            ds.close()</span>
 <span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"所有镶嵌任务完成！"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"🎉 所有镶嵌任务完成！"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
-<section id="注意事项和故障排除" class="level2">
-<h2 class="anchored" data-anchor-id="注意事项和故障排除">6. 注意事项和故障排除</h2>
-<section id="常见问题" class="level3">
-<h3 class="anchored" data-anchor-id="常见问题">6.1 常见问题</h3>
-<ol type="1">
-<li><strong>GEE 身份验证错误</strong>：重新运行 <code>ee.Authenticate()</code> 并按照浏览器提示重新进行身份验证。</li>
-<li><strong>下载中断</strong>：工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复。</li>
-<li><strong>内存过载</strong>：减少下载步骤中的 <code>BATCH_SIZE</code>（如从 5 到 3）或 <code>max_tile_size</code>（如从 1024 到 512）。</li>
-<li><strong>镶嵌失败</strong>：确保所有分段文件具有相同的 CRS 和分辨率（通过 <code>rasterio.open(file_path).crs</code> 检查）。</li>
-</ol>
+<section id="注意事项和故障排除" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="注意事项和故障排除"><span class="header-section-number">1.6</span> ⚠️ 注意事项和故障排除</h2>
+<section id="常见问题" class="level3" data-number="1.6.1">
+<h3 data-number="1.6.1" class="anchored" data-anchor-id="常见问题"><span class="header-section-number">1.6.1</span> 6.1 常见问题</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 37%">
+<col style="width: 62%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>问题</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>GEE 身份验证错误</strong></td>
+<td>重新运行 <code>ee.Authenticate()</code> 并按照浏览器提示重新进行身份验证</td>
+</tr>
+<tr class="even">
+<td><strong>下载中断</strong></td>
+<td>工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复</td>
+</tr>
+<tr class="odd">
+<td><strong>内存过载</strong></td>
+<td>减少 <code>BATCH_SIZE</code>（如从 5 到 3）或 <code>max_tile_size</code>（如从 1024 到 512）</td>
+</tr>
+<tr class="even">
+<td><strong>镶嵌失败</strong></td>
+<td>确保所有分段文件具有相同的 CRS 和分辨率</td>
+</tr>
+</tbody>
+</table>
 </section>
-<section id="自定义提示" class="level3">
-<h3 class="anchored" data-anchor-id="自定义提示">6.2 自定义提示</h3>
+<section id="自定义提示" class="level3" data-number="1.6.2">
+<h3 data-number="1.6.2" class="anchored" data-anchor-id="自定义提示"><span class="header-section-number">1.6.2</span> 6.2 自定义提示</h3>
 <ul>
-<li><strong>非年度数据</strong>：对于月度/季节性数据，修改时间过滤器（如 <code>ee.Filter.calendarRange(year, year, "year").filter(ee.Filter.calendarRange(6, 8, "month"))</code> 用于夏季数据）。</li>
-<li><strong>不同数据集</strong>：更新 <code>GEE_DATA_ID</code>、<code>BAND_NAME</code>、<code>SCALING_FACTOR</code> 和 <code>VIS_PARAMS</code>（参考 <a href="https://developers.google.com/earth-engine/datasets">GEE 数据集目录</a> 了解详情）。</li>
-<li><strong>网格调整</strong>：根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）—更细的网格减少下载大小但增加文件数量。</li>
+<li><p><strong>非年度数据</strong>: 对于月度/季节性数据，修改时间过滤器</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 示例：夏季数据</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ee.Filter.calendarRange(year, year, <span class="st">"year"</span>)<span class="op">\</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  .<span class="bu">filter</span>(ee.Filter.calendarRange(<span class="dv">6</span>, <span class="dv">8</span>, <span class="st">"month"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>不同数据集</strong>: 更新 <code>GEE_DATA_ID</code>、<code>BAND_NAME</code>、<code>SCALING_FACTOR</code> 和 <code>VIS_PARAMS</code></p></li>
+<li><p><strong>网格调整</strong>: 根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）</p></li>
 </ul>
 </section>
 </section>
-<section id="参考资料" class="level2">
-<h2 class="anchored" data-anchor-id="参考资料">7. 参考资料</h2>
+<section id="参考资料" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="参考资料"><span class="header-section-number">1.7</span> 📚 参考资料</h2>
 <ul>
-<li><code>geemap</code> 文档：<a href="https://geemap.org/">geemap.org</a></li>
-<li>GEE Python API 文档：<a href="https://developers.google.com/earth-engine/guides/python_install">developers.google.com/earth-engine</a></li>
-<li><code>rasterio</code> 镶嵌指南：<a href="https://rasterio.readthedocs.io/en/latest/topics/merge.html">rasterio.readthedocs.io</a></li>
-<li>MODIS MOD17A3HGF 数据集：<a href="https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD17A3HGF">GEE MOD17A3HGF 文档</a></li>
+<li><strong><code>geemap</code> 文档</strong>: <a href="https://geemap.org/">geemap.org</a></li>
+<li><strong>GEE Python API 文档</strong>: <a href="https://developers.google.com/earth-engine/guides/python_install">developers.google.com/earth-engine</a></li>
+<li><strong><code>rasterio</code> 镶嵌指南</strong>: <a href="https://rasterio.readthedocs.io/en/latest/topics/merge.html">rasterio.readthedocs.io</a></li>
+<li><strong>MODIS MOD17A3HGF 数据集</strong>: <a href="https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD17A3HGF">GEE MOD17A3HGF 文档</a></li>
 </ul>
+<hr>
+<p><em>💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。</em></p>
 
+
+<!-- -->
 
 </section>
 </section>
@@ -570,6 +695,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -899,7 +1075,359 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       }
     }
   });
-  </script>
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb13" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "使用 Geemap 从 GEE 下载全球栅格数据"</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 2025-09-01</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [技术教程, GEE]</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [Google Earth Engine, geemap, download_ee_image, 遥感数据, 栅格处理]</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。"</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu"># 使用 Geemap 从 GEE 下载全球栅格数据</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## 📋 概述</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>本技术文档提供了使用 <span class="in">`geemap`</span> Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的**完整工作流程**。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## 🛠️ 前置要求</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2.1 软件和库</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>确保安装以下工具和库：</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 工具/库 <span class="pp">|</span> 用途 <span class="pp">|</span> 安装命令 <span class="pp">|</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|---------|------|----------|</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Python** <span class="pp">|</span> 核心编程环境 <span class="pp">|</span> 从 <span class="co">[</span><span class="ot">python.org</span><span class="co">](https://python.org/)</span> 下载 <span class="pp">|</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **`geemap`** <span class="pp">|</span> GEE 可视化和数据下载 <span class="pp">|</span> <span class="in">`pip install geemap`</span> <span class="pp">|</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **`earthengine-api` (ee)** <span class="pp">|</span> GEE Python API <span class="pp">|</span> <span class="in">`pip install earthengine-api`</span> <span class="pp">|</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **`geopandas`** <span class="pp">|</span> 读取矢量网格数据（用于分段） <span class="pp">|</span> <span class="in">`pip install geopandas`</span> <span class="pp">|</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **`rasterio`** <span class="pp">|</span> 图像镶嵌和栅格处理 <span class="pp">|</span> <span class="in">`pip install rasterio`</span> <span class="pp">|</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **GDAL** <span class="pp">|</span> 栅格操作后端（多线程） <span class="pp">|</span> 随 <span class="in">`rasterio`</span> 包含 <span class="pp">|</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **注意**: 安装 </span><span class="in">`earthengine-api`</span><span class="at"> 后，需要通过 </span><span class="in">`earthengine authenticate`</span><span class="at"> 进行身份验证。</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2.2 数据准备</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**GEE 栅格数据集 ID**: 在 GEE 中识别目标数据集 ID</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>示例：NPP 数据 <span class="in">`MODIS/061/MOD17A3HGF`</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>示例：Landsat 8 数据 <span class="in">`LANDSAT/LC08/C02/T1_L2`</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**全球矢量网格**: 准备预分割的矢量网格（GeoPackage <span class="in">`.gpkg`</span> 格式）</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>将全球研究区域分割为较小的、可下载的块</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>示例：<span class="in">`WorldFishnet.gpkg`</span>（可根据数据分辨率自定义网格大小）</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## 🚀 步骤 1：初始化环境和预览数据</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3.1 加载库</span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geemap</span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3.2 身份验证和初始化 GEE</span></span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a><span class="co"># 身份验证 GEE（运行一次；如果已经身份验证则跳过）</span></span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a><span class="co"># ee.Authenticate()</span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="co"># 初始化 GEE API</span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a>ee.Initialize()</span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3.3 加载和预处理 GEE 数据</span></span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a><span class="fu">#### 3.3.1 定义核心参数</span></span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a><span class="co"># 为您的目标数据集自定义这些参数</span></span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a>GEE_DATA_ID <span class="op">=</span> <span class="st">"MODIS/061/MOD17A3HGF"</span>  <span class="co"># 示例：MODIS NPP 数据集</span></span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a>BAND_NAME <span class="op">=</span> <span class="st">"Npp"</span>                       <span class="co"># 目标波段名称</span></span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a>TIME_RANGE <span class="op">=</span> [<span class="st">"2001-01-01"</span>, <span class="st">"2025-01-01"</span>]  <span class="co"># 时间范围（开始，结束）</span></span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a>SCALING_FACTOR <span class="op">=</span> <span class="fl">0.0001</span>                 <span class="co"># 缩放因子，将 GEE 数据转换为实际值</span></span>
+<span id="cb13-74"><a href="#cb13-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-75"><a href="#cb13-75" aria-hidden="true" tabindex="-1"></a><span class="co"># 可视化参数</span></span>
+<span id="cb13-76"><a href="#cb13-76" aria-hidden="true" tabindex="-1"></a>VIS_PARAMS <span class="op">=</span> {</span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a>    <span class="st">"min"</span>: <span class="dv">0</span>,</span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a>    <span class="st">"max"</span>: <span class="dv">3</span>,</span>
+<span id="cb13-79"><a href="#cb13-79" aria-hidden="true" tabindex="-1"></a>    <span class="st">"palette"</span>: [</span>
+<span id="cb13-80"><a href="#cb13-80" aria-hidden="true" tabindex="-1"></a>        <span class="st">"ffffff"</span>, <span class="st">"ce7e45"</span>, <span class="st">"df923d"</span>, <span class="st">"f1b555"</span>, <span class="st">"fcd163"</span>, </span>
+<span id="cb13-81"><a href="#cb13-81" aria-hidden="true" tabindex="-1"></a>        <span class="st">"99b718"</span>, <span class="st">"74a901"</span>, <span class="st">"66a000"</span>, <span class="st">"529400"</span>, <span class="st">"3e8601"</span>, </span>
+<span id="cb13-82"><a href="#cb13-82" aria-hidden="true" tabindex="-1"></a>        <span class="st">"207401"</span>, <span class="st">"056201"</span>, <span class="st">"004c00"</span>, <span class="st">"023b01"</span>, <span class="st">"012e01"</span>, </span>
+<span id="cb13-83"><a href="#cb13-83" aria-hidden="true" tabindex="-1"></a>        <span class="st">"011d01"</span>, <span class="st">"011301"</span></span>
+<span id="cb13-84"><a href="#cb13-84" aria-hidden="true" tabindex="-1"></a>    ]  <span class="co"># 根据数据集范围调整</span></span>
+<span id="cb13-85"><a href="#cb13-85" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-86"><a href="#cb13-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-87"><a href="#cb13-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-88"><a href="#cb13-88" aria-hidden="true" tabindex="-1"></a><span class="fu">#### 3.3.2 加载和预处理数据</span></span>
+<span id="cb13-89"><a href="#cb13-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-90"><a href="#cb13-90" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-91"><a href="#cb13-91" aria-hidden="true" tabindex="-1"></a><span class="co"># 加载 GEE 图像集合</span></span>
+<span id="cb13-92"><a href="#cb13-92" aria-hidden="true" tabindex="-1"></a>image_collection <span class="op">=</span> ee.ImageCollection(GEE_DATA_ID)<span class="op">\</span></span>
+<span id="cb13-93"><a href="#cb13-93" aria-hidden="true" tabindex="-1"></a>    .filterDate(TIME_RANGE[<span class="dv">0</span>], TIME_RANGE[<span class="dv">1</span>])<span class="op">\</span></span>
+<span id="cb13-94"><a href="#cb13-94" aria-hidden="true" tabindex="-1"></a>    .select(BAND_NAME)</span>
+<span id="cb13-95"><a href="#cb13-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-96"><a href="#cb13-96" aria-hidden="true" tabindex="-1"></a><span class="co"># 定义应用缩放因子的函数</span></span>
+<span id="cb13-97"><a href="#cb13-97" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_scaling(image):</span>
+<span id="cb13-98"><a href="#cb13-98" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> image.multiply(SCALING_FACTOR)</span>
+<span id="cb13-99"><a href="#cb13-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-100"><a href="#cb13-100" aria-hidden="true" tabindex="-1"></a><span class="co"># 将缩放应用到集合</span></span>
+<span id="cb13-101"><a href="#cb13-101" aria-hidden="true" tabindex="-1"></a>scaled_collection <span class="op">=</span> image_collection.<span class="bu">map</span>(apply_scaling)</span>
+<span id="cb13-102"><a href="#cb13-102" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-103"><a href="#cb13-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-104"><a href="#cb13-104" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3.4 在 Geemap 中预览数据</span></span>
+<span id="cb13-105"><a href="#cb13-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-106"><a href="#cb13-106" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-107"><a href="#cb13-107" aria-hidden="true" tabindex="-1"></a><span class="co"># 初始化 geemap 界面</span></span>
+<span id="cb13-108"><a href="#cb13-108" aria-hidden="true" tabindex="-1"></a>Map <span class="op">=</span> geemap.Map(center<span class="op">=</span>(<span class="dv">40</span>, <span class="dv">100</span>), zoom<span class="op">=</span><span class="dv">4</span>)  <span class="co"># 以欧亚大陆为中心</span></span>
+<span id="cb13-109"><a href="#cb13-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-110"><a href="#cb13-110" aria-hidden="true" tabindex="-1"></a><span class="co"># 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）</span></span>
+<span id="cb13-111"><a href="#cb13-111" aria-hidden="true" tabindex="-1"></a>preview_image <span class="op">=</span> scaled_collection.median()</span>
+<span id="cb13-112"><a href="#cb13-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-113"><a href="#cb13-113" aria-hidden="true" tabindex="-1"></a><span class="co"># 将图像添加到地图</span></span>
+<span id="cb13-114"><a href="#cb13-114" aria-hidden="true" tabindex="-1"></a>Map.addLayer(preview_image, VIS_PARAMS, <span class="ss">f"</span><span class="sc">{</span>GEE_DATA_ID<span class="sc">.</span>split(<span class="st">'/'</span>)[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">_Preview"</span>)</span>
+<span id="cb13-115"><a href="#cb13-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-116"><a href="#cb13-116" aria-hidden="true" tabindex="-1"></a><span class="co"># 添加颜色条图例</span></span>
+<span id="cb13-117"><a href="#cb13-117" aria-hidden="true" tabindex="-1"></a>Map.add_colorbar_branca(</span>
+<span id="cb13-118"><a href="#cb13-118" aria-hidden="true" tabindex="-1"></a>    colors<span class="op">=</span>VIS_PARAMS[<span class="st">"palette"</span>],</span>
+<span id="cb13-119"><a href="#cb13-119" aria-hidden="true" tabindex="-1"></a>    vmin<span class="op">=</span>VIS_PARAMS[<span class="st">"min"</span>],</span>
+<span id="cb13-120"><a href="#cb13-120" aria-hidden="true" tabindex="-1"></a>    vmax<span class="op">=</span>VIS_PARAMS[<span class="st">"max"</span>],</span>
+<span id="cb13-121"><a href="#cb13-121" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span>BAND_NAME,</span>
+<span id="cb13-122"><a href="#cb13-122" aria-hidden="true" tabindex="-1"></a>    position<span class="op">=</span><span class="st">"bottomright"</span></span>
+<span id="cb13-123"><a href="#cb13-123" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-124"><a href="#cb13-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-125"><a href="#cb13-125" aria-hidden="true" tabindex="-1"></a><span class="co"># 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）</span></span>
+<span id="cb13-126"><a href="#cb13-126" aria-hidden="true" tabindex="-1"></a>Map</span>
+<span id="cb13-127"><a href="#cb13-127" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-128"><a href="#cb13-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-129"><a href="#cb13-129" aria-hidden="true" tabindex="-1"></a><span class="fu">## 📥 步骤 2：支持断点续传的分段下载</span></span>
+<span id="cb13-130"><a href="#cb13-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-131"><a href="#cb13-131" aria-hidden="true" tabindex="-1"></a>直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有**跳过现有文件的断点续传功能**。</span>
+<span id="cb13-132"><a href="#cb13-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-133"><a href="#cb13-133" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4.1 定义下载参数</span></span>
+<span id="cb13-134"><a href="#cb13-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-135"><a href="#cb13-135" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-136"><a href="#cb13-136" aria-hidden="true" tabindex="-1"></a><span class="co"># 文件路径（自定义这些）</span></span>
+<span id="cb13-137"><a href="#cb13-137" aria-hidden="true" tabindex="-1"></a>GRID_PATH <span class="op">=</span> <span class="st">"I:/geemap/roi/WorldFishnet.gpkg"</span>  <span class="co"># 矢量网格路径</span></span>
+<span id="cb13-138"><a href="#cb13-138" aria-hidden="true" tabindex="-1"></a>GRID_LAYER <span class="op">=</span> <span class="st">"WorldFish30"</span>                       <span class="co"># GeoPackage 中的图层名称</span></span>
+<span id="cb13-139"><a href="#cb13-139" aria-hidden="true" tabindex="-1"></a>OUTPUT_DIR <span class="op">=</span> <span class="st">"I:/geemap/GEE_Global_Data/"</span>        <span class="co"># 保存分段文件的目录</span></span>
+<span id="cb13-140"><a href="#cb13-140" aria-hidden="true" tabindex="-1"></a>RESOLUTION <span class="op">=</span> <span class="dv">500</span>                                  <span class="co"># 数据集分辨率（米）</span></span>
+<span id="cb13-141"><a href="#cb13-141" aria-hidden="true" tabindex="-1"></a>BATCH_SIZE <span class="op">=</span> <span class="dv">5</span>                                    <span class="co"># 每批处理的网格块数量</span></span>
+<span id="cb13-142"><a href="#cb13-142" aria-hidden="true" tabindex="-1"></a>START_YEAR <span class="op">=</span> <span class="dv">2001</span>                                 <span class="co"># 从此年开始恢复（如果下载被中断）</span></span>
+<span id="cb13-143"><a href="#cb13-143" aria-hidden="true" tabindex="-1"></a>START_GRID_INDEX <span class="op">=</span> <span class="dv">0</span>                             <span class="co"># 从此网格索引恢复（如果下载被中断）</span></span>
+<span id="cb13-144"><a href="#cb13-144" aria-hidden="true" tabindex="-1"></a>CRS <span class="op">=</span> <span class="st">"EPSG:4326"</span>                                <span class="co"># 目标坐标系（WGS84）</span></span>
+<span id="cb13-145"><a href="#cb13-145" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-146"><a href="#cb13-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-147"><a href="#cb13-147" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4.2 加载矢量网格和创建输出目录</span></span>
+<span id="cb13-148"><a href="#cb13-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-149"><a href="#cb13-149" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-150"><a href="#cb13-150" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 geopandas 加载矢量网格</span></span>
+<span id="cb13-151"><a href="#cb13-151" aria-hidden="true" tabindex="-1"></a>grid_gdf <span class="op">=</span> gpd.read_file(GRID_PATH, layer<span class="op">=</span>GRID_LAYER)</span>
+<span id="cb13-152"><a href="#cb13-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-153"><a href="#cb13-153" aria-hidden="true" tabindex="-1"></a><span class="co"># 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection</span></span>
+<span id="cb13-154"><a href="#cb13-154" aria-hidden="true" tabindex="-1"></a>grid_ee <span class="op">=</span> geemap.gdf_to_ee(grid_gdf)</span>
+<span id="cb13-155"><a href="#cb13-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-156"><a href="#cb13-156" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建输出目录（如果不存在）</span></span>
+<span id="cb13-157"><a href="#cb13-157" aria-hidden="true" tabindex="-1"></a>os.makedirs(OUTPUT_DIR, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-158"><a href="#cb13-158" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-159"><a href="#cb13-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-160"><a href="#cb13-160" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4.3 支持断点续传的批处理下载</span></span>
+<span id="cb13-161"><a href="#cb13-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-162"><a href="#cb13-162" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-163"><a href="#cb13-163" aria-hidden="true" tabindex="-1"></a><span class="co"># 从时间范围获取年份列表</span></span>
+<span id="cb13-164"><a href="#cb13-164" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> <span class="bu">range</span>(<span class="bu">int</span>(TIME_RANGE[<span class="dv">0</span>].split(<span class="st">"-"</span>)[<span class="dv">0</span>]), <span class="bu">int</span>(TIME_RANGE[<span class="dv">1</span>].split(<span class="st">"-"</span>)[<span class="dv">0</span>]))</span>
+<span id="cb13-165"><a href="#cb13-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-166"><a href="#cb13-166" aria-hidden="true" tabindex="-1"></a><span class="co"># 遍历每一年</span></span>
+<span id="cb13-167"><a href="#cb13-167" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> years:</span>
+<span id="cb13-168"><a href="#cb13-168" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 跳过恢复开始年份之前的年份</span></span>
+<span id="cb13-169"><a href="#cb13-169" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> year <span class="op">&lt;</span> START_YEAR:</span>
+<span id="cb13-170"><a href="#cb13-170" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb13-171"><a href="#cb13-171" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"🔄 正在处理 </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> 年的数据..."</span>)</span>
+<span id="cb13-172"><a href="#cb13-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-173"><a href="#cb13-173" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 提取年度数据</span></span>
+<span id="cb13-174"><a href="#cb13-174" aria-hidden="true" tabindex="-1"></a>    annual_image <span class="op">=</span> scaled_collection<span class="op">\</span></span>
+<span id="cb13-175"><a href="#cb13-175" aria-hidden="true" tabindex="-1"></a>        .<span class="bu">filter</span>(ee.Filter.calendarRange(year, year, <span class="st">"year"</span>))<span class="op">\</span></span>
+<span id="cb13-176"><a href="#cb13-176" aria-hidden="true" tabindex="-1"></a>        .median()</span>
+<span id="cb13-177"><a href="#cb13-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-178"><a href="#cb13-178" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 获取网格块总数</span></span>
+<span id="cb13-179"><a href="#cb13-179" aria-hidden="true" tabindex="-1"></a>    total_grids <span class="op">=</span> grid_ee.size().getInfo()</span>
+<span id="cb13-180"><a href="#cb13-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-181"><a href="#cb13-181" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 计算批次数</span></span>
+<span id="cb13-182"><a href="#cb13-182" aria-hidden="true" tabindex="-1"></a>    num_batches <span class="op">=</span> (total_grids <span class="op">-</span> START_GRID_INDEX <span class="op">+</span> BATCH_SIZE <span class="op">-</span> <span class="dv">1</span>) <span class="op">//</span> BATCH_SIZE</span>
+<span id="cb13-183"><a href="#cb13-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-184"><a href="#cb13-184" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 处理每批</span></span>
+<span id="cb13-185"><a href="#cb13-185" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch <span class="kw">in</span> <span class="bu">range</span>(num_batches):</span>
+<span id="cb13-186"><a href="#cb13-186" aria-hidden="true" tabindex="-1"></a>        batch_start <span class="op">=</span> START_GRID_INDEX <span class="op">+</span> batch <span class="op">*</span> BATCH_SIZE</span>
+<span id="cb13-187"><a href="#cb13-187" aria-hidden="true" tabindex="-1"></a>        batch_end <span class="op">=</span> <span class="bu">min</span>(batch_start <span class="op">+</span> BATCH_SIZE, total_grids)</span>
+<span id="cb13-188"><a href="#cb13-188" aria-hidden="true" tabindex="-1"></a>        current_batch <span class="op">=</span> grid_ee.toList(BATCH_SIZE, batch_start)</span>
+<span id="cb13-189"><a href="#cb13-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-190"><a href="#cb13-190" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 处理批次中的每个网格块</span></span>
+<span id="cb13-191"><a href="#cb13-191" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(batch_end <span class="op">-</span> batch_start):</span>
+<span id="cb13-192"><a href="#cb13-192" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 获取当前网格要素和几何形状</span></span>
+<span id="cb13-193"><a href="#cb13-193" aria-hidden="true" tabindex="-1"></a>            grid_feature <span class="op">=</span> ee.Feature(current_batch.get(i))</span>
+<span id="cb13-194"><a href="#cb13-194" aria-hidden="true" tabindex="-1"></a>            grid_geom <span class="op">=</span> grid_feature.geometry()</span>
+<span id="cb13-195"><a href="#cb13-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-196"><a href="#cb13-196" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 生成唯一文件名</span></span>
+<span id="cb13-197"><a href="#cb13-197" aria-hidden="true" tabindex="-1"></a>            grid_index <span class="op">=</span> batch_start <span class="op">+</span> i <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb13-198"><a href="#cb13-198" aria-hidden="true" tabindex="-1"></a>            filename <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>BAND_NAME<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">_grid_</span><span class="sc">{</span>grid_index<span class="sc">:04d}</span><span class="ss">.tif"</span></span>
+<span id="cb13-199"><a href="#cb13-199" aria-hidden="true" tabindex="-1"></a>            file_path <span class="op">=</span> os.path.join(OUTPUT_DIR, filename)</span>
+<span id="cb13-200"><a href="#cb13-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-201"><a href="#cb13-201" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 如果文件已存在则跳过（断点续传功能）</span></span>
+<span id="cb13-202"><a href="#cb13-202" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> os.path.exists(file_path):</span>
+<span id="cb13-203"><a href="#cb13-203" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"⏭️  跳过现有文件: </span><span class="sc">{</span>filename<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-204"><a href="#cb13-204" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb13-205"><a href="#cb13-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-206"><a href="#cb13-206" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 下载裁剪后的图像</span></span>
+<span id="cb13-207"><a href="#cb13-207" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
+<span id="cb13-208"><a href="#cb13-208" aria-hidden="true" tabindex="-1"></a>                <span class="co"># 将年度图像裁剪到当前网格</span></span>
+<span id="cb13-209"><a href="#cb13-209" aria-hidden="true" tabindex="-1"></a>                clipped_image <span class="op">=</span> annual_image.clip(grid_geom)</span>
+<span id="cb13-210"><a href="#cb13-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-211"><a href="#cb13-211" aria-hidden="true" tabindex="-1"></a>                <span class="co"># 使用 geemap 下载</span></span>
+<span id="cb13-212"><a href="#cb13-212" aria-hidden="true" tabindex="-1"></a>                geemap.download_ee_image(</span>
+<span id="cb13-213"><a href="#cb13-213" aria-hidden="true" tabindex="-1"></a>                    image<span class="op">=</span>clipped_image,</span>
+<span id="cb13-214"><a href="#cb13-214" aria-hidden="true" tabindex="-1"></a>                    filename<span class="op">=</span>file_path,</span>
+<span id="cb13-215"><a href="#cb13-215" aria-hidden="true" tabindex="-1"></a>                    scale<span class="op">=</span>RESOLUTION,</span>
+<span id="cb13-216"><a href="#cb13-216" aria-hidden="true" tabindex="-1"></a>                    region<span class="op">=</span>grid_geom,</span>
+<span id="cb13-217"><a href="#cb13-217" aria-hidden="true" tabindex="-1"></a>                    crs<span class="op">=</span>CRS,</span>
+<span id="cb13-218"><a href="#cb13-218" aria-hidden="true" tabindex="-1"></a>                    max_tile_size<span class="op">=</span><span class="dv">1024</span>  <span class="co"># 根据内存调整</span></span>
+<span id="cb13-219"><a href="#cb13-219" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb13-220"><a href="#cb13-220" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"✅ 成功下载: </span><span class="sc">{</span>filename<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-221"><a href="#cb13-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-222"><a href="#cb13-222" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb13-223"><a href="#cb13-223" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"❌ 下载 </span><span class="sc">{</span>filename<span class="sc">}</span><span class="ss"> 失败: </span><span class="sc">{</span><span class="bu">str</span>(e)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-224"><a href="#cb13-224" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb13-225"><a href="#cb13-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-226"><a href="#cb13-226" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 为下一年重置网格索引</span></span>
+<span id="cb13-227"><a href="#cb13-227" aria-hidden="true" tabindex="-1"></a>    START_GRID_INDEX <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb13-228"><a href="#cb13-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-229"><a href="#cb13-229" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"🎉 所有下载任务完成！"</span>)</span>
+<span id="cb13-230"><a href="#cb13-230" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-231"><a href="#cb13-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-232"><a href="#cb13-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## 🔗 步骤 3：镶嵌分段文件</span></span>
+<span id="cb13-233"><a href="#cb13-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-234"><a href="#cb13-234" aria-hidden="true" tabindex="-1"></a>使用 <span class="in">`rasterio`</span> 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。</span>
+<span id="cb13-235"><a href="#cb13-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-236"><a href="#cb13-236" aria-hidden="true" tabindex="-1"></a><span class="fu">### 5.1 定义镶嵌参数</span></span>
+<span id="cb13-237"><a href="#cb13-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-238"><a href="#cb13-238" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-239"><a href="#cb13-239" aria-hidden="true" tabindex="-1"></a><span class="co"># 文件路径（自定义这些）</span></span>
+<span id="cb13-240"><a href="#cb13-240" aria-hidden="true" tabindex="-1"></a>INPUT_DIR <span class="op">=</span> OUTPUT_DIR                    <span class="co"># 与下载输出目录相同</span></span>
+<span id="cb13-241"><a href="#cb13-241" aria-hidden="true" tabindex="-1"></a>MOSAIC_OUTPUT_DIR <span class="op">=</span> <span class="st">"I:/geemap/GEE_Global_Data/Mosaicked/"</span>  <span class="co"># 镶嵌文件的目录</span></span>
+<span id="cb13-242"><a href="#cb13-242" aria-hidden="true" tabindex="-1"></a>COMPRESSION <span class="op">=</span> <span class="st">"LZW"</span>                       <span class="co"># 压缩方法（减少文件大小）</span></span>
+<span id="cb13-243"><a href="#cb13-243" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-244"><a href="#cb13-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-245"><a href="#cb13-245" aria-hidden="true" tabindex="-1"></a><span class="fu">### 5.2 启用 GDAL 多线程</span></span>
+<span id="cb13-246"><a href="#cb13-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-247"><a href="#cb13-247" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-248"><a href="#cb13-248" aria-hidden="true" tabindex="-1"></a><span class="co"># 启用 GDAL 多线程以加速镶嵌</span></span>
+<span id="cb13-249"><a href="#cb13-249" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"GDAL_NUM_THREADS"</span>] <span class="op">=</span> <span class="st">"ALL_CPUS"</span>  <span class="co"># 使用所有可用 CPU</span></span>
+<span id="cb13-250"><a href="#cb13-250" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-251"><a href="#cb13-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-252"><a href="#cb13-252" aria-hidden="true" tabindex="-1"></a><span class="fu">### 5.3 镶嵌年度文件</span></span>
+<span id="cb13-253"><a href="#cb13-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-254"><a href="#cb13-254" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-255"><a href="#cb13-255" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb13-256"><a href="#cb13-256" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rasterio.merge <span class="im">import</span> merge</span>
+<span id="cb13-257"><a href="#cb13-257" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rasterio.enums <span class="im">import</span> Resampling</span>
+<span id="cb13-258"><a href="#cb13-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-259"><a href="#cb13-259" aria-hidden="true" tabindex="-1"></a><span class="co"># 为镶嵌文件创建输出目录</span></span>
+<span id="cb13-260"><a href="#cb13-260" aria-hidden="true" tabindex="-1"></a>os.makedirs(MOSAIC_OUTPUT_DIR, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-261"><a href="#cb13-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-262"><a href="#cb13-262" aria-hidden="true" tabindex="-1"></a><span class="co"># 按年份分组分段文件</span></span>
+<span id="cb13-263"><a href="#cb13-263" aria-hidden="true" tabindex="-1"></a>file_pattern <span class="op">=</span> re.<span class="bu">compile</span>(<span class="vs">rf"</span><span class="sc">{</span>BAND_NAME<span class="sc">}</span><span class="vs">_</span><span class="kw">(</span><span class="dv">\d</span><span class="ch">{{</span><span class="op">4</span><span class="ch">}}</span><span class="kw">)</span><span class="vs">_grid_</span><span class="dv">\d</span><span class="ch">{{</span><span class="op">4</span><span class="ch">}}\.</span><span class="vs">tif</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb13-264"><a href="#cb13-264" aria-hidden="true" tabindex="-1"></a>yearly_files <span class="op">=</span> {}</span>
+<span id="cb13-265"><a href="#cb13-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-266"><a href="#cb13-266" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> filename <span class="kw">in</span> os.listdir(INPUT_DIR):</span>
+<span id="cb13-267"><a href="#cb13-267" aria-hidden="true" tabindex="-1"></a>    match <span class="op">=</span> file_pattern.match(filename)</span>
+<span id="cb13-268"><a href="#cb13-268" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> match:</span>
+<span id="cb13-269"><a href="#cb13-269" aria-hidden="true" tabindex="-1"></a>        year <span class="op">=</span> match.group(<span class="dv">1</span>)</span>
+<span id="cb13-270"><a href="#cb13-270" aria-hidden="true" tabindex="-1"></a>        file_path <span class="op">=</span> os.path.join(INPUT_DIR, filename)</span>
+<span id="cb13-271"><a href="#cb13-271" aria-hidden="true" tabindex="-1"></a>        yearly_files.setdefault(year, []).append(file_path)</span>
+<span id="cb13-272"><a href="#cb13-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-273"><a href="#cb13-273" aria-hidden="true" tabindex="-1"></a><span class="co"># 镶嵌每年的文件</span></span>
+<span id="cb13-274"><a href="#cb13-274" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year, file_list <span class="kw">in</span> yearly_files.items():</span>
+<span id="cb13-275"><a href="#cb13-275" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"🔗 正在镶嵌 </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> 年的 </span><span class="sc">{</span><span class="bu">len</span>(file_list)<span class="sc">}</span><span class="ss"> 个文件..."</span>)</span>
+<span id="cb13-276"><a href="#cb13-276" aria-hidden="true" tabindex="-1"></a>    datasets <span class="op">=</span> []</span>
+<span id="cb13-277"><a href="#cb13-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-278"><a href="#cb13-278" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb13-279"><a href="#cb13-279" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 打开所有分段文件</span></span>
+<span id="cb13-280"><a href="#cb13-280" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> file_path <span class="kw">in</span> file_list:</span>
+<span id="cb13-281"><a href="#cb13-281" aria-hidden="true" tabindex="-1"></a>            src <span class="op">=</span> rasterio.<span class="bu">open</span>(file_path)</span>
+<span id="cb13-282"><a href="#cb13-282" aria-hidden="true" tabindex="-1"></a>            datasets.append(src)</span>
+<span id="cb13-283"><a href="#cb13-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-284"><a href="#cb13-284" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 执行镶嵌</span></span>
+<span id="cb13-285"><a href="#cb13-285" aria-hidden="true" tabindex="-1"></a>        mosaic_array, out_transform <span class="op">=</span> merge(</span>
+<span id="cb13-286"><a href="#cb13-286" aria-hidden="true" tabindex="-1"></a>            datasets,</span>
+<span id="cb13-287"><a href="#cb13-287" aria-hidden="true" tabindex="-1"></a>            resampling<span class="op">=</span>Resampling.nearest  <span class="co"># 对离散数据使用最近邻重采样</span></span>
+<span id="cb13-288"><a href="#cb13-288" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb13-289"><a href="#cb13-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-290"><a href="#cb13-290" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 更新镶嵌文件的元数据</span></span>
+<span id="cb13-291"><a href="#cb13-291" aria-hidden="true" tabindex="-1"></a>        out_meta <span class="op">=</span> datasets[<span class="dv">0</span>].meta.copy()</span>
+<span id="cb13-292"><a href="#cb13-292" aria-hidden="true" tabindex="-1"></a>        out_meta.update({</span>
+<span id="cb13-293"><a href="#cb13-293" aria-hidden="true" tabindex="-1"></a>            <span class="st">"driver"</span>: <span class="st">"GTiff"</span>,</span>
+<span id="cb13-294"><a href="#cb13-294" aria-hidden="true" tabindex="-1"></a>            <span class="st">"height"</span>: mosaic_array.shape[<span class="dv">1</span>],</span>
+<span id="cb13-295"><a href="#cb13-295" aria-hidden="true" tabindex="-1"></a>            <span class="st">"width"</span>: mosaic_array.shape[<span class="dv">2</span>],</span>
+<span id="cb13-296"><a href="#cb13-296" aria-hidden="true" tabindex="-1"></a>            <span class="st">"transform"</span>: out_transform,</span>
+<span id="cb13-297"><a href="#cb13-297" aria-hidden="true" tabindex="-1"></a>            <span class="st">"compress"</span>: COMPRESSION,</span>
+<span id="cb13-298"><a href="#cb13-298" aria-hidden="true" tabindex="-1"></a>            <span class="st">"bigtiff"</span>: <span class="st">"YES"</span>  <span class="co"># 对大文件启用（&gt;4GB）</span></span>
+<span id="cb13-299"><a href="#cb13-299" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb13-300"><a href="#cb13-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-301"><a href="#cb13-301" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 保存镶嵌文件</span></span>
+<span id="cb13-302"><a href="#cb13-302" aria-hidden="true" tabindex="-1"></a>        output_path <span class="op">=</span> os.path.join(MOSAIC_OUTPUT_DIR, <span class="ss">f"</span><span class="sc">{</span>BAND_NAME<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">_Global.tif"</span>)</span>
+<span id="cb13-303"><a href="#cb13-303" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> rasterio.<span class="bu">open</span>(output_path, <span class="st">"w"</span>, <span class="op">**</span>out_meta) <span class="im">as</span> dest:</span>
+<span id="cb13-304"><a href="#cb13-304" aria-hidden="true" tabindex="-1"></a>            dest.write(mosaic_array)</span>
+<span id="cb13-305"><a href="#cb13-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-306"><a href="#cb13-306" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"✅ 成功镶嵌: </span><span class="sc">{</span>output_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-307"><a href="#cb13-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-308"><a href="#cb13-308" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb13-309"><a href="#cb13-309" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"❌ 镶嵌 </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> 年数据失败: </span><span class="sc">{</span><span class="bu">str</span>(e)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-310"><a href="#cb13-310" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb13-311"><a href="#cb13-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-312"><a href="#cb13-312" aria-hidden="true" tabindex="-1"></a>    <span class="cf">finally</span>:</span>
+<span id="cb13-313"><a href="#cb13-313" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 关闭所有打开的栅格数据集以释放内存</span></span>
+<span id="cb13-314"><a href="#cb13-314" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> ds <span class="kw">in</span> datasets:</span>
+<span id="cb13-315"><a href="#cb13-315" aria-hidden="true" tabindex="-1"></a>            ds.close()</span>
+<span id="cb13-316"><a href="#cb13-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-317"><a href="#cb13-317" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"🎉 所有镶嵌任务完成！"</span>)</span>
+<span id="cb13-318"><a href="#cb13-318" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-319"><a href="#cb13-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-320"><a href="#cb13-320" aria-hidden="true" tabindex="-1"></a><span class="fu">## ⚠️ 注意事项和故障排除</span></span>
+<span id="cb13-321"><a href="#cb13-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-322"><a href="#cb13-322" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.1 常见问题</span></span>
+<span id="cb13-323"><a href="#cb13-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-324"><a href="#cb13-324" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 问题 <span class="pp">|</span> 解决方案 <span class="pp">|</span></span>
+<span id="cb13-325"><a href="#cb13-325" aria-hidden="true" tabindex="-1"></a><span class="pp">|------|----------|</span></span>
+<span id="cb13-326"><a href="#cb13-326" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **GEE 身份验证错误** <span class="pp">|</span> 重新运行 <span class="in">`ee.Authenticate()`</span> 并按照浏览器提示重新进行身份验证 <span class="pp">|</span></span>
+<span id="cb13-327"><a href="#cb13-327" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **下载中断** <span class="pp">|</span> 工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复 <span class="pp">|</span></span>
+<span id="cb13-328"><a href="#cb13-328" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **内存过载** <span class="pp">|</span> 减少 <span class="in">`BATCH_SIZE`</span>（如从 5 到 3）或 <span class="in">`max_tile_size`</span>（如从 1024 到 512） <span class="pp">|</span></span>
+<span id="cb13-329"><a href="#cb13-329" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **镶嵌失败** <span class="pp">|</span> 确保所有分段文件具有相同的 CRS 和分辨率 <span class="pp">|</span></span>
+<span id="cb13-330"><a href="#cb13-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-331"><a href="#cb13-331" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.2 自定义提示</span></span>
+<span id="cb13-332"><a href="#cb13-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-333"><a href="#cb13-333" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**非年度数据**: 对于月度/季节性数据，修改时间过滤器</span>
+<span id="cb13-334"><a href="#cb13-334" aria-hidden="true" tabindex="-1"></a>  <span class="in">```python</span></span>
+<span id="cb13-335"><a href="#cb13-335" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 示例：夏季数据</span></span>
+<span id="cb13-336"><a href="#cb13-336" aria-hidden="true" tabindex="-1"></a>  ee.Filter.calendarRange(year, year, <span class="st">"year"</span>)<span class="op">\</span></span>
+<span id="cb13-337"><a href="#cb13-337" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">filter</span>(ee.Filter.calendarRange(<span class="dv">6</span>, <span class="dv">8</span>, <span class="st">"month"</span>))</span>
+<span id="cb13-338"><a href="#cb13-338" aria-hidden="true" tabindex="-1"></a>  <span class="in">```</span></span>
+<span id="cb13-339"><a href="#cb13-339" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**不同数据集**: 更新 <span class="in">`GEE_DATA_ID`</span>、<span class="in">`BAND_NAME`</span>、<span class="in">`SCALING_FACTOR`</span> 和 <span class="in">`VIS_PARAMS`</span></span>
+<span id="cb13-340"><a href="#cb13-340" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**网格调整**: 根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）</span>
+<span id="cb13-341"><a href="#cb13-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-342"><a href="#cb13-342" aria-hidden="true" tabindex="-1"></a><span class="fu">## 📚 参考资料</span></span>
+<span id="cb13-343"><a href="#cb13-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-344"><a href="#cb13-344" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**`geemap` 文档**: <span class="co">[</span><span class="ot">geemap.org</span><span class="co">](https://geemap.org/)</span></span>
+<span id="cb13-345"><a href="#cb13-345" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**GEE Python API 文档**: <span class="co">[</span><span class="ot">developers.google.com/earth-engine</span><span class="co">](https://developers.google.com/earth-engine/guides/python_install)</span></span>
+<span id="cb13-346"><a href="#cb13-346" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**`rasterio` 镶嵌指南**: <span class="co">[</span><span class="ot">rasterio.readthedocs.io</span><span class="co">](https://rasterio.readthedocs.io/en/latest/topics/merge.html)</span></span>
+<span id="cb13-347"><a href="#cb13-347" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**MODIS MOD17A3HGF 数据集**: <span class="co">[</span><span class="ot">GEE MOD17A3HGF 文档</span><span class="co">](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD17A3HGF)</span></span>
+<span id="cb13-348"><a href="#cb13-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-349"><a href="#cb13-349" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb13-350"><a href="#cb13-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-351"><a href="#cb13-351" aria-hidden="true" tabindex="-1"></a>*💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。*</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

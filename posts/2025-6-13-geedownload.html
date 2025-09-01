@@ -105,9 +105,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
+<link rel="stylesheet" href="../styles.css">
 </head>
 
-<body class="nav-fixed quarto-light">
+<body class="floating nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -144,35 +145,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
-<!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#解决-google-earth-engine-认证问题的最新方法" id="toc-解决-google-earth-engine-认证问题的最新方法" class="nav-link active" data-scroll-target="#解决-google-earth-engine-认证问题的最新方法">解决 Google Earth Engine 认证问题的最新方法</a>
+  <li><a href="#解决-google-earth-engine-认证问题的最新方法" id="toc-解决-google-earth-engine-认证问题的最新方法" class="nav-link active" data-scroll-target="#解决-google-earth-engine-认证问题的最新方法"><span class="header-section-number">1</span> 解决 Google Earth Engine 认证问题的最新方法</a>
   <ul class="collapse">
-  <li><a href="#认证步骤" id="toc-认证步骤" class="nav-link" data-scroll-target="#认证步骤">认证步骤</a>
+  <li><a href="#认证步骤" id="toc-认证步骤" class="nav-link" data-scroll-target="#认证步骤"><span class="header-section-number">1.1</span> 认证步骤</a>
   <ul class="collapse">
-  <li><a href="#安装-google-cloud-sdk-gcloud" id="toc-安装-google-cloud-sdk-gcloud" class="nav-link" data-scroll-target="#安装-google-cloud-sdk-gcloud">1. 安装 Google Cloud SDK (gcloud)</a></li>
-  <li><a href="#配置-gcloud" id="toc-配置-gcloud" class="nav-link" data-scroll-target="#配置-gcloud">2. 配置 gcloud</a></li>
-  <li><a href="#启用-earth-engine-api" id="toc-启用-earth-engine-api" class="nav-link" data-scroll-target="#启用-earth-engine-api">3. 启用 Earth Engine API</a></li>
-  <li><a href="#重新认证-earth-engine" id="toc-重新认证-earth-engine" class="nav-link" data-scroll-target="#重新认证-earth-engine">4. 重新认证 Earth Engine</a></li>
+  <li><a href="#安装-google-cloud-sdk-gcloud" id="toc-安装-google-cloud-sdk-gcloud" class="nav-link" data-scroll-target="#安装-google-cloud-sdk-gcloud"><span class="header-section-number">1.1.1</span> 1. 安装 Google Cloud SDK (gcloud)</a></li>
+  <li><a href="#配置-gcloud" id="toc-配置-gcloud" class="nav-link" data-scroll-target="#配置-gcloud"><span class="header-section-number">1.1.2</span> 2. 配置 gcloud</a></li>
+  <li><a href="#启用-earth-engine-api" id="toc-启用-earth-engine-api" class="nav-link" data-scroll-target="#启用-earth-engine-api"><span class="header-section-number">1.1.3</span> 3. 启用 Earth Engine API</a></li>
+  <li><a href="#重新认证-earth-engine" id="toc-重新认证-earth-engine" class="nav-link" data-scroll-target="#重新认证-earth-engine"><span class="header-section-number">1.1.4</span> 4. 重新认证 Earth Engine</a></li>
   </ul></li>
-  <li><a href="#注意事项" id="toc-注意事项" class="nav-link" data-scroll-target="#注意事项">注意事项</a></li>
-  <li><a href="#常见问题" id="toc-常见问题" class="nav-link" data-scroll-target="#常见问题">常见问题</a></li>
+  <li><a href="#注意事项" id="toc-注意事项" class="nav-link" data-scroll-target="#注意事项"><span class="header-section-number">1.2</span> 注意事项</a></li>
+  <li><a href="#常见问题" id="toc-常见问题" class="nav-link" data-scroll-target="#常见问题"><span class="header-section-number">1.3</span> 常见问题</a></li>
   </ul></li>
   </ul>
 </nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content column-page-right" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">解决 Google Earth Engine 认证问题的最新方法</h1>
+<div class="quarto-title-block"><div><h1 class="title">解决 Google Earth Engine 认证问题的最新方法</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
   <div class="quarto-categories">
     <div class="quarto-category">技术教程</div>
     <div class="quarto-category">GEE</div>
@@ -181,7 +185,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<div class="quarto-title-meta">
+<div class="quarto-title-meta column-page-right">
 
     
     <div>
@@ -199,17 +203,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="解决-google-earth-engine-认证问题的最新方法" class="level1">
-<h1>解决 Google Earth Engine 认证问题的最新方法</h1>
+<section id="解决-google-earth-engine-认证问题的最新方法" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> 解决 Google Earth Engine 认证问题的最新方法</h1>
 <p>最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。</p>
-<section id="认证步骤" class="level2">
-<h2 class="anchored" data-anchor-id="认证步骤">认证步骤</h2>
-<section id="安装-google-cloud-sdk-gcloud" class="level3">
-<h3 class="anchored" data-anchor-id="安装-google-cloud-sdk-gcloud">1. 安装 Google Cloud SDK (gcloud)</h3>
+<section id="认证步骤" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="认证步骤"><span class="header-section-number">1.1</span> 认证步骤</h2>
+<section id="安装-google-cloud-sdk-gcloud" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="安装-google-cloud-sdk-gcloud"><span class="header-section-number">1.1.1</span> 1. 安装 Google Cloud SDK (gcloud)</h3>
 <p>首先需要安装 Google Cloud SDK，这是进行认证的必要工具。</p>
 </section>
-<section id="配置-gcloud" class="level3">
-<h3 class="anchored" data-anchor-id="配置-gcloud">2. 配置 gcloud</h3>
+<section id="配置-gcloud" class="level3" data-number="1.1.2">
+<h3 data-number="1.1.2" class="anchored" data-anchor-id="配置-gcloud"><span class="header-section-number">1.1.2</span> 2. 配置 gcloud</h3>
 <ol type="1">
 <li>打开终端，运行以下命令登录：</li>
 </ol>
@@ -219,28 +223,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> config set project <span class="pp">[</span><span class="ss">你的项目ID</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="启用-earth-engine-api" class="level3">
-<h3 class="anchored" data-anchor-id="启用-earth-engine-api">3. 启用 Earth Engine API</h3>
+<section id="启用-earth-engine-api" class="level3" data-number="1.1.3">
+<h3 data-number="1.1.3" class="anchored" data-anchor-id="启用-earth-engine-api"><span class="header-section-number">1.1.3</span> 3. 启用 Earth Engine API</h3>
 <p>运行以下命令启用 Earth Engine API 服务：</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> services enable earthengine.googleapis.com</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="重新认证-earth-engine" class="level3">
-<h3 class="anchored" data-anchor-id="重新认证-earth-engine">4. 重新认证 Earth Engine</h3>
+<section id="重新认证-earth-engine" class="level3" data-number="1.1.4">
+<h3 data-number="1.1.4" class="anchored" data-anchor-id="重新认证-earth-engine"><span class="header-section-number">1.1.4</span> 4. 重新认证 Earth Engine</h3>
 <p>最后，使用以下命令进行 Earth Engine 的重新认证：</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">earthengine</span> authenticate <span class="at">--force</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>系统会自动使用 gcloud 的方式进行认证。</p>
 </section>
 </section>
-<section id="注意事项" class="level2">
-<h2 class="anchored" data-anchor-id="注意事项">注意事项</h2>
+<section id="注意事项" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="注意事项"><span class="header-section-number">1.2</span> 注意事项</h2>
 <ul>
 <li>确保已经安装了最新版本的 Google Cloud SDK</li>
 <li>确保有正确的 Google Cloud 项目权限</li>
 <li>如果遇到问题，可以尝试先运行 <code>gcloud auth revoke</code> 清除旧的认证信息</li>
 </ul>
 </section>
-<section id="常见问题" class="level2">
-<h2 class="anchored" data-anchor-id="常见问题">常见问题</h2>
+<section id="常见问题" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="常见问题"><span class="header-section-number">1.3</span> 常见问题</h2>
 <p>如果认证过程中遇到问题，可以：</p>
 <ol type="1">
 <li>检查 gcloud 是否正确安装：<code>gcloud --version</code></li>
@@ -248,6 +252,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>验证 API 是否已启用：<code>gcloud services list --enabled</code></li>
 </ol>
 
+
+<!-- -->
 
 </section>
 </section>
@@ -322,6 +328,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -651,7 +708,66 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       }
     }
   });
-  </script>
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "解决 Google Earth Engine 认证问题的最新方法"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 2025-06-13</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [技术教程, GEE]</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [Google Earth Engine, 认证, gcloud]</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu"># 解决 Google Earth Engine 认证问题的最新方法</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## 认证步骤</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. 安装 Google Cloud SDK (gcloud)</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>首先需要安装 Google Cloud SDK，这是进行认证的必要工具。</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. 配置 gcloud</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>打开终端，运行以下命令登录：</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> auth login</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>设置项目：</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> config set project <span class="pp">[</span><span class="ss">你的项目ID</span><span class="pp">]</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3. 启用 Earth Engine API</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>运行以下命令启用 Earth Engine API 服务：</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> services enable earthengine.googleapis.com</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4. 重新认证 Earth Engine</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>最后，使用以下命令进行 Earth Engine 的重新认证：</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="ex">earthengine</span> authenticate <span class="at">--force</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>系统会自动使用 gcloud 的方式进行认证。</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="fu">## 注意事项</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>确保已经安装了最新版本的 Google Cloud SDK</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>确保有正确的 Google Cloud 项目权限</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>如果遇到问题，可以尝试先运行 <span class="in">`gcloud auth revoke`</span> 清除旧的认证信息</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## 常见问题</span></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>如果认证过程中遇到问题，可以：</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>检查 gcloud 是否正确安装：<span class="in">`gcloud --version`</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>确认项目设置：<span class="in">`gcloud config list`</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>验证 API 是否已启用：<span class="in">`gcloud services list --enabled`</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
