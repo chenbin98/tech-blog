@@ -1,5 +1,49 @@
 /* Custom styles for Binchen's Tech Blog */
 
+/* Hide right-side code tools panel */
+.quarto-code-tools {
+  display: none !important;
+}
+
+.quarto-code-tools-container {
+  display: none !important;
+}
+
+.quarto-code-tools-content {
+  display: none !important;
+}
+
+/* Hide any code-related right panels */
+[data-quarto-code-tools] {
+  display: none !important;
+}
+
+/* Fix right-side shadow issue */
+body {
+  overflow-x: hidden;
+}
+
+.quarto-layout-row {
+  overflow-x: hidden;
+}
+
+.quarto-layout-row > * {
+  overflow-x: hidden;
+}
+
+.main-content {
+  overflow-x: hidden;
+}
+
+/* Remove any unwanted shadows from the right side */
+.quarto-container {
+  box-shadow: none !important;
+}
+
+.quarto-layout-row {
+  box-shadow: none !important;
+}
+
 /* Card hover effects */
 .card {
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;

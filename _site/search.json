@@ -4,7 +4,7 @@
     "href": "about.html",
     "title": "About Me",
     "section": "",
-    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work.\n\n\n\nMy research interests include:\n\nAgricultural Modeling & Simulation\nIntegration of traditional crop models with machine learning methods\nRemote Sensing & GIS\nAgricultural monitoring and spatial analysis\nSmart Agriculture Devices\nAgricultural sensors for weather, irrigation, fertilization, and pest control\nCrop Yield Prediction & Analysis\nMachine learning approaches for yield forecasting\nClimate-Smart Agriculture\nImpact of climate change on agriculture and mitigation pathways\n\n\n\n\nThis blog primarily focuses on:\n\nTechnical Tutorials & Solutions\nStep-by-step guides for common technical challenges\nResearch Methodology Discussions\nInsights into agricultural research approaches\nData Analysis Techniques\nPractical methods for agricultural data processing\nProgramming Tips & Tricks\nPython, R, and other tools in agricultural research\nAgricultural Technology Insights\nLatest developments in agricultural technology\n\n\n\n\nFeel free to reach out to me for:\n\nResearch collaborations\nTechnical discussions\n\nQuestions about blog posts\nProfessional networking\n\nEmail: binc041208@gmail.com\n\n\n\nYou can also find me on:\n\nGitHub\nCheck out my open-source projects and code repositories\nLinkedIn\nConnect with me professionally\nORCID\nView my research publications and contributions\n\n\n“Looking for like-minded friends to do something different together.”"
+    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
   },
   {
     "objectID": "about.html#introduction",
@@ -17,29 +17,29 @@
     "objectID": "about.html#research-focus",
     "href": "about.html#research-focus",
     "title": "About Me",
-    "section": "",
-    "text": "My research interests include:\n\nAgricultural Modeling & Simulation\nIntegration of traditional crop models with machine learning methods\nRemote Sensing & GIS\nAgricultural monitoring and spatial analysis\nSmart Agriculture Devices\nAgricultural sensors for weather, irrigation, fertilization, and pest control\nCrop Yield Prediction & Analysis\nMachine learning approaches for yield forecasting\nClimate-Smart Agriculture\nImpact of climate change on agriculture and mitigation pathways"
+    "section": "2 Research Focus",
+    "text": "2 Research Focus\nMy research interests include:\n\nAgricultural Modeling & Simulation\nIntegration of traditional crop models with machine learning methods\nRemote Sensing & GIS\nAgricultural monitoring and spatial analysis\nSmart Agriculture Devices\nAgricultural sensors for weather, irrigation, fertilization, and pest control\nCrop Yield Prediction & Analysis\nMachine learning approaches for yield forecasting\nClimate-Smart Agriculture\nImpact of climate change on agriculture and mitigation pathways"
   },
   {
     "objectID": "about.html#blog-content",
     "href": "about.html#blog-content",
     "title": "About Me",
-    "section": "",
-    "text": "This blog primarily focuses on:\n\nTechnical Tutorials & Solutions\nStep-by-step guides for common technical challenges\nResearch Methodology Discussions\nInsights into agricultural research approaches\nData Analysis Techniques\nPractical methods for agricultural data processing\nProgramming Tips & Tricks\nPython, R, and other tools in agricultural research\nAgricultural Technology Insights\nLatest developments in agricultural technology"
+    "section": "3 Blog Content",
+    "text": "3 Blog Content\nThis blog primarily focuses on:\n\nTechnical Tutorials & Solutions\nStep-by-step guides for common technical challenges\nResearch Methodology Discussions\nInsights into agricultural research approaches\nData Analysis Techniques\nPractical methods for agricultural data processing\nProgramming Tips & Tricks\nPython, R, and other tools in agricultural research\nAgricultural Technology Insights\nLatest developments in agricultural technology"
   },
   {
     "objectID": "about.html#contact",
     "href": "about.html#contact",
     "title": "About Me",
-    "section": "",
-    "text": "Feel free to reach out to me for:\n\nResearch collaborations\nTechnical discussions\n\nQuestions about blog posts\nProfessional networking\n\nEmail: binc041208@gmail.com"
+    "section": "4 Contact",
+    "text": "4 Contact\nFeel free to reach out to me for:\n\nResearch collaborations\nTechnical discussions\n\nQuestions about blog posts\nProfessional networking\n\nEmail: binc041208@gmail.com"
   },
   {
     "objectID": "about.html#connect",
     "href": "about.html#connect",
     "title": "About Me",
-    "section": "",
-    "text": "You can also find me on:\n\nGitHub\nCheck out my open-source projects and code repositories\nLinkedIn\nConnect with me professionally\nORCID\nView my research publications and contributions\n\n\n“Looking for like-minded friends to do something different together.”"
+    "section": "5 Connect",
+    "text": "5 Connect\nYou can also find me on:\n\nGitHub\nCheck out my open-source projects and code repositories\nLinkedIn\nConnect with me professionally\nORCID\nView my research publications and contributions\n\n\n“Looking for like-minded friends to do something different together.”"
   },
   {
     "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
