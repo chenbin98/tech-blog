@@ -1,52 +1,45 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Welcome to My Tech Blog",
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About Me",
     "section": "",
-    "text": "Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science."
+    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
   },
   {
-    "objectID": "index.html#latest-posts",
-    "href": "index.html#latest-posts",
-    "title": "Welcome to My Tech Blog",
-    "section": "1 Latest Posts",
-    "text": "1 Latest Posts\nHere are my most recent technical articles:\n\n1.1 🚀 使用 Geemap 从 GEE 下载全球栅格数据\nDate: Sep 1, 2025\n使用 geemap Python 库从谷歌地球引擎下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n阅读更多 →\n\n\n1.2 🔧 Python 论文图片尺寸规范指南\nDate: Jun 10, 2025\n详细介绍如何在 Python 中设置符合学术期刊要求的图片尺寸和格式，适用于 Elsevier 等出版社的论文投稿。\n阅读更多 →\n\n\n1.3 🌱 机器学习与传统作物模型的未来展望\nDate: Jun 1, 2025\n探讨机器学习如何改变传统作物模型的发展方向，以及未来农业建模的趋势和挑战。\n阅读更多 →\n\n📚 View All Posts → - 查看更多技术文档"
+    "objectID": "about.html#introduction",
+    "href": "about.html#introduction",
+    "title": "About Me",
+    "section": "",
+    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html",
-    "href": "posts/2025-6-8-local_package_install.html",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。\n\n\n\n\n首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall\n\n\n\n\n如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e .\n\n\n\n\n确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境\n\n\n\n\n如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
+    "objectID": "about.html#research-focus",
+    "href": "about.html#research-focus",
+    "title": "About Me",
+    "section": "2 Research Focus",
+    "text": "2 Research Focus\nMy research interests include:\n\nAgricultural Modeling & Simulation\nIntegration of traditional crop models with machine learning methods\nRemote Sensing & GIS\nAgricultural monitoring and spatial analysis\nSmart Agriculture Devices\nAgricultural sensors for weather, irrigation, fertilization, and pest control\nCrop Yield Prediction & Analysis\nMachine learning approaches for yield forecasting\nClimate-Smart Agriculture\nImpact of climate change on agriculture and mitigation pathways"
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html#标准安装流程",
-    "href": "posts/2025-6-8-local_package_install.html#标准安装流程",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall"
+    "objectID": "about.html#blog-content",
+    "href": "about.html#blog-content",
+    "title": "About Me",
+    "section": "3 Blog Content",
+    "text": "3 Blog Content\nThis blog primarily focuses on:\n\nTechnical Tutorials & Solutions\nStep-by-step guides for common technical challenges\nResearch Methodology Discussions\nInsights into agricultural research approaches\nData Analysis Techniques\nPractical methods for agricultural data processing\nProgramming Tips & Tricks\nPython, R, and other tools in agricultural research\nAgricultural Technology Insights\nLatest developments in agricultural technology"
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html#临时安装方法",
-    "href": "posts/2025-6-8-local_package_install.html#临时安装方法",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e ."
+    "objectID": "about.html#contact",
+    "href": "about.html#contact",
+    "title": "About Me",
+    "section": "4 Contact",
+    "text": "4 Contact\nFeel free to reach out to me for:\n\nResearch collaborations\nTechnical discussions\n\nQuestions about blog posts\nProfessional networking\n\nEmail: binc041208@gmail.com"
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html#注意事项",
-    "href": "posts/2025-6-8-local_package_install.html#注意事项",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境"
-  },
-  {
-    "objectID": "posts/2025-6-8-local_package_install.html#常见问题",
-    "href": "posts/2025-6-8-local_package_install.html#常见问题",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
+    "objectID": "about.html#connect",
+    "href": "about.html#connect",
+    "title": "About Me",
+    "section": "5 Connect",
+    "text": "5 Connect\nYou can also find me on:\n\nGitHub\nCheck out my open-source projects and code repositories\nLinkedIn\nConnect with me professionally\nORCID\nView my research publications and contributions\n\n\n“Looking for like-minded friends to do something different together.”"
   },
   {
     "objectID": "posts/2025-9-1-geedownloadimages.html",
@@ -105,32 +98,186 @@
     "text": "geemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html",
-    "href": "posts/2025-6-13-geedownload.html",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html",
+    "title": "学术论文常用缩写与写作规范",
     "section": "",
-    "text": "最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。\n\n\n\n\n首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。\n\n\n\n\n\n确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息\n\n\n\n\n如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
+    "text": "本文汇总学术论文中缩写（abbreviations, ABBR.）的使用场景、规范与常见清单，帮助在不同期刊风格下维持清晰、一致与可读性。不同期刊（如 APA、AMA、IEEE、Nature）细则略有差异，投稿前以目标期刊作者指南为准。\n\n\n\n\n高频出现（≥3 次）且读者熟悉的术语可以缩写。\n标题与摘要一般减少缩写；如必须使用，应在首次出现处定义。\n正文首次出现需先给出全称与缩写：全称（缩写），后续一致使用缩写。\n表格/图注可直接使用缩写，但需在注释或“缩写表”中给出定义。\n避免生造缩写；领域内不常见者宁可使用全称。\n\n示例：\n在遥感研究中，我们计算了归一化植被指数（Normalized Difference Vegetation Index，NDVI）并评估其时间序列特征。随后，NDVI 以 16 天合成数据呈现。\n\n\n\n\n一致性：文内同一概念仅保留一个缩写形式。\n大小写：遵循术语规范（如 DNA、GIS、ANOVA）；句首不强制改为小写。\n复数：单位符号不加复数 s（5 km，而非 5 kms）；名词类缩写可加 s（PCs）。\n标点：e.g.、i.e. 后常跟逗号，括号外可改写为“例如”“即”。\n不跨行：数字与单位之间使用不换行空格（可在排版中设定）。\n\n\n\n\n\n\n\n缩写\n含义\n说明\n\n\n\n\ne.g.\n例如\n文中可改写为“例如”；括号内可用 e.g.\n\n\ni.e.\n即/也即\n同上；避免与 e.g. 混淆\n\n\netc.\n等等\n列举充分时使用，避免滥用\n\n\nvs.\n对比/与\n更正式可用 “versus”\n\n\ncf.\n参见/比较\n用于引导对比性参考\n\n\net al.\n等人\n参考文献与文内引文常用\n\n\nFig. / Table\n图 / 表\n期刊偏好不同：Figure 或 Fig.\n\n\nEq.\n方程\n同上，依期刊风格\n\n\n\n\n\n\n\n\n\n缩写\n含义\n\n\n\n\nSD\nstandard deviation，标准差\n\n\nSE\nstandard error，标准误\n\n\nCI\nconfidence interval，置信区间\n\n\nOR / RR / HR\n比值比 / 相对风险 / 危险比\n\n\nRMSE / MAE\n均方根误差 / 平均绝对误差\n\n\nR²\n决定系数（可用 R^2 表示）\n\n\nAUC / ROC\n曲线下面积 / 受试者工作特征曲线\n\n\nANOVA / ANCOVA\n方差分析 / 协方差分析\n\n\nGLM / GAM\n广义线性模型 / 广义加性模型\n\n\n\n写作要点： - P 值与比较：P &lt; 0.05；区分“均值±SD”与“均值（95% CI）”。 - 报告效应量与区间：建议与显著性同时给出（如 OR=1.42，95% CI 1.10–1.83）。\n\n\n\n\n数字与单位之间留空格：25 km、5 mg/L（除角度、百分号、温度单位惯例：45°、25%、25 °C）。\n单位不加复数，不随大小写变化：1 m，10 m。\n使用小数点，不使用逗号作小数分隔；≥1000 的数字可用细空或逗号分组（依期刊）。\n建议前导零：0.05 而非 .05。\n常见单位：s、min、h、d、yr；m、km；g、kg；°C；Pa、kPa；W、kW；Hz、kHz。\n\n\n\n\n遥感/地学：\n\n\n\n缩写\n含义\n\n\n\n\nGEE\nGoogle Earth Engine\n\n\nMODIS\nModerate Resolution Imaging Spectroradiometer\n\n\nNDVI / EVI\n归一化植被指数 / 增强型植被指数\n\n\nDEM\n数字高程模型\n\n\nLULC\n土地利用/土地覆盖\n\n\nROI\n感兴趣区域（region of interest）\n\n\nCRS / EPSG\n坐标参考系 / EPSG 代码\n\n\n\n生命科学：\n\n\n\n缩写\n含义\n\n\n\n\nDNA / RNA\n脱氧核糖核酸 / 核糖核酸\n\n\nPCR / qPCR\n聚合酶链式反应 / 定量 PCR\n\n\nELISA\n酶联免疫吸附测定\n\n\nBMI\n体质指数\n\n\nICU\n重症监护室\n\n\n\n计算与工程：\n\n\n\n缩写\n含义\n\n\n\n\nCPU / GPU\n中央/图形处理器\n\n\nAPI / SDK\n应用编程接口 / 软件开发工具包\n\n\nIoT\n物联网\n\n\nML / DL\n机器学习 / 深度学习\n\n\n\n\n提示：根据您的研究领域补充自定义清单，并在“缩写表”集中呈现。\n\n\n\n\n\n图表题注：如期刊允许，可用 Fig. 1、Table 2；否则用全拼 Figure 1、Table 2。\n轴标签/单位：首字母大写的名词，单位符号遵循 SI（如 NDVI（无量纲）、Precipitation（mm））。\n章节命名：Introduction、Methods、Results、Discussion（IMRaD）；避免在标题中过度使用缩写。\n\n\n\n\n\n典型元素：vol.（卷）、no.（期）、pp.（页）、doi、ed./eds.（编）。\n文内作者：Zhang et al., 2024；中文可用“等”。\n参考文献条目依投稿格式（APA、IEEE、Vancouver 等）统一生成。\n\n\n\n\n\nAbbreviations\n\nANOVA — analysis of variance（方差分析）\nCI — confidence interval（置信区间）\nGEE — Google Earth Engine\nNDVI — normalized difference vegetation index（归一化植被指数）\nSD — standard deviation（标准差）\n…（按字母序扩展）\n\n\n\n\n\n\n首次出现是否“全称（缩写）”并后续一致？\n标题与摘要中的缩写是否必要且已定义？\n图表与附注是否给出缩写释义或“缩写表”？\n单位、数值与符号是否符合 SI 与期刊风格？\n统计量（P 值、区间、效应量）是否书写一致？\n参考文献与文内引文缩写是否统一格式？\n\n\n如需，我可以按您的研究方向（如遥感、生态、医学等）扩充专用缩写清单或将本页适配目标期刊格式。"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html#认证步骤",
-    "href": "posts/2025-6-13-geedownload.html#认证步骤",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#概述",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#概述",
+    "title": "学术论文常用缩写与写作规范",
     "section": "",
-    "text": "首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。"
+    "text": "本文汇总学术论文中缩写（abbreviations, ABBR.）的使用场景、规范与常见清单，帮助在不同期刊风格下维持清晰、一致与可读性。不同期刊（如 APA、AMA、IEEE、Nature）细则略有差异，投稿前以目标期刊作者指南为准。"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html#注意事项",
-    "href": "posts/2025-6-13-geedownload.html#注意事项",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#何时使用缩写",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#何时使用缩写",
+    "title": "学术论文常用缩写与写作规范",
     "section": "",
-    "text": "确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息"
+    "text": "高频出现（≥3 次）且读者熟悉的术语可以缩写。\n标题与摘要一般减少缩写；如必须使用，应在首次出现处定义。\n正文首次出现需先给出全称与缩写：全称（缩写），后续一致使用缩写。\n表格/图注可直接使用缩写，但需在注释或“缩写表”中给出定义。\n避免生造缩写；领域内不常见者宁可使用全称。\n\n示例：\n在遥感研究中，我们计算了归一化植被指数（Normalized Difference Vegetation Index，NDVI）并评估其时间序列特征。随后，NDVI 以 16 天合成数据呈现。"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html#常见问题",
-    "href": "posts/2025-6-13-geedownload.html#常见问题",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#通用写作规则",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#通用写作规则",
+    "title": "学术论文常用缩写与写作规范",
     "section": "",
-    "text": "如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
+    "text": "一致性：文内同一概念仅保留一个缩写形式。\n大小写：遵循术语规范（如 DNA、GIS、ANOVA）；句首不强制改为小写。\n复数：单位符号不加复数 s（5 km，而非 5 kms）；名词类缩写可加 s（PCs）。\n标点：e.g.、i.e. 后常跟逗号，括号外可改写为“例如”“即”。\n不跨行：数字与单位之间使用不换行空格（可在排版中设定）。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#常见通用缩写编辑与拉丁",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#常见通用缩写编辑与拉丁",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "缩写\n含义\n说明\n\n\n\n\ne.g.\n例如\n文中可改写为“例如”；括号内可用 e.g.\n\n\ni.e.\n即/也即\n同上；避免与 e.g. 混淆\n\n\netc.\n等等\n列举充分时使用，避免滥用\n\n\nvs.\n对比/与\n更正式可用 “versus”\n\n\ncf.\n参见/比较\n用于引导对比性参考\n\n\net al.\n等人\n参考文献与文内引文常用\n\n\nFig. / Table\n图 / 表\n期刊偏好不同：Figure 或 Fig.\n\n\nEq.\n方程\n同上，依期刊风格"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#统计与方法缩写",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#统计与方法缩写",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "缩写\n含义\n\n\n\n\nSD\nstandard deviation，标准差\n\n\nSE\nstandard error，标准误\n\n\nCI\nconfidence interval，置信区间\n\n\nOR / RR / HR\n比值比 / 相对风险 / 危险比\n\n\nRMSE / MAE\n均方根误差 / 平均绝对误差\n\n\nR²\n决定系数（可用 R^2 表示）\n\n\nAUC / ROC\n曲线下面积 / 受试者工作特征曲线\n\n\nANOVA / ANCOVA\n方差分析 / 协方差分析\n\n\nGLM / GAM\n广义线性模型 / 广义加性模型\n\n\n\n写作要点： - P 值与比较：P &lt; 0.05；区分“均值±SD”与“均值（95% CI）”。 - 报告效应量与区间：建议与显著性同时给出（如 OR=1.42，95% CI 1.10–1.83）。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#单位与符号si",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#单位与符号si",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "数字与单位之间留空格：25 km、5 mg/L（除角度、百分号、温度单位惯例：45°、25%、25 °C）。\n单位不加复数，不随大小写变化：1 m，10 m。\n使用小数点，不使用逗号作小数分隔；≥1000 的数字可用细空或逗号分组（依期刊）。\n建议前导零：0.05 而非 .05。\n常见单位：s、min、h、d、yr；m、km；g、kg；°C；Pa、kPa；W、kW；Hz、kHz。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#学科常见缩写示例",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#学科常见缩写示例",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "遥感/地学：\n\n\n\n缩写\n含义\n\n\n\n\nGEE\nGoogle Earth Engine\n\n\nMODIS\nModerate Resolution Imaging Spectroradiometer\n\n\nNDVI / EVI\n归一化植被指数 / 增强型植被指数\n\n\nDEM\n数字高程模型\n\n\nLULC\n土地利用/土地覆盖\n\n\nROI\n感兴趣区域（region of interest）\n\n\nCRS / EPSG\n坐标参考系 / EPSG 代码\n\n\n\n生命科学：\n\n\n\n缩写\n含义\n\n\n\n\nDNA / RNA\n脱氧核糖核酸 / 核糖核酸\n\n\nPCR / qPCR\n聚合酶链式反应 / 定量 PCR\n\n\nELISA\n酶联免疫吸附测定\n\n\nBMI\n体质指数\n\n\nICU\n重症监护室\n\n\n\n计算与工程：\n\n\n\n缩写\n含义\n\n\n\n\nCPU / GPU\n中央/图形处理器\n\n\nAPI / SDK\n应用编程接口 / 软件开发工具包\n\n\nIoT\n物联网\n\n\nML / DL\n机器学习 / 深度学习\n\n\n\n\n提示：根据您的研究领域补充自定义清单，并在“缩写表”集中呈现。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#图表与章节中的缩写",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#图表与章节中的缩写",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "图表题注：如期刊允许，可用 Fig. 1、Table 2；否则用全拼 Figure 1、Table 2。\n轴标签/单位：首字母大写的名词，单位符号遵循 SI（如 NDVI（无量纲）、Precipitation（mm））。\n章节命名：Introduction、Methods、Results、Discussion（IMRaD）；避免在标题中过度使用缩写。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#参考文献与引文缩写",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#参考文献与引文缩写",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "典型元素：vol.（卷）、no.（期）、pp.（页）、doi、ed./eds.（编）。\n文内作者：Zhang et al., 2024；中文可用“等”。\n参考文献条目依投稿格式（APA、IEEE、Vancouver 等）统一生成。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#模板缩写表可放于摘要后或附录",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#模板缩写表可放于摘要后或附录",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "Abbreviations\n\nANOVA — analysis of variance（方差分析）\nCI — confidence interval（置信区间）\nGEE — Google Earth Engine\nNDVI — normalized difference vegetation index（归一化植被指数）\nSD — standard deviation（标准差）\n…（按字母序扩展）"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#自查清单提交前",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#自查清单提交前",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "首次出现是否“全称（缩写）”并后续一致？\n标题与摘要中的缩写是否必要且已定义？\n图表与附注是否给出缩写释义或“缩写表”？\n单位、数值与符号是否符合 SI 与期刊风格？\n统计量（P 值、区间、效应量）是否书写一致？\n参考文献与文内引文缩写是否统一格式？\n\n\n如需，我可以按您的研究方向（如遥感、生态、医学等）扩充专用缩写清单或将本页适配目标期刊格式。"
+  },
+  {
+    "objectID": "posts/index.html",
+    "href": "posts/index.html",
+    "title": "技术文档",
+    "section": "",
+    "text": "这里收录了我在农业数据科学领域的技术笔记和解决方案。文档按时间倒序排列，最新的内容在最前面。\n\n\n\n技术教程: 实用的技术操作指南\nGEE: Google Earth Engine 相关技术\nPython: Python 编程技巧\n机器学习: 机器学习在农业中的应用\n数据可视化: 科研图表制作技巧\n\n\n持续更新中，欢迎关注！"
+  },
+  {
+    "objectID": "posts/index.html#按分类浏览",
+    "href": "posts/index.html#按分类浏览",
+    "title": "技术文档",
+    "section": "",
+    "text": "技术教程: 实用的技术操作指南\nGEE: Google Earth Engine 相关技术\nPython: Python 编程技巧\n机器学习: 机器学习在农业中的应用\n数据可视化: 科研图表制作技巧\n\n\n持续更新中，欢迎关注！"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to My Tech Blog",
+    "section": "",
+    "text": "Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science."
+  },
+  {
+    "objectID": "index.html#latest-posts",
+    "href": "index.html#latest-posts",
+    "title": "Welcome to My Tech Blog",
+    "section": "1 Latest Posts",
+    "text": "1 Latest Posts\nHere are my most recent technical articles:\n\n1.1 🚀 使用 Geemap 从 GEE 下载全球栅格数据\nDate: Sep 1, 2025\n使用 geemap Python 库从谷歌地球引擎下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n阅读更多 →\n\n\n1.2 🔧 Python 论文图片尺寸规范指南\nDate: Jun 10, 2025\n详细介绍如何在 Python 中设置符合学术期刊要求的图片尺寸和格式，适用于 Elsevier 等出版社的论文投稿。\n阅读更多 →\n\n\n1.3 🌱 机器学习与传统作物模型的未来展望\nDate: Jun 1, 2025\n探讨机器学习如何改变传统作物模型的发展方向，以及未来农业建模的趋势和挑战。\n阅读更多 →\n\n📚 View All Posts → - 查看更多技术文档"
+  },
+  {
+    "objectID": "posts/2025-6-8-local_package_install.html",
+    "href": "posts/2025-6-8-local_package_install.html",
+    "title": "Python 本地包安装与更新指南",
+    "section": "",
+    "text": "本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。\n\n\n\n\n首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall\n\n\n\n\n如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e .\n\n\n\n\n确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境\n\n\n\n\n如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
+  },
+  {
+    "objectID": "posts/2025-6-8-local_package_install.html#标准安装流程",
+    "href": "posts/2025-6-8-local_package_install.html#标准安装流程",
+    "title": "Python 本地包安装与更新指南",
+    "section": "",
+    "text": "首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall"
+  },
+  {
+    "objectID": "posts/2025-6-8-local_package_install.html#临时安装方法",
+    "href": "posts/2025-6-8-local_package_install.html#临时安装方法",
+    "title": "Python 本地包安装与更新指南",
+    "section": "",
+    "text": "如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e ."
+  },
+  {
+    "objectID": "posts/2025-6-8-local_package_install.html#注意事项",
+    "href": "posts/2025-6-8-local_package_install.html#注意事项",
+    "title": "Python 本地包安装与更新指南",
+    "section": "",
+    "text": "确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境"
+  },
+  {
+    "objectID": "posts/2025-6-8-local_package_install.html#常见问题",
+    "href": "posts/2025-6-8-local_package_install.html#常见问题",
+    "title": "Python 本地包安装与更新指南",
+    "section": "",
+    "text": "如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
   },
   {
     "objectID": "posts/2025-6-10-paper_fig_size.html",
@@ -175,94 +322,31 @@
     "text": "图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-13-geedownload.html",
+    "href": "posts/2025-6-13-geedownload.html",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
     "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+    "text": "最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。\n\n\n\n\n首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。\n\n\n\n\n\n确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息\n\n\n\n\n如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-13-geedownload.html#认证步骤",
+    "href": "posts/2025-6-13-geedownload.html#认证步骤",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
     "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
+    "text": "首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-13-geedownload.html#注意事项",
+    "href": "posts/2025-6-13-geedownload.html#注意事项",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
     "section": "",
-    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
+    "text": "确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-13-geedownload.html#常见问题",
+    "href": "posts/2025-6-13-geedownload.html#常见问题",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
     "section": "",
-    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
-  },
-  {
-    "objectID": "posts/index.html",
-    "href": "posts/index.html",
-    "title": "技术文档",
-    "section": "",
-    "text": "这里收录了我在农业数据科学领域的技术笔记和解决方案。文档按时间倒序排列，最新的内容在最前面。\n\n\n\n技术教程: 实用的技术操作指南\nGEE: Google Earth Engine 相关技术\nPython: Python 编程技巧\n机器学习: 机器学习在农业中的应用\n数据可视化: 科研图表制作技巧\n\n\n持续更新中，欢迎关注！"
-  },
-  {
-    "objectID": "posts/index.html#按分类浏览",
-    "href": "posts/index.html#按分类浏览",
-    "title": "技术文档",
-    "section": "",
-    "text": "技术教程: 实用的技术操作指南\nGEE: Google Earth Engine 相关技术\nPython: Python 编程技巧\n机器学习: 机器学习在农业中的应用\n数据可视化: 科研图表制作技巧\n\n\n持续更新中，欢迎关注！"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About Me",
-    "section": "",
-    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
-  },
-  {
-    "objectID": "about.html#introduction",
-    "href": "about.html#introduction",
-    "title": "About Me",
-    "section": "",
-    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
-  },
-  {
-    "objectID": "about.html#research-focus",
-    "href": "about.html#research-focus",
-    "title": "About Me",
-    "section": "2 Research Focus",
-    "text": "2 Research Focus\nMy research interests include:\n\nAgricultural Modeling & Simulation\nIntegration of traditional crop models with machine learning methods\nRemote Sensing & GIS\nAgricultural monitoring and spatial analysis\nSmart Agriculture Devices\nAgricultural sensors for weather, irrigation, fertilization, and pest control\nCrop Yield Prediction & Analysis\nMachine learning approaches for yield forecasting\nClimate-Smart Agriculture\nImpact of climate change on agriculture and mitigation pathways"
-  },
-  {
-    "objectID": "about.html#blog-content",
-    "href": "about.html#blog-content",
-    "title": "About Me",
-    "section": "3 Blog Content",
-    "text": "3 Blog Content\nThis blog primarily focuses on:\n\nTechnical Tutorials & Solutions\nStep-by-step guides for common technical challenges\nResearch Methodology Discussions\nInsights into agricultural research approaches\nData Analysis Techniques\nPractical methods for agricultural data processing\nProgramming Tips & Tricks\nPython, R, and other tools in agricultural research\nAgricultural Technology Insights\nLatest developments in agricultural technology"
-  },
-  {
-    "objectID": "about.html#contact",
-    "href": "about.html#contact",
-    "title": "About Me",
-    "section": "4 Contact",
-    "text": "4 Contact\nFeel free to reach out to me for:\n\nResearch collaborations\nTechnical discussions\n\nQuestions about blog posts\nProfessional networking\n\nEmail: binc041208@gmail.com"
-  },
-  {
-    "objectID": "about.html#connect",
-    "href": "about.html#connect",
-    "title": "About Me",
-    "section": "5 Connect",
-    "text": "5 Connect\nYou can also find me on:\n\nGitHub\nCheck out my open-source projects and code repositories\nLinkedIn\nConnect with me professionally\nORCID\nView my research publications and contributions\n\n\n“Looking for like-minded friends to do something different together.”"
+    "text": "如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
   }
 ]
