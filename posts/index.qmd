@@ -1,6 +1,8 @@
 ---
 title: "技术文档"
-listing: default
+listing:
+  type: default
+  sort: "date desc"
 ---
 
 # 技术文档

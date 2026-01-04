@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2025-09-27">
+<meta name="description" content="整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。">
 
-<title>技术文档 – Binchen’s Tech Blog</title>
+<title>学术论文常用缩写与写作规范 – Binchen’s Tech Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +32,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -69,65 +69,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -176,9 +118,19 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#技术文档" id="toc-技术文档" class="nav-link active" data-scroll-target="#技术文档"><span class="header-section-number">1</span> 技术文档</a>
+  <li><a href="#学术论文常用缩写与写作规范" id="toc-学术论文常用缩写与写作规范" class="nav-link active" data-scroll-target="#学术论文常用缩写与写作规范"><span class="header-section-number">1</span> 学术论文常用缩写与写作规范</a>
   <ul class="collapse">
-  <li><a href="#按分类浏览" id="toc-按分类浏览" class="nav-link" data-scroll-target="#按分类浏览"><span class="header-section-number">1.1</span> 按分类浏览</a></li>
+  <li><a href="#概述" id="toc-概述" class="nav-link" data-scroll-target="#概述"><span class="header-section-number">1.1</span> 📋 概述</a></li>
+  <li><a href="#何时使用缩写" id="toc-何时使用缩写" class="nav-link" data-scroll-target="#何时使用缩写"><span class="header-section-number">1.2</span> 🧭 何时使用缩写</a></li>
+  <li><a href="#通用写作规则" id="toc-通用写作规则" class="nav-link" data-scroll-target="#通用写作规则"><span class="header-section-number">1.3</span> 🧱 通用写作规则</a></li>
+  <li><a href="#常见通用缩写编辑与拉丁" id="toc-常见通用缩写编辑与拉丁" class="nav-link" data-scroll-target="#常见通用缩写编辑与拉丁"><span class="header-section-number">1.4</span> 🔤 常见通用缩写（编辑与拉丁）</a></li>
+  <li><a href="#统计与方法缩写" id="toc-统计与方法缩写" class="nav-link" data-scroll-target="#统计与方法缩写"><span class="header-section-number">1.5</span> 🧪 统计与方法缩写</a></li>
+  <li><a href="#单位与符号si" id="toc-单位与符号si" class="nav-link" data-scroll-target="#单位与符号si"><span class="header-section-number">1.6</span> 📏 单位与符号（SI）</a></li>
+  <li><a href="#学科常见缩写示例" id="toc-学科常见缩写示例" class="nav-link" data-scroll-target="#学科常见缩写示例"><span class="header-section-number">1.7</span> 🌍 学科常见缩写（示例）</a></li>
+  <li><a href="#图表与章节中的缩写" id="toc-图表与章节中的缩写" class="nav-link" data-scroll-target="#图表与章节中的缩写"><span class="header-section-number">1.8</span> 🗂️ 图表与章节中的缩写</a></li>
+  <li><a href="#参考文献与引文缩写" id="toc-参考文献与引文缩写" class="nav-link" data-scroll-target="#参考文献与引文缩写"><span class="header-section-number">1.9</span> 📖 参考文献与引文缩写</a></li>
+  <li><a href="#模板缩写表可放于摘要后或附录" id="toc-模板缩写表可放于摘要后或附录" class="nav-link" data-scroll-target="#模板缩写表可放于摘要后或附录"><span class="header-section-number">1.10</span> 🧩 模板：缩写表（可放于摘要后或附录）</a></li>
+  <li><a href="#自查清单提交前" id="toc-自查清单提交前" class="nav-link" data-scroll-target="#自查清单提交前"><span class="header-section-number">1.11</span> ✅ 自查清单（提交前）</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -192,14 +144,28 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">技术文档</h1>
-</div>
+<h1 class="title">学术论文常用缩写与写作规范</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">学术写作</div>
+  </div>
+  </div>
 
+<div>
+  <div class="description">
+    整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。
+  </div>
+</div>
 
 
 <div class="quarto-title-meta column-page-right">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 27, 2025</p>
+    </div>
+  </div>
   
     
   </div>
@@ -209,185 +175,299 @@ window.Quarto = {
 </header>
 
 
-<section id="技术文档" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> 技术文档</h1>
-<p>这里收录了我在农业数据科学领域的技术笔记和解决方案。文档按时间倒序排列，最新的内容在最前面。</p>
-<section id="按分类浏览" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="按分类浏览"><span class="header-section-number">1.1</span> 按分类浏览</h2>
+<section id="学术论文常用缩写与写作规范" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> 学术论文常用缩写与写作规范</h1>
+<section id="概述" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="概述"><span class="header-section-number">1.1</span> 📋 概述</h2>
+<p>本文汇总学术论文中缩写（abbreviations, ABBR.）的使用场景、规范与常见清单，帮助在不同期刊风格下维持清晰、一致与可读性。不同期刊（如 APA、AMA、IEEE、Nature）细则略有差异，投稿前以目标期刊作者指南为准。</p>
+</section>
+<section id="何时使用缩写" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="何时使用缩写"><span class="header-section-number">1.2</span> 🧭 何时使用缩写</h2>
 <ul>
-<li><strong>技术教程</strong>: 实用的技术操作指南</li>
-<li><strong>GEE</strong>: Google Earth Engine 相关技术</li>
-<li><strong>Python</strong>: Python 编程技巧</li>
-<li><strong>机器学习</strong>: 机器学习在农业中的应用</li>
-<li><strong>数据可视化</strong>: 科研图表制作技巧</li>
+<li>高频出现（≥3 次）且读者熟悉的术语可以缩写。</li>
+<li>标题与摘要一般减少缩写；如必须使用，应在首次出现处定义。</li>
+<li>正文首次出现需先给出全称与缩写：全称（缩写），后续一致使用缩写。</li>
+<li>表格/图注可直接使用缩写，但需在注释或“缩写表”中给出定义。</li>
+<li>避免生造缩写；领域内不常见者宁可使用全称。</li>
+</ul>
+<p>示例：</p>
+<p>在遥感研究中，我们计算了归一化植被指数（Normalized Difference Vegetation Index，NDVI）并评估其时间序列特征。随后，NDVI 以 16 天合成数据呈现。</p>
+</section>
+<section id="通用写作规则" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="通用写作规则"><span class="header-section-number">1.3</span> 🧱 通用写作规则</h2>
+<ul>
+<li>一致性：文内同一概念仅保留一个缩写形式。</li>
+<li>大小写：遵循术语规范（如 DNA、GIS、ANOVA）；句首不强制改为小写。</li>
+<li>复数：单位符号不加复数 s（5 km，而非 5 kms）；名词类缩写可加 s（PCs）。</li>
+<li>标点：e.g.、i.e.&nbsp;后常跟逗号，括号外可改写为“例如”“即”。</li>
+<li>不跨行：数字与单位之间使用不换行空格（可在排版中设定）。</li>
+</ul>
+</section>
+<section id="常见通用缩写编辑与拉丁" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="常见通用缩写编辑与拉丁"><span class="header-section-number">1.4</span> 🔤 常见通用缩写（编辑与拉丁）</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>缩写</th>
+<th>含义</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>e.g.</td>
+<td>例如</td>
+<td>文中可改写为“例如”；括号内可用 e.g.</td>
+</tr>
+<tr class="even">
+<td>i.e.</td>
+<td>即/也即</td>
+<td>同上；避免与 e.g.&nbsp;混淆</td>
+</tr>
+<tr class="odd">
+<td>etc.</td>
+<td>等等</td>
+<td>列举充分时使用，避免滥用</td>
+</tr>
+<tr class="even">
+<td>vs.</td>
+<td>对比/与</td>
+<td>更正式可用 “versus”</td>
+</tr>
+<tr class="odd">
+<td>cf.</td>
+<td>参见/比较</td>
+<td>用于引导对比性参考</td>
+</tr>
+<tr class="even">
+<td>et al.</td>
+<td>等人</td>
+<td>参考文献与文内引文常用</td>
+</tr>
+<tr class="odd">
+<td>Fig. / Table</td>
+<td>图 / 表</td>
+<td>期刊偏好不同：Figure 或 Fig.</td>
+</tr>
+<tr class="even">
+<td>Eq.</td>
+<td>方程</td>
+<td>同上，依期刊风格</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="统计与方法缩写" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="统计与方法缩写"><span class="header-section-number">1.5</span> 🧪 统计与方法缩写</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>缩写</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>SD</td>
+<td>standard deviation，标准差</td>
+</tr>
+<tr class="even">
+<td>SE</td>
+<td>standard error，标准误</td>
+</tr>
+<tr class="odd">
+<td>CI</td>
+<td>confidence interval，置信区间</td>
+</tr>
+<tr class="even">
+<td>OR / RR / HR</td>
+<td>比值比 / 相对风险 / 危险比</td>
+</tr>
+<tr class="odd">
+<td>RMSE / MAE</td>
+<td>均方根误差 / 平均绝对误差</td>
+</tr>
+<tr class="even">
+<td>R²</td>
+<td>决定系数（可用 R^2 表示）</td>
+</tr>
+<tr class="odd">
+<td>AUC / ROC</td>
+<td>曲线下面积 / 受试者工作特征曲线</td>
+</tr>
+<tr class="even">
+<td>ANOVA / ANCOVA</td>
+<td>方差分析 / 协方差分析</td>
+</tr>
+<tr class="odd">
+<td>GLM / GAM</td>
+<td>广义线性模型 / 广义加性模型</td>
+</tr>
+</tbody>
+</table>
+<p>写作要点： - P 值与比较：P &lt; 0.05；区分“均值±SD”与“均值（95% CI）”。 - 报告效应量与区间：建议与显著性同时给出（如 OR=1.42，95% CI 1.10–1.83）。</p>
+</section>
+<section id="单位与符号si" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="单位与符号si"><span class="header-section-number">1.6</span> 📏 单位与符号（SI）</h2>
+<ul>
+<li>数字与单位之间留空格：25 km、5 mg/L（除角度、百分号、温度单位惯例：45°、25%、25 °C）。</li>
+<li>单位不加复数，不随大小写变化：1 m，10 m。</li>
+<li>使用小数点，不使用逗号作小数分隔；≥1000 的数字可用细空或逗号分组（依期刊）。</li>
+<li>建议前导零：0.05 而非 .05。</li>
+<li>常见单位：s、min、h、d、yr；m、km；g、kg；°C；Pa、kPa；W、kW；Hz、kHz。</li>
+</ul>
+</section>
+<section id="学科常见缩写示例" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="学科常见缩写示例"><span class="header-section-number">1.7</span> 🌍 学科常见缩写（示例）</h2>
+<p>遥感/地学：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>缩写</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>GEE</td>
+<td>Google Earth Engine</td>
+</tr>
+<tr class="even">
+<td>MODIS</td>
+<td>Moderate Resolution Imaging Spectroradiometer</td>
+</tr>
+<tr class="odd">
+<td>NDVI / EVI</td>
+<td>归一化植被指数 / 增强型植被指数</td>
+</tr>
+<tr class="even">
+<td>DEM</td>
+<td>数字高程模型</td>
+</tr>
+<tr class="odd">
+<td>LULC</td>
+<td>土地利用/土地覆盖</td>
+</tr>
+<tr class="even">
+<td>ROI</td>
+<td>感兴趣区域（region of interest）</td>
+</tr>
+<tr class="odd">
+<td>CRS / EPSG</td>
+<td>坐标参考系 / EPSG 代码</td>
+</tr>
+</tbody>
+</table>
+<p>生命科学：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>缩写</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>DNA / RNA</td>
+<td>脱氧核糖核酸 / 核糖核酸</td>
+</tr>
+<tr class="even">
+<td>PCR / qPCR</td>
+<td>聚合酶链式反应 / 定量 PCR</td>
+</tr>
+<tr class="odd">
+<td>ELISA</td>
+<td>酶联免疫吸附测定</td>
+</tr>
+<tr class="even">
+<td>BMI</td>
+<td>体质指数</td>
+</tr>
+<tr class="odd">
+<td>ICU</td>
+<td>重症监护室</td>
+</tr>
+</tbody>
+</table>
+<p>计算与工程：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>缩写</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CPU / GPU</td>
+<td>中央/图形处理器</td>
+</tr>
+<tr class="even">
+<td>API / SDK</td>
+<td>应用编程接口 / 软件开发工具包</td>
+</tr>
+<tr class="odd">
+<td>IoT</td>
+<td>物联网</td>
+</tr>
+<tr class="even">
+<td>ML / DL</td>
+<td>机器学习 / 深度学习</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p>提示：根据您的研究领域补充自定义清单，并在“缩写表”集中呈现。</p>
+</blockquote>
+</section>
+<section id="图表与章节中的缩写" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="图表与章节中的缩写"><span class="header-section-number">1.8</span> 🗂️ 图表与章节中的缩写</h2>
+<ul>
+<li>图表题注：如期刊允许，可用 Fig. 1、Table 2；否则用全拼 Figure 1、Table 2。</li>
+<li>轴标签/单位：首字母大写的名词，单位符号遵循 SI（如 NDVI（无量纲）、Precipitation（mm））。</li>
+<li>章节命名：Introduction、Methods、Results、Discussion（IMRaD）；避免在标题中过度使用缩写。</li>
+</ul>
+</section>
+<section id="参考文献与引文缩写" class="level2" data-number="1.9">
+<h2 data-number="1.9" class="anchored" data-anchor-id="参考文献与引文缩写"><span class="header-section-number">1.9</span> 📖 参考文献与引文缩写</h2>
+<ul>
+<li>典型元素：vol.（卷）、no.（期）、pp.（页）、doi、ed./eds.（编）。</li>
+<li>文内作者：Zhang et al., 2024；中文可用“等”。</li>
+<li>参考文献条目依投稿格式（APA、IEEE、Vancouver 等）统一生成。</li>
+</ul>
+</section>
+<section id="模板缩写表可放于摘要后或附录" class="level2" data-number="1.10">
+<h2 data-number="1.10" class="anchored" data-anchor-id="模板缩写表可放于摘要后或附录"><span class="header-section-number">1.10</span> 🧩 模板：缩写表（可放于摘要后或附录）</h2>
+<blockquote class="blockquote">
+<p>Abbreviations</p>
+<ul>
+<li>ANOVA — analysis of variance（方差分析）</li>
+<li>CI — confidence interval（置信区间）</li>
+<li>GEE — Google Earth Engine</li>
+<li>NDVI — normalized difference vegetation index（归一化植被指数）</li>
+<li>SD — standard deviation（标准差）</li>
+<li>…（按字母序扩展）</li>
+</ul>
+</blockquote>
+</section>
+<section id="自查清单提交前" class="level2" data-number="1.11">
+<h2 data-number="1.11" class="anchored" data-anchor-id="自查清单提交前"><span class="header-section-number">1.11</span> ✅ 自查清单（提交前）</h2>
+<ul class="task-list">
+<li><label><input type="checkbox">首次出现是否“全称（缩写）”并后续一致？</label></li>
+<li><label><input type="checkbox">标题与摘要中的缩写是否必要且已定义？</label></li>
+<li><label><input type="checkbox">图表与附注是否给出缩写释义或“缩写表”？</label></li>
+<li><label><input type="checkbox">单位、数值与符号是否符合 SI 与期刊风格？</label></li>
+<li><label><input type="checkbox">统计量（P 值、区间、效应量）是否书写一致？</label></li>
+<li><label><input type="checkbox">参考文献与文内引文缩写是否统一格式？</label></li>
 </ul>
 <hr>
-<p><em>持续更新中，欢迎关注！</em></p>
-
+<p>如需，我可以按您的研究方向（如遥感、生态、医学等）扩充专用缩写清单或将本页适配目标期刊格式。</p>
 
 
 </section>
 </section>
 
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="JUU5JTgzJUE4JUU3JUJEJUIyJTJDJUU1JTkwJThFJUU3JUFCJUFG" data-listing-date-sort="1767456000000" data-listing-file-modified-sort="1767514115342" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="149">
-<div class="thumbnail"><a href="../posts/2026-1-4-front_and_backend_server.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2026-1-4-front_and_backend_server.html" class="no-external">后端服务部署：systemd + venv + Nginx</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2026-1-4-front_and_backend_server.html" class="no-external">
-<p>以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2026-1-4-front_and_backend_server.html" class="no-external">
-<div class="listing-date">
-Jan 4, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="JUU1JUFEJUE2JUU2JTlDJUFGJUU1JTg2JTk5JUU0JUJEJTlD" data-listing-date-sort="1758902400000" data-listing-file-modified-sort="1758957509946" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="388">
-<div class="thumbnail"><a href="../posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">学术论文常用缩写与写作规范</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">
-<p>整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">
-<div class="listing-date">
-Sep 27, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDR0VF" data-listing-date-sort="1756656000000" data-listing-file-modified-sort="1756750502369" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1825">
-<div class="thumbnail"><a href="../posts/2025-9-1-geedownloadimages.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-9-1-geedownloadimages.html" class="no-external">使用 Geemap 从 GEE 下载全球栅格数据</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-9-1-geedownloadimages.html" class="no-external">
-<p>本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-9-1-geedownloadimages.html" class="no-external">
-<div class="listing-date">
-Sep 1, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDR0VF" data-listing-date-sort="1749744000000" data-listing-file-modified-sort="1749881003765" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="77">
-<div class="thumbnail"><a href="../posts/2025-6-13-geedownload.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-13-geedownload.html" class="no-external">解决 Google Earth Engine 认证问题的最新方法</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-13-geedownload.html" class="no-external">
-最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-13-geedownload.html" class="no-external">
-<div class="listing-date">
-Jun 13, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDJUU2JTk1JUIwJUU2JThEJUFFJUU1JThGJUFGJUU4JUE3JTg2JUU1JThDJTk2" data-listing-date-sort="1749484800000" data-listing-file-modified-sort="1749882639081" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="216">
-<div class="thumbnail"><a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">Python 论文图片尺寸规范指南</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">
-在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">
-<div class="listing-date">
-Jun 10, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDUHl0aG9u" data-listing-date-sort="1749312000000" data-listing-file-modified-sort="1749881003765" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="81">
-<div class="thumbnail"><a href="../posts/2025-6-8-local_package_install.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-8-local_package_install.html" class="no-external">Python 本地包安装与更新指南</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-8-local_package_install.html" class="no-external">
-本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-8-local_package_install.html" class="no-external">
-<div class="listing-date">
-Jun 8, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="6" data-categories="JUU1JTg2JTlDJUU0JUI4JTlBJUU2JThBJTgwJUU2JTlDJUFGJTJDJUU2JTlDJUJBJUU1JTk5JUE4JUU1JUFEJUE2JUU0JUI5JUEw" data-listing-date-sort="1748707200000" data-listing-file-modified-sort="1749881457951" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="41">
-<div class="thumbnail"><a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">机器学习与传统作物模型的未来展望</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">
-农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">
-<div class="listing-date">
-Jun 1, 2025
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

@@ -1,0 +1,105 @@
+---
+title: "后端服务部署：systemd + venv + Nginx"
+date: 2026-01-04
+categories: [部署, 后端]
+tags: [Linux, systemd, Nginx, Python, venv]
+description: "以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。"
+---
+
+# 后端服务部署（systemd + venv + Nginx）
+
+以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。
+
+## 1. 安装依赖
+
+```bash
+sudo apt-get update
+sudo apt-get install -y python3-venv python3-pip
+```
+
+## 2. 创建虚拟环境并安装依赖
+
+```bash
+cd rose-wechat-agent
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -U pip
+pip install -r requirements.txt
+cp .env.example .env
+nano .env
+```
+
+## 3. 用 systemd 托管
+
+### 3.1 创建服务文件
+
+```bash
+sudo nano /etc/systemd/system/rose-wechat-agent.service
+```
+
+### 3.2 服务文件示例（按实际入口调整）
+
+建议使用 uvicorn 作为入口，便于后续扩展异步能力。
+
+```ini
+[Unit]
+Description=Rose WeChat Agent
+After=network.target
+
+[Service]
+WorkingDirectory=/path/to/rose-wechat-agent
+EnvironmentFile=/path/to/rose-wechat-agent/.env
+ExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py
+Restart=always
+RestartSec=3
+User=www-data
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## 4. 启动服务
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now rose-wechat-agent
+sudo journalctl -u rose-wechat-agent -f
+```
+
+## 5. 用 Nginx 做反向代理 + HTTPS
+
+### 5.1 安装 Nginx
+
+```bash
+sudo apt-get install -y nginx
+```
+
+### 5.2 配置 Nginx
+
+```bash
+sudo nano /etc/nginx/sites-available/grape
+```
+
+在 `server` 块内添加：
+
+```nginx
+location /rose_wechat_agent/ {
+    proxy_pass http://127.0.0.1:18008/;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;
+    proxy_set_header X-Script-Name /rose_wechat_agent;
+
+    proxy_buffering off;
+    proxy_read_timeout 3600s;
+}
+```
+
+## 6. 维护常用命令
+
+- 重启后端服务：`sudo systemctl restart rose-wechat-agent`
+- 查看后端服务日志：`sudo journalctl -u rose-wechat-agent -n 100 --no-pager`
+- 重启 Nginx：`sudo systemctl restart nginx`

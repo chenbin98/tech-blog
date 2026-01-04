@@ -264,5 +264,138 @@
     "title": "Welcome to My Tech Blog",
     "section": "1 Latest Posts",
     "text": "1 Latest Posts\nHere are my most recent technical articles:\n\n1.1 🚀 使用 Geemap 从 GEE 下载全球栅格数据\nDate: Sep 1, 2025\n使用 geemap Python 库从谷歌地球引擎下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n阅读更多 →\n\n\n1.2 🔧 Python 论文图片尺寸规范指南\nDate: Jun 10, 2025\n详细介绍如何在 Python 中设置符合学术期刊要求的图片尺寸和格式，适用于 Elsevier 等出版社的论文投稿。\n阅读更多 →\n\n\n1.3 🌱 机器学习与传统作物模型的未来展望\nDate: Jun 1, 2025\n探讨机器学习如何改变传统作物模型的发展方向，以及未来农业建模的趋势和挑战。\n阅读更多 →\n\n📚 View All Posts → - 查看更多技术文档"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html",
+    "href": "posts/2026-1-4-front_and_backend_server.html",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。\n\n\nsudo apt-get update\nsudo apt-get install -y python3-venv python3-pip\n\n\n\ncd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env\n\n\n\n\n\nsudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target\n\n\n\n\nsudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f\n\n\n\n\n\nsudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}\n\n\n\n\n\n重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
+    "href": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo apt-get update\nsudo apt-get install -y python3-venv python3-pip"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
+    "href": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "cd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
+    "href": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#启动服务",
+    "href": "posts/2026-1-4-front_and_backend_server.html#启动服务",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
+    "href": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
+    "href": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "本文汇总学术论文中缩写（abbreviations, ABBR.）的使用场景、规范与常见清单，帮助在不同期刊风格下维持清晰、一致与可读性。不同期刊（如 APA、AMA、IEEE、Nature）细则略有差异，投稿前以目标期刊作者指南为准。\n\n\n\n\n高频出现（≥3 次）且读者熟悉的术语可以缩写。\n标题与摘要一般减少缩写；如必须使用，应在首次出现处定义。\n正文首次出现需先给出全称与缩写：全称（缩写），后续一致使用缩写。\n表格/图注可直接使用缩写，但需在注释或“缩写表”中给出定义。\n避免生造缩写；领域内不常见者宁可使用全称。\n\n示例：\n在遥感研究中，我们计算了归一化植被指数（Normalized Difference Vegetation Index，NDVI）并评估其时间序列特征。随后，NDVI 以 16 天合成数据呈现。\n\n\n\n\n一致性：文内同一概念仅保留一个缩写形式。\n大小写：遵循术语规范（如 DNA、GIS、ANOVA）；句首不强制改为小写。\n复数：单位符号不加复数 s（5 km，而非 5 kms）；名词类缩写可加 s（PCs）。\n标点：e.g.、i.e. 后常跟逗号，括号外可改写为“例如”“即”。\n不跨行：数字与单位之间使用不换行空格（可在排版中设定）。\n\n\n\n\n\n\n\n缩写\n含义\n说明\n\n\n\n\ne.g.\n例如\n文中可改写为“例如”；括号内可用 e.g.\n\n\ni.e.\n即/也即\n同上；避免与 e.g. 混淆\n\n\netc.\n等等\n列举充分时使用，避免滥用\n\n\nvs.\n对比/与\n更正式可用 “versus”\n\n\ncf.\n参见/比较\n用于引导对比性参考\n\n\net al.\n等人\n参考文献与文内引文常用\n\n\nFig. / Table\n图 / 表\n期刊偏好不同：Figure 或 Fig.\n\n\nEq.\n方程\n同上，依期刊风格\n\n\n\n\n\n\n\n\n\n缩写\n含义\n\n\n\n\nSD\nstandard deviation，标准差\n\n\nSE\nstandard error，标准误\n\n\nCI\nconfidence interval，置信区间\n\n\nOR / RR / HR\n比值比 / 相对风险 / 危险比\n\n\nRMSE / MAE\n均方根误差 / 平均绝对误差\n\n\nR²\n决定系数（可用 R^2 表示）\n\n\nAUC / ROC\n曲线下面积 / 受试者工作特征曲线\n\n\nANOVA / ANCOVA\n方差分析 / 协方差分析\n\n\nGLM / GAM\n广义线性模型 / 广义加性模型\n\n\n\n写作要点： - P 值与比较：P &lt; 0.05；区分“均值±SD”与“均值（95% CI）”。 - 报告效应量与区间：建议与显著性同时给出（如 OR=1.42，95% CI 1.10–1.83）。\n\n\n\n\n数字与单位之间留空格：25 km、5 mg/L（除角度、百分号、温度单位惯例：45°、25%、25 °C）。\n单位不加复数，不随大小写变化：1 m，10 m。\n使用小数点，不使用逗号作小数分隔；≥1000 的数字可用细空或逗号分组（依期刊）。\n建议前导零：0.05 而非 .05。\n常见单位：s、min、h、d、yr；m、km；g、kg；°C；Pa、kPa；W、kW；Hz、kHz。\n\n\n\n\n遥感/地学：\n\n\n\n缩写\n含义\n\n\n\n\nGEE\nGoogle Earth Engine\n\n\nMODIS\nModerate Resolution Imaging Spectroradiometer\n\n\nNDVI / EVI\n归一化植被指数 / 增强型植被指数\n\n\nDEM\n数字高程模型\n\n\nLULC\n土地利用/土地覆盖\n\n\nROI\n感兴趣区域（region of interest）\n\n\nCRS / EPSG\n坐标参考系 / EPSG 代码\n\n\n\n生命科学：\n\n\n\n缩写\n含义\n\n\n\n\nDNA / RNA\n脱氧核糖核酸 / 核糖核酸\n\n\nPCR / qPCR\n聚合酶链式反应 / 定量 PCR\n\n\nELISA\n酶联免疫吸附测定\n\n\nBMI\n体质指数\n\n\nICU\n重症监护室\n\n\n\n计算与工程：\n\n\n\n缩写\n含义\n\n\n\n\nCPU / GPU\n中央/图形处理器\n\n\nAPI / SDK\n应用编程接口 / 软件开发工具包\n\n\nIoT\n物联网\n\n\nML / DL\n机器学习 / 深度学习\n\n\n\n\n提示：根据您的研究领域补充自定义清单，并在“缩写表”集中呈现。\n\n\n\n\n\n图表题注：如期刊允许，可用 Fig. 1、Table 2；否则用全拼 Figure 1、Table 2。\n轴标签/单位：首字母大写的名词，单位符号遵循 SI（如 NDVI（无量纲）、Precipitation（mm））。\n章节命名：Introduction、Methods、Results、Discussion（IMRaD）；避免在标题中过度使用缩写。\n\n\n\n\n\n典型元素：vol.（卷）、no.（期）、pp.（页）、doi、ed./eds.（编）。\n文内作者：Zhang et al., 2024；中文可用“等”。\n参考文献条目依投稿格式（APA、IEEE、Vancouver 等）统一生成。\n\n\n\n\n\nAbbreviations\n\nANOVA — analysis of variance（方差分析）\nCI — confidence interval（置信区间）\nGEE — Google Earth Engine\nNDVI — normalized difference vegetation index（归一化植被指数）\nSD — standard deviation（标准差）\n…（按字母序扩展）\n\n\n\n\n\n\n首次出现是否“全称（缩写）”并后续一致？\n标题与摘要中的缩写是否必要且已定义？\n图表与附注是否给出缩写释义或“缩写表”？\n单位、数值与符号是否符合 SI 与期刊风格？\n统计量（P 值、区间、效应量）是否书写一致？\n参考文献与文内引文缩写是否统一格式？\n\n\n如需，我可以按您的研究方向（如遥感、生态、医学等）扩充专用缩写清单或将本页适配目标期刊格式。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#概述",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#概述",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "本文汇总学术论文中缩写（abbreviations, ABBR.）的使用场景、规范与常见清单，帮助在不同期刊风格下维持清晰、一致与可读性。不同期刊（如 APA、AMA、IEEE、Nature）细则略有差异，投稿前以目标期刊作者指南为准。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#何时使用缩写",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#何时使用缩写",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "高频出现（≥3 次）且读者熟悉的术语可以缩写。\n标题与摘要一般减少缩写；如必须使用，应在首次出现处定义。\n正文首次出现需先给出全称与缩写：全称（缩写），后续一致使用缩写。\n表格/图注可直接使用缩写，但需在注释或“缩写表”中给出定义。\n避免生造缩写；领域内不常见者宁可使用全称。\n\n示例：\n在遥感研究中，我们计算了归一化植被指数（Normalized Difference Vegetation Index，NDVI）并评估其时间序列特征。随后，NDVI 以 16 天合成数据呈现。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#通用写作规则",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#通用写作规则",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "一致性：文内同一概念仅保留一个缩写形式。\n大小写：遵循术语规范（如 DNA、GIS、ANOVA）；句首不强制改为小写。\n复数：单位符号不加复数 s（5 km，而非 5 kms）；名词类缩写可加 s（PCs）。\n标点：e.g.、i.e. 后常跟逗号，括号外可改写为“例如”“即”。\n不跨行：数字与单位之间使用不换行空格（可在排版中设定）。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#常见通用缩写编辑与拉丁",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#常见通用缩写编辑与拉丁",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "缩写\n含义\n说明\n\n\n\n\ne.g.\n例如\n文中可改写为“例如”；括号内可用 e.g.\n\n\ni.e.\n即/也即\n同上；避免与 e.g. 混淆\n\n\netc.\n等等\n列举充分时使用，避免滥用\n\n\nvs.\n对比/与\n更正式可用 “versus”\n\n\ncf.\n参见/比较\n用于引导对比性参考\n\n\net al.\n等人\n参考文献与文内引文常用\n\n\nFig. / Table\n图 / 表\n期刊偏好不同：Figure 或 Fig.\n\n\nEq.\n方程\n同上，依期刊风格"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#统计与方法缩写",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#统计与方法缩写",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "缩写\n含义\n\n\n\n\nSD\nstandard deviation，标准差\n\n\nSE\nstandard error，标准误\n\n\nCI\nconfidence interval，置信区间\n\n\nOR / RR / HR\n比值比 / 相对风险 / 危险比\n\n\nRMSE / MAE\n均方根误差 / 平均绝对误差\n\n\nR²\n决定系数（可用 R^2 表示）\n\n\nAUC / ROC\n曲线下面积 / 受试者工作特征曲线\n\n\nANOVA / ANCOVA\n方差分析 / 协方差分析\n\n\nGLM / GAM\n广义线性模型 / 广义加性模型\n\n\n\n写作要点： - P 值与比较：P &lt; 0.05；区分“均值±SD”与“均值（95% CI）”。 - 报告效应量与区间：建议与显著性同时给出（如 OR=1.42，95% CI 1.10–1.83）。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#单位与符号si",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#单位与符号si",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "数字与单位之间留空格：25 km、5 mg/L（除角度、百分号、温度单位惯例：45°、25%、25 °C）。\n单位不加复数，不随大小写变化：1 m，10 m。\n使用小数点，不使用逗号作小数分隔；≥1000 的数字可用细空或逗号分组（依期刊）。\n建议前导零：0.05 而非 .05。\n常见单位：s、min、h、d、yr；m、km；g、kg；°C；Pa、kPa；W、kW；Hz、kHz。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#学科常见缩写示例",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#学科常见缩写示例",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "遥感/地学：\n\n\n\n缩写\n含义\n\n\n\n\nGEE\nGoogle Earth Engine\n\n\nMODIS\nModerate Resolution Imaging Spectroradiometer\n\n\nNDVI / EVI\n归一化植被指数 / 增强型植被指数\n\n\nDEM\n数字高程模型\n\n\nLULC\n土地利用/土地覆盖\n\n\nROI\n感兴趣区域（region of interest）\n\n\nCRS / EPSG\n坐标参考系 / EPSG 代码\n\n\n\n生命科学：\n\n\n\n缩写\n含义\n\n\n\n\nDNA / RNA\n脱氧核糖核酸 / 核糖核酸\n\n\nPCR / qPCR\n聚合酶链式反应 / 定量 PCR\n\n\nELISA\n酶联免疫吸附测定\n\n\nBMI\n体质指数\n\n\nICU\n重症监护室\n\n\n\n计算与工程：\n\n\n\n缩写\n含义\n\n\n\n\nCPU / GPU\n中央/图形处理器\n\n\nAPI / SDK\n应用编程接口 / 软件开发工具包\n\n\nIoT\n物联网\n\n\nML / DL\n机器学习 / 深度学习\n\n\n\n\n提示：根据您的研究领域补充自定义清单，并在“缩写表”集中呈现。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#图表与章节中的缩写",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#图表与章节中的缩写",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "图表题注：如期刊允许，可用 Fig. 1、Table 2；否则用全拼 Figure 1、Table 2。\n轴标签/单位：首字母大写的名词，单位符号遵循 SI（如 NDVI（无量纲）、Precipitation（mm））。\n章节命名：Introduction、Methods、Results、Discussion（IMRaD）；避免在标题中过度使用缩写。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#参考文献与引文缩写",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#参考文献与引文缩写",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "典型元素：vol.（卷）、no.（期）、pp.（页）、doi、ed./eds.（编）。\n文内作者：Zhang et al., 2024；中文可用“等”。\n参考文献条目依投稿格式（APA、IEEE、Vancouver 等）统一生成。"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#模板缩写表可放于摘要后或附录",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#模板缩写表可放于摘要后或附录",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "Abbreviations\n\nANOVA — analysis of variance（方差分析）\nCI — confidence interval（置信区间）\nGEE — Google Earth Engine\nNDVI — normalized difference vegetation index（归一化植被指数）\nSD — standard deviation（标准差）\n…（按字母序扩展）"
+  },
+  {
+    "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html#自查清单提交前",
+    "href": "posts/2025-9-27-scientific_paper_abbreviations.html#自查清单提交前",
+    "title": "学术论文常用缩写与写作规范",
+    "section": "",
+    "text": "首次出现是否“全称（缩写）”并后续一致？\n标题与摘要中的缩写是否必要且已定义？\n图表与附注是否给出缩写释义或“缩写表”？\n单位、数值与符号是否符合 SI 与期刊风格？\n统计量（P 值、区间、效应量）是否书写一致？\n参考文献与文内引文缩写是否统一格式？\n\n\n如需，我可以按您的研究方向（如遥感、生态、医学等）扩充专用缩写清单或将本页适配目标期刊格式。"
   }
 ]
