@@ -6,9 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-06-01">
+<meta name="dcterms.date" content="2026-01-04">
+<meta name="description" content="以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。">
 
-<title>机器学习与传统作物模型的未来展望 – Binchen’s Tech Blog</title>
+<title>后端服务部署：systemd + venv + Nginx – Binchen’s Tech Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +21,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -118,12 +154,22 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#机器学习与传统作物模型的未来展望" id="toc-机器学习与传统作物模型的未来展望" class="nav-link active" data-scroll-target="#机器学习与传统作物模型的未来展望"><span class="header-section-number">1</span> 机器学习与传统作物模型的未来展望</a>
+  <li><a href="#后端服务部署systemd-venv-nginx" id="toc-后端服务部署systemd-venv-nginx" class="nav-link active" data-scroll-target="#后端服务部署systemd-venv-nginx"><span class="header-section-number">1</span> 后端服务部署（systemd + venv + Nginx）</a>
   <ul class="collapse">
-  <li><a href="#传统作物模型的现状与挑战" id="toc-传统作物模型的现状与挑战" class="nav-link" data-scroll-target="#传统作物模型的现状与挑战"><span class="header-section-number">1.1</span> 传统作物模型的现状与挑战</a></li>
-  <li><a href="#机器学习在农业建模中的兴起" id="toc-机器学习在农业建模中的兴起" class="nav-link" data-scroll-target="#机器学习在农业建模中的兴起"><span class="header-section-number">1.2</span> 机器学习在农业建模中的兴起</a></li>
-  <li><a href="#物理知识引导的机器学习模型" id="toc-物理知识引导的机器学习模型" class="nav-link" data-scroll-target="#物理知识引导的机器学习模型"><span class="header-section-number">1.3</span> 物理知识引导的机器学习模型</a></li>
-  <li><a href="#未来展望" id="toc-未来展望" class="nav-link" data-scroll-target="#未来展望"><span class="header-section-number">1.4</span> 未来展望</a></li>
+  <li><a href="#安装依赖" id="toc-安装依赖" class="nav-link" data-scroll-target="#安装依赖"><span class="header-section-number">1.1</span> 1. 安装依赖</a></li>
+  <li><a href="#创建虚拟环境并安装依赖" id="toc-创建虚拟环境并安装依赖" class="nav-link" data-scroll-target="#创建虚拟环境并安装依赖"><span class="header-section-number">1.2</span> 2. 创建虚拟环境并安装依赖</a></li>
+  <li><a href="#用-systemd-托管" id="toc-用-systemd-托管" class="nav-link" data-scroll-target="#用-systemd-托管"><span class="header-section-number">1.3</span> 3. 用 systemd 托管</a>
+  <ul class="collapse">
+  <li><a href="#创建服务文件" id="toc-创建服务文件" class="nav-link" data-scroll-target="#创建服务文件"><span class="header-section-number">1.3.1</span> 3.1 创建服务文件</a></li>
+  <li><a href="#服务文件示例按实际入口调整" id="toc-服务文件示例按实际入口调整" class="nav-link" data-scroll-target="#服务文件示例按实际入口调整"><span class="header-section-number">1.3.2</span> 3.2 服务文件示例（按实际入口调整）</a></li>
+  </ul></li>
+  <li><a href="#启动服务" id="toc-启动服务" class="nav-link" data-scroll-target="#启动服务"><span class="header-section-number">1.4</span> 4. 启动服务</a></li>
+  <li><a href="#用-nginx-做反向代理-https" id="toc-用-nginx-做反向代理-https" class="nav-link" data-scroll-target="#用-nginx-做反向代理-https"><span class="header-section-number">1.5</span> 5. 用 Nginx 做反向代理 + HTTPS</a>
+  <ul class="collapse">
+  <li><a href="#安装-nginx" id="toc-安装-nginx" class="nav-link" data-scroll-target="#安装-nginx"><span class="header-section-number">1.5.1</span> 5.1 安装 Nginx</a></li>
+  <li><a href="#配置-nginx" id="toc-配置-nginx" class="nav-link" data-scroll-target="#配置-nginx"><span class="header-section-number">1.5.2</span> 5.2 配置 Nginx</a></li>
+  </ul></li>
+  <li><a href="#维护常用命令" id="toc-维护常用命令" class="nav-link" data-scroll-target="#维护常用命令"><span class="header-section-number">1.6</span> 6. 维护常用命令</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -137,13 +183,18 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">机器学习与传统作物模型的未来展望</h1>
+<h1 class="title">后端服务部署：systemd + venv + Nginx</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">农业技术</div>
-    <div class="quarto-category">机器学习</div>
+    <div class="quarto-category">部署</div>
+    <div class="quarto-category">后端</div>
   </div>
   </div>
 
+<div>
+  <div class="description">
+    以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。
+  </div>
+</div>
 
 
 <div class="quarto-title-meta column-page-right">
@@ -152,7 +203,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 1, 2025</p>
+      <p class="date">January 4, 2026</p>
     </div>
   </div>
   
@@ -164,58 +215,87 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="机器学习与传统作物模型的未来展望" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> 机器学习与传统作物模型的未来展望</h1>
-<section id="传统作物模型的现状与挑战" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="传统作物模型的现状与挑战"><span class="header-section-number">1.1</span> 传统作物模型的现状与挑战</h2>
-<p>农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。</p>
-<p>然而，传统作物模型在实际应用中面临诸多挑战：</p>
-<ol type="1">
-<li>预测精度不足：在实际条件下往往难以准确预测</li>
-<li>实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用</li>
-<li>理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限</li>
-</ol>
+<section id="后端服务部署systemd-venv-nginx" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> 后端服务部署（systemd + venv + Nginx）</h1>
+<p>以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。</p>
+<section id="安装依赖" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="安装依赖"><span class="header-section-number">1.1</span> 1. 安装依赖</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> python3-venv python3-pip</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="机器学习在农业建模中的兴起" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="机器学习在农业建模中的兴起"><span class="header-section-number">1.2</span> 机器学习在农业建模中的兴起</h2>
-<p>在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。</p>
-<p>一个理想的农业模型架构应该：</p>
+<section id="创建虚拟环境并安装依赖" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="创建虚拟环境并安装依赖"><span class="header-section-number">1.2</span> 2. 创建虚拟环境并安装依赖</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> rose-wechat-agent</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-U</span> pip</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> .env.example .env</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">nano</span> .env</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="用-systemd-托管" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="用-systemd-托管"><span class="header-section-number">1.3</span> 3. 用 systemd 托管</h2>
+<section id="创建服务文件" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="创建服务文件"><span class="header-section-number">1.3.1</span> 3.1 创建服务文件</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> nano /etc/systemd/system/rose-wechat-agent.service</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="服务文件示例按实际入口调整" class="level3" data-number="1.3.2">
+<h3 data-number="1.3.2" class="anchored" data-anchor-id="服务文件示例按实际入口调整"><span class="header-section-number">1.3.2</span> 3.2 服务文件示例（按实际入口调整）</h3>
+<p>建议使用 uvicorn 作为入口，便于后续扩展异步能力。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[Unit]</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Description</span><span class="ot">=</span><span class="st">Rose WeChat Agent</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">After</span><span class="ot">=</span><span class="st">network.target</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">[Service]</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dt">WorkingDirectory</span><span class="ot">=</span><span class="st">/path/to/rose-wechat-agent</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dt">EnvironmentFile</span><span class="ot">=</span><span class="st">/path/to/rose-wechat-agent/.env</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="dt">ExecStart</span><span class="ot">=</span><span class="st">/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="dt">Restart</span><span class="ot">=</span><span class="st">always</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="dt">RestartSec</span><span class="ot">=</span><span class="dv">3</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="dt">User</span><span class="ot">=</span><span class="st">www-data</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="kw">[Install]</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="dt">WantedBy</span><span class="ot">=</span><span class="st">multi-user.target</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="启动服务" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="启动服务"><span class="header-section-number">1.4</span> 4. 启动服务</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl daemon-reload</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable <span class="at">--now</span> rose-wechat-agent</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> journalctl <span class="at">-u</span> rose-wechat-agent <span class="at">-f</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="用-nginx-做反向代理-https" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="用-nginx-做反向代理-https"><span class="header-section-number">1.5</span> 5. 用 Nginx 做反向代理 + HTTPS</h2>
+<section id="安装-nginx" class="level3" data-number="1.5.1">
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="安装-nginx"><span class="header-section-number">1.5.1</span> 5.1 安装 Nginx</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> nginx</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="配置-nginx" class="level3" data-number="1.5.2">
+<h3 data-number="1.5.2" class="anchored" data-anchor-id="配置-nginx"><span class="header-section-number">1.5.2</span> 5.2 配置 Nginx</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> nano /etc/nginx/sites-available/grape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>在 <code>server</code> 块内添加：</p>
+<pre class="nginx"><code>location /rose_wechat_agent/ {
+    proxy_pass http://127.0.0.1:18008/;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;
+    proxy_set_header X-Script-Name /rose_wechat_agent;
+
+    proxy_buffering off;
+    proxy_read_timeout 3600s;
+}</code></pre>
+</section>
+</section>
+<section id="维护常用命令" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="维护常用命令"><span class="header-section-number">1.6</span> 6. 维护常用命令</h2>
 <ul>
-<li>符合人们对作物长势的直观感知</li>
-<li>以天为单位动态输出关键指标</li>
-<li>包含以下要素：
-<ul>
-<li>生育期</li>
-<li>叶面积</li>
-<li>株高</li>
-<li>生物量</li>
-<li>产量</li>
-<li>健康状态</li>
-</ul></li>
+<li>重启后端服务：<code>sudo systemctl restart rose-wechat-agent</code></li>
+<li>查看后端服务日志：<code>sudo journalctl -u rose-wechat-agent -n 100 --no-pager</code></li>
+<li>重启 Nginx：<code>sudo systemctl restart nginx</code></li>
 </ul>
-<p>这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标</p>
-</section>
-<section id="物理知识引导的机器学习模型" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="物理知识引导的机器学习模型"><span class="header-section-number">1.3</span> 物理知识引导的机器学习模型</h2>
-<p>目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：</p>
-<ol type="1">
-<li>利用传统作物模型的知识作为引导</li>
-<li>让机器学习模型先学习基础知识</li>
-<li>减少后续训练所需的数据量</li>
-</ol>
-<p>这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。</p>
-</section>
-<section id="未来展望" class="level2" data-number="1.4">
-<h2 data-number="1.4" class="anchored" data-anchor-id="未来展望"><span class="header-section-number">1.4</span> 未来展望</h2>
-<p>未来的作物模型发展趋势将是：</p>
-<ul>
-<li>以机器学习为主导</li>
-<li>面向实际农业生产问题</li>
-<li>具备自适应和自学习能力</li>
-<li>能够独立输出关键决策信息</li>
-<li>真正成为智慧农业的”大脑”</li>
-</ul>
-<p>这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。</p>
 
 
 </section>

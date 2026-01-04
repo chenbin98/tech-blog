@@ -2,44 +2,16 @@
   {
     "objectID": "about.html",
     "href": "about.html",
-    "title": "About Me",
+    "title": "About",
     "section": "",
-    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
+    "text": "我是一名农业数据科学研究者，关注农业系统中的数据建模、遥感分析与智能决策。希望用更清晰的方法与流程，解决真实的农业问题。"
   },
   {
-    "objectID": "about.html#introduction",
-    "href": "about.html#introduction",
-    "title": "About Me",
-    "section": "",
-    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
-  },
-  {
-    "objectID": "about.html#research-focus",
-    "href": "about.html#research-focus",
-    "title": "About Me",
-    "section": "2 Research Focus",
-    "text": "2 Research Focus\nMy research interests include:\n\nAgricultural Modeling & Simulation\nIntegration of traditional crop models with machine learning methods\nRemote Sensing & GIS\nAgricultural monitoring and spatial analysis\nSmart Agriculture Devices\nAgricultural sensors for weather, irrigation, fertilization, and pest control\nCrop Yield Prediction & Analysis\nMachine learning approaches for yield forecasting\nClimate-Smart Agriculture\nImpact of climate change on agriculture and mitigation pathways"
-  },
-  {
-    "objectID": "about.html#blog-content",
-    "href": "about.html#blog-content",
-    "title": "About Me",
-    "section": "3 Blog Content",
-    "text": "3 Blog Content\nThis blog primarily focuses on:\n\nTechnical Tutorials & Solutions\nStep-by-step guides for common technical challenges\nResearch Methodology Discussions\nInsights into agricultural research approaches\nData Analysis Techniques\nPractical methods for agricultural data processing\nProgramming Tips & Tricks\nPython, R, and other tools in agricultural research\nAgricultural Technology Insights\nLatest developments in agricultural technology"
-  },
-  {
-    "objectID": "about.html#contact",
-    "href": "about.html#contact",
-    "title": "About Me",
-    "section": "4 Contact",
-    "text": "4 Contact\nFeel free to reach out to me for:\n\nResearch collaborations\nTechnical discussions\n\nQuestions about blog posts\nProfessional networking\n\nEmail: binc041208@gmail.com"
-  },
-  {
-    "objectID": "about.html#connect",
-    "href": "about.html#connect",
-    "title": "About Me",
-    "section": "5 Connect",
-    "text": "5 Connect\nYou can also find me on:\n\nGitHub\nCheck out my open-source projects and code repositories\nLinkedIn\nConnect with me professionally\nORCID\nView my research publications and contributions\n\n\n“Looking for like-minded friends to do something different together.”"
+    "objectID": "about.html#交流与合作",
+    "href": "about.html#交流与合作",
+    "title": "About",
+    "section": "交流与合作",
+    "text": "交流与合作\n\n\n\n\nEmail\nbinc041208@gmail.com\n\n\n\n\n\nGitHub\ngithub.com/chenbin98\n\n\n\n\n\nLinkedIn\nbin-chen-49292b312\n\n\n\n\n\nORCID\n0009-0000-8266-940X\n\n\n\n\n“Looking for like-minded friends to do something different together.”"
   },
   {
     "objectID": "posts/2025-9-1-geedownloadimages.html",
@@ -96,6 +68,146 @@
     "title": "使用 Geemap 从 GEE 下载全球栅格数据",
     "section": "",
     "text": "geemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html",
+    "href": "posts/2026-1-4-front_and_backend_server.html",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。\n\n\nsudo apt-get update\nsudo apt-get install -y python3-venv python3-pip\n\n\n\ncd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env\n\n\n\n\n\nsudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target\n\n\n\n\nsudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f\n\n\n\n\n\nsudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}\n\n\n\n\n\n重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
+    "href": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo apt-get update\nsudo apt-get install -y python3-venv python3-pip"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
+    "href": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "cd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
+    "href": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#启动服务",
+    "href": "posts/2026-1-4-front_and_backend_server.html#启动服务",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
+    "href": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
+    "href": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+  },
+  {
+    "objectID": "posts/2025-6-8-local_package_install.html",
+    "href": "posts/2025-6-8-local_package_install.html",
+    "title": "Python 本地包安装与更新指南",
+    "section": "",
+    "text": "本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。\n\n\n\n\n首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall\n\n\n\n\n如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e .\n\n\n\n\n确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境\n\n\n\n\n如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
+  },
+  {
+    "objectID": "posts/2025-6-8-local_package_install.html#标准安装流程",
+    "href": "posts/2025-6-8-local_package_install.html#标准安装流程",
+    "title": "Python 本地包安装与更新指南",
+    "section": "",
+    "text": "首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall"
+  },
+  {
+    "objectID": "posts/2025-6-8-local_package_install.html#临时安装方法",
+    "href": "posts/2025-6-8-local_package_install.html#临时安装方法",
+    "title": "Python 本地包安装与更新指南",
+    "section": "",
+    "text": "如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e ."
+  },
+  {
+    "objectID": "posts/2025-6-8-local_package_install.html#注意事项",
+    "href": "posts/2025-6-8-local_package_install.html#注意事项",
+    "title": "Python 本地包安装与更新指南",
+    "section": "",
+    "text": "确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境"
+  },
+  {
+    "objectID": "posts/2025-6-8-local_package_install.html#常见问题",
+    "href": "posts/2025-6-8-local_package_install.html#常见问题",
+    "title": "Python 本地包安装与更新指南",
+    "section": "",
+    "text": "如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Binchen’s Tech Blog",
+    "section": "",
+    "text": "农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法。\n\n浏览全部文章 → 关于我 →"
+  },
+  {
+    "objectID": "index.html#最新文章",
+    "href": "index.html#最新文章",
+    "title": "Binchen’s Tech Blog",
+    "section": "最新文章",
+    "text": "最新文章\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/index.html",
+    "href": "posts/index.html",
+    "title": "技术文档",
+    "section": "",
+    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html",
@@ -180,104 +292,6 @@
     "title": "学术论文常用缩写与写作规范",
     "section": "",
     "text": "首次出现是否“全称（缩写）”并后续一致？\n标题与摘要中的缩写是否必要且已定义？\n图表与附注是否给出缩写释义或“缩写表”？\n单位、数值与符号是否符合 SI 与期刊风格？\n统计量（P 值、区间、效应量）是否书写一致？\n参考文献与文内引文缩写是否统一格式？\n\n\n如需，我可以按您的研究方向（如遥感、生态、医学等）扩充专用缩写清单或将本页适配目标期刊格式。"
-  },
-  {
-    "objectID": "posts/index.html",
-    "href": "posts/index.html",
-    "title": "技术文档",
-    "section": "",
-    "text": "这里收录了我在农业数据科学领域的技术笔记和解决方案。文档按时间倒序排列，最新的内容在最前面。\n\n\n\n技术教程: 实用的技术操作指南\nGEE: Google Earth Engine 相关技术\nPython: Python 编程技巧\n机器学习: 机器学习在农业中的应用\n数据可视化: 科研图表制作技巧\n\n\n持续更新中，欢迎关注！"
-  },
-  {
-    "objectID": "posts/index.html#按分类浏览",
-    "href": "posts/index.html#按分类浏览",
-    "title": "技术文档",
-    "section": "",
-    "text": "技术教程: 实用的技术操作指南\nGEE: Google Earth Engine 相关技术\nPython: Python 编程技巧\n机器学习: 机器学习在农业中的应用\n数据可视化: 科研图表制作技巧\n\n\n持续更新中，欢迎关注！"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Welcome to My Tech Blog",
-    "section": "",
-    "text": "Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science."
-  },
-  {
-    "objectID": "index.html#latest-posts",
-    "href": "index.html#latest-posts",
-    "title": "Welcome to My Tech Blog",
-    "section": "1 Latest Posts",
-    "text": "1 Latest Posts\nHere are my most recent technical articles:\n\n1.1 🚀 使用 Geemap 从 GEE 下载全球栅格数据\nDate: Sep 1, 2025\n使用 geemap Python 库从谷歌地球引擎下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n阅读更多 →\n\n\n1.2 🔧 Python 论文图片尺寸规范指南\nDate: Jun 10, 2025\n详细介绍如何在 Python 中设置符合学术期刊要求的图片尺寸和格式，适用于 Elsevier 等出版社的论文投稿。\n阅读更多 →\n\n\n1.3 🌱 机器学习与传统作物模型的未来展望\nDate: Jun 1, 2025\n探讨机器学习如何改变传统作物模型的发展方向，以及未来农业建模的趋势和挑战。\n阅读更多 →\n\n📚 View All Posts → - 查看更多技术文档"
-  },
-  {
-    "objectID": "posts/2025-6-8-local_package_install.html",
-    "href": "posts/2025-6-8-local_package_install.html",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。\n\n\n\n\n首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall\n\n\n\n\n如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e .\n\n\n\n\n确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境\n\n\n\n\n如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
-  },
-  {
-    "objectID": "posts/2025-6-8-local_package_install.html#标准安装流程",
-    "href": "posts/2025-6-8-local_package_install.html#标准安装流程",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall"
-  },
-  {
-    "objectID": "posts/2025-6-8-local_package_install.html#临时安装方法",
-    "href": "posts/2025-6-8-local_package_install.html#临时安装方法",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e ."
-  },
-  {
-    "objectID": "posts/2025-6-8-local_package_install.html#注意事项",
-    "href": "posts/2025-6-8-local_package_install.html#注意事项",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境"
-  },
-  {
-    "objectID": "posts/2025-6-8-local_package_install.html#常见问题",
-    "href": "posts/2025-6-8-local_package_install.html#常见问题",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
   },
   {
     "objectID": "posts/2025-6-10-paper_fig_size.html",
