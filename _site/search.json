@@ -2,9 +2,9 @@
   {
     "objectID": "about.html",
     "href": "about.html",
-    "title": "About Me",
+    "title": "About",
     "section": "",
-    "text": "I am an agricultural data science researcher passionate about applying modern data science and machine learning techniques to solve agricultural challenges. This blog serves as a platform to document and share solutions to technical challenges I encounter in my research and work."
+    "text": "我是一名农业数据科学研究者，关注农业系统中的数据建模、遥感分析与智能决策。希望用更清晰的方法与流程，解决真实的农业问题。"
   },
   {
     "objectID": "about.html#introduction",
@@ -81,7 +81,7 @@
     "href": "posts/index.html",
     "title": "技术文档",
     "section": "",
-    "text": "这里收录了我在农业数据科学领域的技术笔记和解决方案。文档按时间倒序排列，最新的内容在最前面。\n\n\n\n技术教程: 实用的技术操作指南\nGEE: Google Earth Engine 相关技术\nPython: Python 编程技巧\n机器学习: 机器学习在农业中的应用\n数据可视化: 科研图表制作技巧\n\n\n持续更新中，欢迎关注！"
+    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/index.html#按分类浏览",
@@ -254,9 +254,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Welcome to My Tech Blog",
+    "title": "Binchen’s Tech Blog",
     "section": "",
-    "text": "Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science."
+    "text": "农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法。\n\n浏览全部文章 → 关于我 →"
   },
   {
     "objectID": "index.html#latest-posts",
@@ -397,5 +397,26 @@
     "title": "学术论文常用缩写与写作规范",
     "section": "",
     "text": "首次出现是否“全称（缩写）”并后续一致？\n标题与摘要中的缩写是否必要且已定义？\n图表与附注是否给出缩写释义或“缩写表”？\n单位、数值与符号是否符合 SI 与期刊风格？\n统计量（P 值、区间、效应量）是否书写一致？\n参考文献与文内引文缩写是否统一格式？\n\n\n如需，我可以按您的研究方向（如遥感、生态、医学等）扩充专用缩写清单或将本页适配目标期刊格式。"
+  },
+  {
+    "objectID": "index.html#最新文章",
+    "href": "index.html#最新文章",
+    "title": "Binchen’s Tech Blog",
+    "section": "最新文章",
+    "text": "最新文章\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "about.html#交流与合作",
+    "href": "about.html#交流与合作",
+    "title": "About",
+    "section": "交流与合作",
+    "text": "交流与合作\n\n\n\n\nEmail\nbinc041208@gmail.com\n\n\n\n\n\nGitHub\ngithub.com/chenbin98\n\n\n\n\n\nLinkedIn\nbin-chen-49292b312\n\n\n\n\n\nORCID\n0009-0000-8266-940X\n\n\n\n\n“Looking for like-minded friends to do something different together.”"
+  },
+  {
+    "objectID": "posts/index.html#全部文章",
+    "href": "posts/index.html#全部文章",
+    "title": "技术文档",
+    "section": "1 全部文章",
+    "text": "1 全部文章"
   }
 ]

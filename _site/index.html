@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Welcome to My Tech Blog – Binchen’s Tech Blog</title>
+<title>Binchen’s Tech Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,6 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-listing/list.min.js"></script>
+<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -67,7 +69,65 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script>
 
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-latest-posts .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-title','listing-date','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-latest-posts'] = new List('listing-latest-posts', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -111,35 +171,21 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#latest-posts" id="toc-latest-posts" class="nav-link active" data-scroll-target="#latest-posts"><span class="header-section-number">1</span> Latest Posts</a>
-  <ul class="collapse">
-  <li><a href="#使用-geemap-从-gee-下载全球栅格数据" id="toc-使用-geemap-从-gee-下载全球栅格数据" class="nav-link" data-scroll-target="#使用-geemap-从-gee-下载全球栅格数据"><span class="header-section-number">1.1</span> 🚀 使用 Geemap 从 GEE 下载全球栅格数据</a></li>
-  <li><a href="#python-论文图片尺寸规范指南" id="toc-python-论文图片尺寸规范指南" class="nav-link" data-scroll-target="#python-论文图片尺寸规范指南"><span class="header-section-number">1.2</span> 🔧 Python 论文图片尺寸规范指南</a></li>
-  <li><a href="#机器学习与传统作物模型的未来展望" id="toc-机器学习与传统作物模型的未来展望" class="nav-link" data-scroll-target="#机器学习与传统作物模型的未来展望"><span class="header-section-number">1.3</span> 🌱 机器学习与传统作物模型的未来展望</a></li>
-  </ul></li>
-  </ul>
-</nav>
-</nav>
+  
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-    </div>
+    
 <!-- main -->
-<main class="content column-page-right" id="quarto-document-content">
+<main class="content column-page" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Welcome to My Tech Blog</h1>
+<h1 class="title">Binchen’s Tech Blog</h1>
 </div>
 
 
 
-<div class="quarto-title-meta column-page-right">
+<div class="quarto-title-meta column-page">
 
     
   
@@ -151,32 +197,99 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Welcome to my technical blog! Here I document my research insights and technical solutions in agricultural data science.</p>
-<section id="latest-posts" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="latest-posts"><span class="header-section-number">1</span> Latest Posts</h2>
-<p>Here are my most recent technical articles:</p>
-<section id="使用-geemap-从-gee-下载全球栅格数据" class="level3" data-number="1.1">
-<h3 data-number="1.1" class="anchored" data-anchor-id="使用-geemap-从-gee-下载全球栅格数据"><span class="header-section-number">1.1</span> 🚀 使用 Geemap 从 GEE 下载全球栅格数据</h3>
-<p><strong>Date:</strong> Sep 1, 2025<br>
-使用 geemap Python 库从谷歌地球引擎下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。</p>
-<p><a href="./posts/2025-9-1-geedownloadimages.html">阅读更多 →</a></p>
+<div class="hero">
+<p>农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法。</p>
+<div class="hero-actions">
+<p><a href="./posts/" class="btn btn-primary">浏览全部文章 →</a> <a href="./about.html" class="btn btn-outline-primary">关于我 →</a></p>
+</div>
+</div>
+<div class="hero-grid">
+<section id="研究方向" class="level3 hero-card">
+<h3 class="anchored" data-anchor-id="研究方向">研究方向</h3>
+<ul>
+<li>作物模型与机器学习</li>
+<li>遥感与 GIS 分析</li>
+<li>气候与农业系统</li>
+</ul>
 </section>
-<section id="python-论文图片尺寸规范指南" class="level3" data-number="1.2">
-<h3 data-number="1.2" class="anchored" data-anchor-id="python-论文图片尺寸规范指南"><span class="header-section-number">1.2</span> 🔧 Python 论文图片尺寸规范指南</h3>
-<p><strong>Date:</strong> Jun 10, 2025<br>
-详细介绍如何在 Python 中设置符合学术期刊要求的图片尺寸和格式，适用于 Elsevier 等出版社的论文投稿。</p>
-<p><a href="./posts/2025-6-10-paper_fig_size.html">阅读更多 →</a></p>
+<section id="你能在这里找到" class="level3 hero-card">
+<h3 class="anchored" data-anchor-id="你能在这里找到">你能在这里找到</h3>
+<ul>
+<li>可复用的技术流程</li>
+<li>论文图表与写作规范</li>
+<li>数据处理与工具实践</li>
+</ul>
 </section>
-<section id="机器学习与传统作物模型的未来展望" class="level3" data-number="1.3">
-<h3 data-number="1.3" class="anchored" data-anchor-id="机器学习与传统作物模型的未来展望"><span class="header-section-number">1.3</span> 🌱 机器学习与传统作物模型的未来展望</h3>
-<p><strong>Date:</strong> Jun 1, 2025<br>
-探讨机器学习如何改变传统作物模型的发展方向，以及未来农业建模的趋势和挑战。</p>
-<p><a href="./posts/2025-6-1-machine_leaning_vs_crop_model.html">阅读更多 →</a></p>
-<hr>
-<p>📚 <strong><a href="./posts/">View All Posts →</a></strong> - 查看更多技术文档</p>
+<section id="记录方式" class="level3 hero-card">
+<h3 class="anchored" data-anchor-id="记录方式">记录方式</h3>
+<ul>
+<li>以问题为线索</li>
+<li>以步骤为主干</li>
+<li>以复现为目标</li>
+</ul>
+</section>
+</div>
+<section id="最新文章" class="level2 section-title">
+<h2 class="section-title anchored" data-anchor-id="最新文章">最新文章</h2>
+<div id="listing-latest-posts" class="quarto-listing quarto-listing-container-default">
+<div class="list quarto-listing-default">
+<div class="quarto-post image-right" data-index="0" data-categories="JUU5JTgzJUE4JUU3JUJEJUIyJTJDJUU1JTkwJThFJUU3JUFCJUFG" data-listing-date-sort="1767456000000" data-listing-file-modified-sort="1767514115342" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="149">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/2026-1-4-front_and_backend_server.html" class="no-external">后端服务部署：systemd + venv + Nginx</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/2026-1-4-front_and_backend_server.html" class="no-external">
+<p>以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/2026-1-4-front_and_backend_server.html" class="no-external">
+<div class="listing-date">
+Jan 4, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="JUU1JUFEJUE2JUU2JTlDJUFGJUU1JTg2JTk5JUU0JUJEJTlD" data-listing-date-sort="1758902400000" data-listing-file-modified-sort="1758957509946" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="388">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">学术论文常用缩写与写作规范</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">
+<p>整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">
+<div class="listing-date">
+Sep 27, 2025
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="2" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDR0VF" data-listing-date-sort="1756656000000" data-listing-file-modified-sort="1756750502369" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1825">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/2025-9-1-geedownloadimages.html" class="no-external">使用 Geemap 从 GEE 下载全球栅格数据</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/2025-9-1-geedownloadimages.html" class="no-external">
+<p>本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/2025-9-1-geedownloadimages.html" class="no-external">
+<div class="listing-date">
+Sep 1, 2025
+</div>
+</a>
+</div>
+</div>
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div>
 
 
-</section>
+
 </section>
 
 </main> <!-- /main -->
