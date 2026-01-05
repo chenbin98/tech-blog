@@ -6,7 +6,7 @@ number-sections: false
 ---
 
 ::: {.hero}
-我是一名农业数据科学研究者，关注农业系统中的数据建模、遥感分析与智能决策。希望用更清晰的方法与流程，解决真实的农业问题。
+我是一名农业数据科学研究者，关注农业系统中的数据建模、遥感分析与智能决策。希望用更清晰的方法与流程，助力农业技术进步与可持续发展
 :::
 
 ::: {.about-grid}
@@ -21,7 +21,7 @@ number-sections: false
 ### 研究内容
 - 产量预测与不确定性分析
 - 农业监测与数据融合
-- 田间传感与智能设备
+- 农业建模与智能决策
 :::
 
 ::: {.about-card}
@@ -64,6 +64,14 @@ number-sections: false
 <div>
 **ORCID**  
 [0009-0000-8266-940X](https://orcid.org/my-orcid?orcid=0009-0000-8266-940X)
+</div>
+:::
+
+::: {.contact-item}
+<i class="bi bi-journal-text contact-icon"></i>
+<div>
+**Google Scholar**  
+[Bin Chen](https://scholar.google.com/citations?user=pN6ngXAAAAAJ&hl=zh-CN)
 </div>
 :::
 :::
