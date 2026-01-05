@@ -156,20 +156,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#后端服务部署systemd-venv-nginx" id="toc-后端服务部署systemd-venv-nginx" class="nav-link active" data-scroll-target="#后端服务部署systemd-venv-nginx"><span class="header-section-number">1</span> 后端服务部署（systemd + venv + Nginx）</a>
   <ul class="collapse">
-  <li><a href="#安装依赖" id="toc-安装依赖" class="nav-link" data-scroll-target="#安装依赖"><span class="header-section-number">1.1</span> 1. 安装依赖</a></li>
-  <li><a href="#创建虚拟环境并安装依赖" id="toc-创建虚拟环境并安装依赖" class="nav-link" data-scroll-target="#创建虚拟环境并安装依赖"><span class="header-section-number">1.2</span> 2. 创建虚拟环境并安装依赖</a></li>
-  <li><a href="#用-systemd-托管" id="toc-用-systemd-托管" class="nav-link" data-scroll-target="#用-systemd-托管"><span class="header-section-number">1.3</span> 3. 用 systemd 托管</a>
+  <li><a href="#安装依赖" id="toc-安装依赖" class="nav-link" data-scroll-target="#安装依赖"><span class="header-section-number">1.1</span> 安装依赖</a></li>
+  <li><a href="#创建虚拟环境并安装依赖" id="toc-创建虚拟环境并安装依赖" class="nav-link" data-scroll-target="#创建虚拟环境并安装依赖"><span class="header-section-number">1.2</span> 创建虚拟环境并安装依赖</a></li>
+  <li><a href="#用-systemd-托管" id="toc-用-systemd-托管" class="nav-link" data-scroll-target="#用-systemd-托管"><span class="header-section-number">1.3</span> 用 systemd 托管</a>
   <ul class="collapse">
-  <li><a href="#创建服务文件" id="toc-创建服务文件" class="nav-link" data-scroll-target="#创建服务文件"><span class="header-section-number">1.3.1</span> 3.1 创建服务文件</a></li>
-  <li><a href="#服务文件示例按实际入口调整" id="toc-服务文件示例按实际入口调整" class="nav-link" data-scroll-target="#服务文件示例按实际入口调整"><span class="header-section-number">1.3.2</span> 3.2 服务文件示例（按实际入口调整）</a></li>
+  <li><a href="#创建服务文件" id="toc-创建服务文件" class="nav-link" data-scroll-target="#创建服务文件"><span class="header-section-number">1.3.1</span> 创建服务文件</a></li>
+  <li><a href="#服务文件示例按实际入口调整" id="toc-服务文件示例按实际入口调整" class="nav-link" data-scroll-target="#服务文件示例按实际入口调整"><span class="header-section-number">1.3.2</span> 服务文件示例（按实际入口调整）</a></li>
   </ul></li>
-  <li><a href="#启动服务" id="toc-启动服务" class="nav-link" data-scroll-target="#启动服务"><span class="header-section-number">1.4</span> 4. 启动服务</a></li>
-  <li><a href="#用-nginx-做反向代理-https" id="toc-用-nginx-做反向代理-https" class="nav-link" data-scroll-target="#用-nginx-做反向代理-https"><span class="header-section-number">1.5</span> 5. 用 Nginx 做反向代理 + HTTPS</a>
+  <li><a href="#启动服务" id="toc-启动服务" class="nav-link" data-scroll-target="#启动服务"><span class="header-section-number">1.4</span> 启动服务</a></li>
+  <li><a href="#用-nginx-做反向代理-https" id="toc-用-nginx-做反向代理-https" class="nav-link" data-scroll-target="#用-nginx-做反向代理-https"><span class="header-section-number">1.5</span> 用 Nginx 做反向代理 + HTTPS</a>
   <ul class="collapse">
-  <li><a href="#安装-nginx" id="toc-安装-nginx" class="nav-link" data-scroll-target="#安装-nginx"><span class="header-section-number">1.5.1</span> 5.1 安装 Nginx</a></li>
-  <li><a href="#配置-nginx" id="toc-配置-nginx" class="nav-link" data-scroll-target="#配置-nginx"><span class="header-section-number">1.5.2</span> 5.2 配置 Nginx</a></li>
+  <li><a href="#安装-nginx" id="toc-安装-nginx" class="nav-link" data-scroll-target="#安装-nginx"><span class="header-section-number">1.5.1</span> 安装 Nginx</a></li>
+  <li><a href="#配置-nginx" id="toc-配置-nginx" class="nav-link" data-scroll-target="#配置-nginx"><span class="header-section-number">1.5.2</span> 配置 Nginx</a></li>
   </ul></li>
-  <li><a href="#维护常用命令" id="toc-维护常用命令" class="nav-link" data-scroll-target="#维护常用命令"><span class="header-section-number">1.6</span> 6. 维护常用命令</a></li>
+  <li><a href="#维护常用命令" id="toc-维护常用命令" class="nav-link" data-scroll-target="#维护常用命令"><span class="header-section-number">1.6</span> 维护常用命令</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -219,12 +219,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1 data-number="1"><span class="header-section-number">1</span> 后端服务部署（systemd + venv + Nginx）</h1>
 <p>以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。</p>
 <section id="安装依赖" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="安装依赖"><span class="header-section-number">1.1</span> 1. 安装依赖</h2>
+<h2 data-number="1.1" class="anchored" data-anchor-id="安装依赖"><span class="header-section-number">1.1</span> 安装依赖</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> python3-venv python3-pip</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="创建虚拟环境并安装依赖" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="创建虚拟环境并安装依赖"><span class="header-section-number">1.2</span> 2. 创建虚拟环境并安装依赖</h2>
+<h2 data-number="1.2" class="anchored" data-anchor-id="创建虚拟环境并安装依赖"><span class="header-section-number">1.2</span> 创建虚拟环境并安装依赖</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> rose-wechat-agent</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
@@ -234,13 +234,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">nano</span> .env</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="用-systemd-托管" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="用-systemd-托管"><span class="header-section-number">1.3</span> 3. 用 systemd 托管</h2>
+<h2 data-number="1.3" class="anchored" data-anchor-id="用-systemd-托管"><span class="header-section-number">1.3</span> 用 systemd 托管</h2>
 <section id="创建服务文件" class="level3" data-number="1.3.1">
-<h3 data-number="1.3.1" class="anchored" data-anchor-id="创建服务文件"><span class="header-section-number">1.3.1</span> 3.1 创建服务文件</h3>
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="创建服务文件"><span class="header-section-number">1.3.1</span> 创建服务文件</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> nano /etc/systemd/system/rose-wechat-agent.service</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="服务文件示例按实际入口调整" class="level3" data-number="1.3.2">
-<h3 data-number="1.3.2" class="anchored" data-anchor-id="服务文件示例按实际入口调整"><span class="header-section-number">1.3.2</span> 3.2 服务文件示例（按实际入口调整）</h3>
+<h3 data-number="1.3.2" class="anchored" data-anchor-id="服务文件示例按实际入口调整"><span class="header-section-number">1.3.2</span> 服务文件示例（按实际入口调整）</h3>
 <p>建议使用 uvicorn 作为入口，便于后续扩展异步能力。</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[Unit]</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Description</span><span class="ot">=</span><span class="st">Rose WeChat Agent</span></span>
@@ -259,19 +259,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 </section>
 <section id="启动服务" class="level2" data-number="1.4">
-<h2 data-number="1.4" class="anchored" data-anchor-id="启动服务"><span class="header-section-number">1.4</span> 4. 启动服务</h2>
+<h2 data-number="1.4" class="anchored" data-anchor-id="启动服务"><span class="header-section-number">1.4</span> 启动服务</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl daemon-reload</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable <span class="at">--now</span> rose-wechat-agent</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> journalctl <span class="at">-u</span> rose-wechat-agent <span class="at">-f</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="用-nginx-做反向代理-https" class="level2" data-number="1.5">
-<h2 data-number="1.5" class="anchored" data-anchor-id="用-nginx-做反向代理-https"><span class="header-section-number">1.5</span> 5. 用 Nginx 做反向代理 + HTTPS</h2>
+<h2 data-number="1.5" class="anchored" data-anchor-id="用-nginx-做反向代理-https"><span class="header-section-number">1.5</span> 用 Nginx 做反向代理 + HTTPS</h2>
 <section id="安装-nginx" class="level3" data-number="1.5.1">
-<h3 data-number="1.5.1" class="anchored" data-anchor-id="安装-nginx"><span class="header-section-number">1.5.1</span> 5.1 安装 Nginx</h3>
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="安装-nginx"><span class="header-section-number">1.5.1</span> 安装 Nginx</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> nginx</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="配置-nginx" class="level3" data-number="1.5.2">
-<h3 data-number="1.5.2" class="anchored" data-anchor-id="配置-nginx"><span class="header-section-number">1.5.2</span> 5.2 配置 Nginx</h3>
+<h3 data-number="1.5.2" class="anchored" data-anchor-id="配置-nginx"><span class="header-section-number">1.5.2</span> 配置 Nginx</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> nano /etc/nginx/sites-available/grape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>在 <code>server</code> 块内添加：</p>
 <pre class="nginx"><code>location /rose_wechat_agent/ {
@@ -290,7 +290,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 </section>
 <section id="维护常用命令" class="level2" data-number="1.6">
-<h2 data-number="1.6" class="anchored" data-anchor-id="维护常用命令"><span class="header-section-number">1.6</span> 6. 维护常用命令</h2>
+<h2 data-number="1.6" class="anchored" data-anchor-id="维护常用命令"><span class="header-section-number">1.6</span> 维护常用命令</h2>
 <ul>
 <li>重启后端服务：<code>sudo systemctl restart rose-wechat-agent</code></li>
 <li>查看后端服务日志：<code>sudo journalctl -u rose-wechat-agent -n 100 --no-pager</code></li>
