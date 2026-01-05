@@ -10,14 +10,14 @@ description: "以玫瑰通 agent 项目为例，整理后端服务的原生部�
 
 以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。
 
-## 1. 安装依赖
+## 安装依赖
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y python3-venv python3-pip
 ```
 
-## 2. 创建虚拟环境并安装依赖
+## 创建虚拟环境并安装依赖
 
 ```bash
 cd rose-wechat-agent
@@ -29,15 +29,15 @@ cp .env.example .env
 nano .env
 ```
 
-## 3. 用 systemd 托管
+## 用 systemd 托管
 
-### 3.1 创建服务文件
+### 创建服务文件
 
 ```bash
 sudo nano /etc/systemd/system/rose-wechat-agent.service
 ```
 
-### 3.2 服务文件示例（按实际入口调整）
+### 服务文件示例（按实际入口调整）
 
 建议使用 uvicorn 作为入口，便于后续扩展异步能力。
 
@@ -58,7 +58,7 @@ User=www-data
 WantedBy=multi-user.target
 ```
 
-## 4. 启动服务
+## 启动服务
 
 ```bash
 sudo systemctl daemon-reload
@@ -66,15 +66,15 @@ sudo systemctl enable --now rose-wechat-agent
 sudo journalctl -u rose-wechat-agent -f
 ```
 
-## 5. 用 Nginx 做反向代理 + HTTPS
+## 用 Nginx 做反向代理 + HTTPS
 
-### 5.1 安装 Nginx
+### 安装 Nginx
 
 ```bash
 sudo apt-get install -y nginx
 ```
 
-### 5.2 配置 Nginx
+### 配置 Nginx
 
 ```bash
 sudo nano /etc/nginx/sites-available/grape
@@ -98,7 +98,7 @@ location /rose_wechat_agent/ {
 }
 ```
 
-## 6. 维护常用命令
+## 维护常用命令
 
 - 重启后端服务：`sudo systemctl restart rose-wechat-agent`
 - 查看后端服务日志：`sudo journalctl -u rose-wechat-agent -n 100 --no-pager`
