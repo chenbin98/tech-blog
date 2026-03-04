@@ -1,0 +1,88 @@
+---
+title: "Git 忽略 Python .pyc 编译文件解决方案"
+date: "2026-03-04"
+categories: [运维, 后端]
+tags: [Git, Python]
+description: "python 文档的gitigonre文件配置。"
+
+---
+
+## 问题背景
+在 Git 仓库中执行 `git status` 时，大量 Python 编译生成的 `.pyc` 文件、`__pycache__` 目录被标记为「修改未暂存」或「未跟踪文件」，干扰版本管理，需通过 `.gitignore` 规则永久忽略这类文件。
+
+## 适用环境
+- 操作系统：Windows（PowerShell）/ Linux / macOS
+- Git 版本：>= 2.0
+- 项目类型：Python 项目
+
+## 解决方案步骤
+
+### 定位仓库根目录
+打开终端/命令行，切换到 Git 仓库根目录（以示例路径为例）：
+
+```bash
+# Windows PowerShell
+cd F:\rice_planthoppers_shift
+
+# Linux/macOS
+cd /path/to/rice_planthoppers_shift
+
+## 创建 / 编辑 .gitignore 文件
+### 新建或打开 .gitignore
+
+## Windows PowerShell（用记事本打开）
+notepad .gitignore
+
+## Linux/macOS（用vim打开）
+vim .gitignore
+
+## 添加忽略规则
+在 .gitignore 文件中写入以下规则（覆盖 Python 编译文件核心忽略项 + 通用推荐项）：
+
+# --------------------------
+# Python 编译文件忽略规则
+# --------------------------
+# 忽略所有 .pyc 编译文件
+*.pyc
+# 忽略所有 __pycache__ 缓存目录（含子目录）
+__pycache__/
+
+# --------------------------
+# 可选：Python 项目通用忽略项（推荐添加）
+# --------------------------
+# 其他编译文件
+*.pyo
+*.pyd
+# 虚拟环境目录
+.venv/
+venv/
+env/
+# 打包/构建目录
+dist/
+build/
+*.egg-info/
+# 测试缓存
+.pytest_cache/
+# IDE 配置（如VSCode）
+.vscode/
+
+## 处理已被 Git 跟踪的 .pyc 文件
+若 .pyc 文件 /__pycache__ 目录已被 Git 提交过（即历史记录中有该文件），需先移除 Git 跟踪（仅移除索引，不删除本地文件）：
+# 递归移除所有已跟踪的 .pyc 文件
+git rm --cached **/*.pyc
+# 移除已跟踪的 __pycache__ 目录（若有）
+git rm --cached -r **/__pycache__
+
+## 提交 .gitignore 规则
+将 .gitignore 文件加入版本控制并提交，使规则生效：
+# 暂存 .gitignore 文件
+git add .gitignore
+# 提交修改（备注清晰说明变更）
+git commit -m "feat: 添加.gitignore规则，忽略Python .pyc编译文件和__pycache__目录"
+# 推送到远程仓库（可选，同步到团队仓库）
+git push origin main
+
+## 验证效果
+执行以下命令验证忽略规则是否生效：
+git status
+预期结果：终端输出中不再出现 .pyc 文件、__pycache__ 目录的「modified」或「Untracked files」提示。
