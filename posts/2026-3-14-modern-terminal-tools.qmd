@@ -1,0 +1,424 @@
+---
+title: "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程"
+date: "2026-03-14"
+categories: [开发工具, 运维]
+tags: [Terminal, Ghostty, Yazi, Lazygit, Zoxide, 效率工具]
+description: "终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。"
+
+---
+
+## 为什么需要这些工具？
+
+传统终端命令（`cd`, `ls`, `git status`）功能强大但体验原始。今天介绍的四个工具能让终端拥有**GUI 般的易用性**，同时保持**SSH 友好**和**低资源占用**。
+
+**核心优势：**
+- ⚡ 性能更快（Rust/Zig/Go 编写，GPU 加速）
+- 🎨 美观现代（主题、透明度、连字字体）
+- ⌨️ 键盘优先（手不离开键盘完成所有操作）
+- 🔧 可组合性（管道、脚本、自动化）
+
+---
+
+## 工具清单
+
+| 工具 | 类别 | 作用 | 替代 |
+|------|------|------|------|
+| **Ghostty** | 终端模拟器 | 提供终端窗口 | iTerm2, Terminal.app |
+| **Yazi** | 文件管理器 | 浏览/管理文件 | `ls`+`cd`+`cat` |
+| **Lazygit** | Git 界面 | 可视化 Git 操作 | `git status/diff/add` |
+| **Zoxide** | 目录跳转 | 智能目录导航 | `cd` |
+
+---
+
+## 安装（macOS）
+
+### 1. 安装 Homebrew（如果没有）
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+### 2. 安装所有工具
+
+```bash
+# 终端模拟器
+brew install --cask ghostty
+
+# 终端工具
+brew install zoxide lazygit yazi
+
+# 字体（支持图标显示）
+brew install --cask jetbrains-mono-nerd-font
+```
+
+### 3. 初始化配置
+
+```bash
+# 创建配置目录
+mkdir -p ~/.config/ghostty ~/.config/yazi ~/.config/lazygit
+```
+
+---
+
+## 配置详解
+
+### Ghostty 配置
+
+编辑 `~/.config/ghostty/config`：
+
+```toml
+# 字体配置
+font-family = "JetBrainsMono Nerd Font"
+font-size = 13
+
+# 主题（Catppuccin Mocha - 深色护眼）
+theme = "catppuccin-mocha"
+background = "#1e1e2e"
+foreground = "#cdd6f4"
+
+# 窗口设置
+initial-window-size = "1200x800"
+window-padding-x = 12
+window-padding-y = 12
+background-opacity = 0.92
+
+# 快捷键
+keybind = "cmd+t=new_tab"
+keybind = "cmd+w=close"
+keybind = "cmd+d=split:right"
+keybind = "cmd+shift+d=split:down"
+keybind = "cmd+f=show_search"
+keybind = "cmd+c=copy_to_clipboard"
+keybind = "cmd+v=paste_from_clipboard"
+```
+
+**核心快捷键：**
+
+| 快捷键 | 功能 |
+|--------|------|
+| `Cmd+T` | 新建标签页 |
+| `Cmd+D` | 右分屏 |
+| `Cmd+Shift+D` | 下分屏 |
+| `Cmd+W` | 关闭标签页 |
+| `Cmd+Enter` | 全屏切换 |
+| `Cmd+F` | 搜索 |
+| `Cmd+Plus/Minus` | 字体缩放 |
+
+---
+
+### Zoxide 配置
+
+编辑 `~/.zshrc`（或 `~/.bashrc`）：
+
+```bash
+# 初始化 zoxide
+eval "$(zoxide init zsh)"
+
+# 快捷别名
+alias z="z"
+alias zi="z -i"  # 交互式选择
+```
+
+**基本用法：**
+
+```bash
+# 跳转到包含关键词的目录
+z projects          # 跳转到 ~/projects 或 /work/projects
+z ai                # 跳转到包含"ai"的目录
+
+# 模糊匹配（超好用！）
+z proj/ai           # 匹配 ~/projects/ai-tool
+
+# 列出所有记录
+z
+
+# 交互式选择（推荐）
+zi
+
+# 跳转并列出文件
+z projects -
+```
+
+**智能学习：**
+Zoxide 会记录你常去的目录，去得越多的地方优先级越高。
+
+---
+
+### Yazi 配置
+
+编辑 `~/.config/yazi/yazi.toml`：
+
+```toml
+[manager]
+show_hidden = true
+sort_by = "alphabetical"
+sort_dir_first = true
+
+[preview]
+code_syntax_highlight = true
+code_max_lines = 1000
+image_quality = 75
+
+[opener]
+edit = [
+  { run = '${EDITOR:-vi} "$@"', block = true, for = "unix" },
+]
+open = [
+  { run = 'open "$1"', for = "macos" },
+]
+```
+
+**基本用法：**
+
+```bash
+# 启动 yazi
+y
+ya
+
+# 从指定目录启动
+y ~/projects
+```
+
+**核心快捷键：**
+
+| 按键 | 功能 |
+|------|------|
+| `j/k` | 上/下移动 |
+| `l` | 进入目录/打开文件 |
+| `h` | 返回上级目录 |
+| `Tab` | 切换预览面板 |
+| `/` | 搜索文件 |
+| `a` | 新建文件/目录 |
+| `r` | 重命名 |
+| `d` | 删除（到回收站） |
+| `c` | 复制 |
+| `x` | 剪切 |
+| `p` | 粘贴 |
+| `.` | 显示/隐藏文件 |
+| `q` | 退出 |
+
+**预览功能：**
+- 代码文件：语法高亮
+- 图片：缩略图预览
+- PDF：第一页预览
+- 视频：封面预览
+
+---
+
+### Lazygit 配置
+
+编辑 `~/.config/lazygit/config.yml`：
+
+```yaml
+gui:
+  theme:
+    activeBorderColor:
+      - "#89b4fa"
+      - "bold"
+    selectedLineBgColor:
+      - "#313244"
+  
+  mouseEvents: true
+  showFileTree: true
+  
+git:
+  autoRefresh: true
+  autoRefreshPeriod: 5
+```
+
+**基本用法：**
+
+```bash
+# 在项目目录中启动
+cd ~/your-project
+lg
+lazygit
+```
+
+**界面布局：**
+
+```
+┌─ Files ─────────────┬─ Diff ──────────────┐
+│ M src/main.rs       │ @@ -12,7 +12,9 @@   │
+│ M Cargo.toml        │  fn main() {        │
+│ ? README.md         │ +   // new code     │
+│                     │      old code       │
+└─────────────────────┴─────────────────────┘
+┌─ Branches ──────────┬─ Commits ───────────┐
+│ * feature/auth      │ abc123 Add login    │
+│   main              │ def456 Fix bug      │
+│   develop           │ 789xyz Update deps  │
+└─────────────────────┴─────────────────────┘
+```
+
+**核心快捷键：**
+
+| 按键 | 功能 |
+|------|------|
+| `j/k` | 上/下移动 |
+| `Space` | 选择/取消选择文件 |
+| `a` | 添加文件到暂存区 |
+| `c` | 提交（Commit） |
+| `p` | 推送（Push） |
+| `P` | 拉取（Pull） |
+| `b` | 切换分支 |
+| `B` | 创建分支 |
+| `m` | 合并分支 |
+| `r` | 刷新 |
+| `q` | 退出 |
+| `?` | 查看完整快捷键列表 |
+
+**高级功能：**
+- **部分提交**：选中部分代码行提交
+- **交互式 Rebase**：可视化调整提交历史
+- **冲突解决**：分屏对比，点击选择保留哪边
+- **暂存区管理**：分开查看暂存和未暂存的变更
+
+---
+
+## 完整工作流示例
+
+### 场景：开发新功能并提交
+
+```bash
+# 1. 用 zoxide 快速跳转项目
+z ai-project
+
+# 2. 用 yazi 浏览文件结构
+y
+
+# 3. 编辑代码（用你喜欢的编辑器）
+code .
+
+# 4. 用 lazygit 查看变更并提交
+lg
+# → Space 选择文件
+# → c 输入提交信息
+# → p 推送到远程
+
+# 5. 分屏查看日志（Ghostty 原生支持）
+Cmd+D  # 右分屏
+tail -f logs/app.log
+```
+
+### 场景：多项目并行开发
+
+```bash
+# Ghostty 分屏工作流
+
+# 左侧：项目 A
+z project-a
+lg
+
+# 右侧：项目 B（Cmd+D 分屏）
+z project-b
+y
+
+# 下方：系统监控（Cmd+Shift+D 分屏）
+htop
+```
+
+---
+
+## 常见问题
+
+### Q1: 字体显示异常？
+**A:** 确保安装了 Nerd Font 并在配置中指定：
+```toml
+font-family = "JetBrainsMono Nerd Font"
+```
+
+### Q2: Yazi 预览乱码？
+**A:** 安装 `bat` 和 `ffmpegthumbnailer`：
+```bash
+brew install bat ffmpeg
+```
+
+### Q3: Lazygit 中文乱码？
+**A:** 确保终端支持 UTF-8（Ghostty 默认支持）。
+
+### Q4: Zoxide 找不到目录？
+**A:** 需要先用 `cd` 去几次，Zoxide 会学习你的习惯。
+
+---
+
+## 进阶技巧
+
+### Zoxide 高级用法
+
+```bash
+# 删除记录
+zoxide remove ~/old-project
+
+# 导出记录
+zoxide query --list > directories.txt
+
+# 在 Yazi 中集成
+# ~/.config/yazi/keymap.toml
+[[manager.prepend_keymap]]
+on   = [ "c", "z" ]
+run  = "plugin zoxide"
+desc = "Jump to a directory using zoxide"
+```
+
+### Yazi 插件推荐
+
+```bash
+# 安装插件管理器
+git clone https://github.com/yazi-rs/plugins.git ~/.config/yazi/plugins
+
+# 推荐插件
+# - zoxide.yazi: 目录跳转
+# - git.yazi: Git 状态显示
+# - full-border.yazi: 美化边框
+```
+
+### Lazygit 自定义命令
+
+```yaml
+# ~/.config/lazygit/config.yml
+customCommands:
+  - key: "<c-r>"
+    command: "git reset --hard HEAD~1"
+    description: "回滚上一个提交"
+    context: "commits"
+    prompts:
+      - type: "confirm"
+        title: "确认回滚"
+        body: "确定要删除上一个提交吗？"
+```
+
+---
+
+## 总结
+
+这套工具组合能显著提升终端开发体验：
+
+| 工具 | 学习成本 | 效率提升 | 推荐指数 |
+|------|---------|---------|---------|
+| Ghostty | ⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Zoxide | ⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Lazygit | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Yazi | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+
+**建议学习路径：**
+1. **第 1 周**：Ghostty + Zoxide（最低学习成本）
+2. **第 2 周**：Lazygit（Git 复杂操作救星）
+3. **第 3 周**：Yazi（文件管理进阶）
+
+**最终目标：**
+手不离开键盘，完成所有开发工作！
+
+---
+
+## 参考链接
+
+- [Ghostty 官网](https://ghostty.org)
+- [Zoxide GitHub](https://github.com/ajeetdsouza/zoxide)
+- [Yazi 官网](https://yazi-rs.github.io)
+- [Lazygit GitHub](https://github.com/jesseduffield/lazygit)
+- [Catppuccin 主题](https://catppuccin.com)
+
+---
+
+*最后更新：2026-03-14 | 测试环境：macOS 26.3.1 (arm64)*
