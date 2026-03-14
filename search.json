@@ -14,6 +14,223 @@
     "text": "交流与合作\n\n\n\n\nEmail\nbinc041208@gmail.com\n\n\n\n\n\nGitHub\ngithub.com/chenbin98\n\n\n\n\n\nLinkedIn\nbin-chen-49292b312\n\n\n\n\n\nORCID\n0009-0000-8266-940X\n\n\n\n\n\nGoogle Scholar\nBin Chen\n\n\n\n\n“Looking for like-minded friends to do something different together.”"
   },
   {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html",
+    "href": "posts/2026-1-4-front_and_backend_server.html",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。\n\n\nsudo apt-get update\nsudo apt-get install -y python3-venv python3-pip\n\n\n\ncd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env\n\n\n\n\n\nsudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target\n\n\n\n\nsudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f\n\n\n\n\n\nsudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}\n\n\n\n\n\n重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
+    "href": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo apt-get update\nsudo apt-get install -y python3-venv python3-pip"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
+    "href": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "cd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
+    "href": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#启动服务",
+    "href": "posts/2026-1-4-front_and_backend_server.html#启动服务",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
+    "href": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
+    "href": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html",
+    "href": "posts/2025-6-10-paper_fig_size.html",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。\n\n\n\n\n\n用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图\n\n\n\n\n\n\n\n\nimport matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})\n\n\n\n\n\n分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt\n\n\n\n\n\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)\n\n\n\n\n图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
+    "href": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
+    "href": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "import matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
+    "href": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html#代码示例",
+    "href": "posts/2025-6-10-paper_fig_size.html#代码示例",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html#常见问题",
+    "href": "posts/2025-6-10-paper_fig_size.html#常见问题",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html",
+    "href": "posts/2026-3-14-modern-terminal-tools.html",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "",
+    "text": "传统终端命令（cd, ls, git status）功能强大但体验原始。今天介绍的四个工具能让终端拥有GUI 般的易用性，同时保持SSH 友好和低资源占用。\n核心优势： - ⚡ 性能更快（Rust/Zig/Go 编写，GPU 加速） - 🎨 美观现代（主题、透明度、连字字体） - ⌨️ 键盘优先（手不离开键盘完成所有操作） - 🔧 可组合性（管道、脚本、自动化）"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#为什么需要这些工具",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#为什么需要这些工具",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "",
+    "text": "传统终端命令（cd, ls, git status）功能强大但体验原始。今天介绍的四个工具能让终端拥有GUI 般的易用性，同时保持SSH 友好和低资源占用。\n核心优势： - ⚡ 性能更快（Rust/Zig/Go 编写，GPU 加速） - 🎨 美观现代（主题、透明度、连字字体） - ⌨️ 键盘优先（手不离开键盘完成所有操作） - 🔧 可组合性（管道、脚本、自动化）"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#工具清单",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#工具清单",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "2 工具清单",
+    "text": "2 工具清单\n\n\n\n工具\n类别\n作用\n替代\n\n\n\n\nGhostty\n终端模拟器\n提供终端窗口\niTerm2, Terminal.app\n\n\nYazi\n文件管理器\n浏览/管理文件\nls+cd+cat\n\n\nLazygit\nGit 界面\n可视化 Git 操作\ngit status/diff/add\n\n\nZoxide\n目录跳转\n智能目录导航\ncd"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#安装macos",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#安装macos",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "3 安装（macOS）",
+    "text": "3 安装（macOS）\n\n3.1 1. 安装 Homebrew（如果没有）\n/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\n\n\n3.2 2. 安装所有工具\n# 终端模拟器\nbrew install --cask ghostty\n\n# 终端工具\nbrew install zoxide lazygit yazi\n\n# 字体（支持图标显示）\nbrew install --cask jetbrains-mono-nerd-font\n\n\n3.3 3. 初始化配置\n# 创建配置目录\nmkdir -p ~/.config/ghostty ~/.config/yazi ~/.config/lazygit"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#配置详解",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#配置详解",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "4 配置详解",
+    "text": "4 配置详解\n\n4.1 Ghostty 配置\n编辑 ~/.config/ghostty/config：\n# 字体配置\nfont-family = \"JetBrainsMono Nerd Font\"\nfont-size = 13\n\n# 主题（Catppuccin Mocha - 深色护眼）\ntheme = \"catppuccin-mocha\"\nbackground = \"#1e1e2e\"\nforeground = \"#cdd6f4\"\n\n# 窗口设置\ninitial-window-size = \"1200x800\"\nwindow-padding-x = 12\nwindow-padding-y = 12\nbackground-opacity = 0.92\n\n# 快捷键\nkeybind = \"cmd+t=new_tab\"\nkeybind = \"cmd+w=close\"\nkeybind = \"cmd+d=split:right\"\nkeybind = \"cmd+shift+d=split:down\"\nkeybind = \"cmd+f=show_search\"\nkeybind = \"cmd+c=copy_to_clipboard\"\nkeybind = \"cmd+v=paste_from_clipboard\"\n核心快捷键：\n\n\n\n快捷键\n功能\n\n\n\n\nCmd+T\n新建标签页\n\n\nCmd+D\n右分屏\n\n\nCmd+Shift+D\n下分屏\n\n\nCmd+W\n关闭标签页\n\n\nCmd+Enter\n全屏切换\n\n\nCmd+F\n搜索\n\n\nCmd+Plus/Minus\n字体缩放\n\n\n\n\n\n\n4.2 Zoxide 配置\n编辑 ~/.zshrc（或 ~/.bashrc）：\n# 初始化 zoxide\neval \"$(zoxide init zsh)\"\n\n# 快捷别名\nalias z=\"z\"\nalias zi=\"z -i\"  # 交互式选择\n基本用法：\n# 跳转到包含关键词的目录\nz projects          # 跳转到 ~/projects 或 /work/projects\nz ai                # 跳转到包含\"ai\"的目录\n\n# 模糊匹配（超好用！）\nz proj/ai           # 匹配 ~/projects/ai-tool\n\n# 列出所有记录\nz\n\n# 交互式选择（推荐）\nzi\n\n# 跳转并列出文件\nz projects -\n智能学习： Zoxide 会记录你常去的目录，去得越多的地方优先级越高。\n\n\n\n4.3 Yazi 配置\n编辑 ~/.config/yazi/yazi.toml：\n[manager]\nshow_hidden = true\nsort_by = \"alphabetical\"\nsort_dir_first = true\n\n[preview]\ncode_syntax_highlight = true\ncode_max_lines = 1000\nimage_quality = 75\n\n[opener]\nedit = [\n  { run = '${EDITOR:-vi} \"$@\"', block = true, for = \"unix\" },\n]\nopen = [\n  { run = 'open \"$1\"', for = \"macos\" },\n]\n基本用法：\n# 启动 yazi\ny\nya\n\n# 从指定目录启动\ny ~/projects\n核心快捷键：\n\n\n\n按键\n功能\n\n\n\n\nj/k\n上/下移动\n\n\nl\n进入目录/打开文件\n\n\nh\n返回上级目录\n\n\nTab\n切换预览面板\n\n\n/\n搜索文件\n\n\na\n新建文件/目录\n\n\nr\n重命名\n\n\nd\n删除（到回收站）\n\n\nc\n复制\n\n\nx\n剪切\n\n\np\n粘贴\n\n\n.\n显示/隐藏文件\n\n\nq\n退出\n\n\n\n预览功能： - 代码文件：语法高亮 - 图片：缩略图预览 - PDF：第一页预览 - 视频：封面预览\n\n\n\n4.4 Lazygit 配置\n编辑 ~/.config/lazygit/config.yml：\ngui:\n  theme:\n    activeBorderColor:\n      - \"#89b4fa\"\n      - \"bold\"\n    selectedLineBgColor:\n      - \"#313244\"\n  \n  mouseEvents: true\n  showFileTree: true\n  \ngit:\n  autoRefresh: true\n  autoRefreshPeriod: 5\n基本用法：\n# 在项目目录中启动\ncd ~/your-project\nlg\nlazygit\n界面布局：\n┌─ Files ─────────────┬─ Diff ──────────────┐\n│ M src/main.rs       │ @@ -12,7 +12,9 @@   │\n│ M Cargo.toml        │  fn main() {        │\n│ ? README.md         │ +   // new code     │\n│                     │      old code       │\n└─────────────────────┴─────────────────────┘\n┌─ Branches ──────────┬─ Commits ───────────┐\n│ * feature/auth      │ abc123 Add login    │\n│   main              │ def456 Fix bug      │\n│   develop           │ 789xyz Update deps  │\n└─────────────────────┴─────────────────────┘\n核心快捷键：\n\n\n\n按键\n功能\n\n\n\n\nj/k\n上/下移动\n\n\nSpace\n选择/取消选择文件\n\n\na\n添加文件到暂存区\n\n\nc\n提交（Commit）\n\n\np\n推送（Push）\n\n\nP\n拉取（Pull）\n\n\nb\n切换分支\n\n\nB\n创建分支\n\n\nm\n合并分支\n\n\nr\n刷新\n\n\nq\n退出\n\n\n?\n查看完整快捷键列表\n\n\n\n高级功能： - 部分提交：选中部分代码行提交 - 交互式 Rebase：可视化调整提交历史 - 冲突解决：分屏对比，点击选择保留哪边 - 暂存区管理：分开查看暂存和未暂存的变更"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#完整工作流示例",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#完整工作流示例",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "5 完整工作流示例",
+    "text": "5 完整工作流示例\n\n5.1 场景：开发新功能并提交\n# 1. 用 zoxide 快速跳转项目\nz ai-project\n\n# 2. 用 yazi 浏览文件结构\ny\n\n# 3. 编辑代码（用你喜欢的编辑器）\ncode .\n\n# 4. 用 lazygit 查看变更并提交\nlg\n# → Space 选择文件\n# → c 输入提交信息\n# → p 推送到远程\n\n# 5. 分屏查看日志（Ghostty 原生支持）\nCmd+D  # 右分屏\ntail -f logs/app.log\n\n\n5.2 场景：多项目并行开发\n# Ghostty 分屏工作流\n\n# 左侧：项目 A\nz project-a\nlg\n\n# 右侧：项目 B（Cmd+D 分屏）\nz project-b\ny\n\n# 下方：系统监控（Cmd+Shift+D 分屏）\nhtop"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#常见问题",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#常见问题",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "6 常见问题",
+    "text": "6 常见问题\n\n6.1 Q1: 字体显示异常？\nA: 确保安装了 Nerd Font 并在配置中指定：\nfont-family = \"JetBrainsMono Nerd Font\"\n\n\n6.2 Q2: Yazi 预览乱码？\nA: 安装 bat 和 ffmpegthumbnailer：\nbrew install bat ffmpeg\n\n\n6.3 Q3: Lazygit 中文乱码？\nA: 确保终端支持 UTF-8（Ghostty 默认支持）。\n\n\n6.4 Q4: Zoxide 找不到目录？\nA: 需要先用 cd 去几次，Zoxide 会学习你的习惯。"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#进阶技巧",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#进阶技巧",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "7 进阶技巧",
+    "text": "7 进阶技巧\n\n7.1 Zoxide 高级用法\n# 删除记录\nzoxide remove ~/old-project\n\n# 导出记录\nzoxide query --list &gt; directories.txt\n\n# 在 Yazi 中集成\n# ~/.config/yazi/keymap.toml\n[[manager.prepend_keymap]]\non   = [ \"c\", \"z\" ]\nrun  = \"plugin zoxide\"\ndesc = \"Jump to a directory using zoxide\"\n\n\n7.2 Yazi 插件推荐\n# 安装插件管理器\ngit clone https://github.com/yazi-rs/plugins.git ~/.config/yazi/plugins\n\n# 推荐插件\n# - zoxide.yazi: 目录跳转\n# - git.yazi: Git 状态显示\n# - full-border.yazi: 美化边框\n\n\n7.3 Lazygit 自定义命令\n# ~/.config/lazygit/config.yml\ncustomCommands:\n  - key: \"&lt;c-r&gt;\"\n    command: \"git reset --hard HEAD~1\"\n    description: \"回滚上一个提交\"\n    context: \"commits\"\n    prompts:\n      - type: \"confirm\"\n        title: \"确认回滚\"\n        body: \"确定要删除上一个提交吗？\""
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#总结",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#总结",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "8 总结",
+    "text": "8 总结\n这套工具组合能显著提升终端开发体验：\n\n\n\n工具\n学习成本\n效率提升\n推荐指数\n\n\n\n\nGhostty\n⭐\n⭐⭐⭐\n⭐⭐⭐⭐⭐\n\n\nZoxide\n⭐\n⭐⭐⭐\n⭐⭐⭐⭐⭐\n\n\nLazygit\n⭐⭐\n⭐⭐⭐⭐⭐\n⭐⭐⭐⭐⭐\n\n\nYazi\n⭐⭐\n⭐⭐⭐⭐\n⭐⭐⭐⭐\n\n\n\n建议学习路径： 1. 第 1 周：Ghostty + Zoxide（最低学习成本） 2. 第 2 周：Lazygit（Git 复杂操作救星） 3. 第 3 周：Yazi（文件管理进阶）\n最终目标： 手不离开键盘，完成所有开发工作！"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#参考链接",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#参考链接",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "9 参考链接",
+    "text": "9 参考链接\n\nGhostty 官网\nZoxide GitHub\nYazi 官网\nLazygit GitHub\nCatppuccin 主题\n\n\n最后更新：2026-03-14 | 测试环境：macOS 26.3.1 (arm64)"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+  },
+  {
+    "objectID": "posts/index.html",
+    "href": "posts/index.html",
+    "title": "技术文档",
+    "section": "",
+    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Binchen’s Tech Blog",
+    "section": "",
+    "text": "农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法\n\n浏览全部文章 → 关于我 →"
+  },
+  {
+    "objectID": "index.html#最新文章",
+    "href": "index.html#最新文章",
+    "title": "Binchen’s Tech Blog",
+    "section": "最新文章",
+    "text": "最新文章\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\nNo matching items"
+  },
+  {
     "objectID": "posts/2025-9-1-geedownloadimages.html",
     "href": "posts/2025-9-1-geedownloadimages.html",
     "title": "使用 Geemap 从 GEE 下载全球栅格数据",
@@ -70,90 +287,6 @@
     "text": "geemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
   },
   {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html",
-    "href": "posts/2026-1-4-front_and_backend_server.html",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。\n\n\nsudo apt-get update\nsudo apt-get install -y python3-venv python3-pip\n\n\n\ncd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env\n\n\n\n\n\nsudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target\n\n\n\n\nsudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f\n\n\n\n\n\nsudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}\n\n\n\n\n\n重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
-    "href": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "sudo apt-get update\nsudo apt-get install -y python3-venv python3-pip"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
-    "href": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "cd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
-    "href": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "sudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#启动服务",
-    "href": "posts/2026-1-4-front_and_backend_server.html#启动服务",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "sudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
-    "href": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "sudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
-    "href": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
-  },
-  {
     "objectID": "posts/2025-6-8-local_package_install.html",
     "href": "posts/2025-6-8-local_package_install.html",
     "title": "Python 本地包安装与更新指南",
@@ -189,25 +322,81 @@
     "text": "如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Binchen’s Tech Blog",
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html",
+    "href": "posts/2026-3-4-git_ignore_pyc.html",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
     "section": "",
-    "text": "农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法\n\n浏览全部文章 → 关于我 →"
+    "text": "在 Git 仓库中执行 git status 时，大量 Python 编译生成的 .pyc 文件、__pycache__ 目录被标记为「修改未暂存」或「未跟踪文件」，干扰版本管理，需通过 .gitignore 规则永久忽略这类文件。"
   },
   {
-    "objectID": "index.html#最新文章",
-    "href": "index.html#最新文章",
-    "title": "Binchen’s Tech Blog",
-    "section": "最新文章",
-    "text": "最新文章\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\nNo matching items"
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#问题背景",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#问题背景",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "",
+    "text": "在 Git 仓库中执行 git status 时，大量 Python 编译生成的 .pyc 文件、__pycache__ 目录被标记为「修改未暂存」或「未跟踪文件」，干扰版本管理，需通过 .gitignore 规则永久忽略这类文件。"
   },
   {
-    "objectID": "posts/index.html",
-    "href": "posts/index.html",
-    "title": "技术文档",
-    "section": "",
-    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#适用环境",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#适用环境",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "0.2 适用环境",
+    "text": "0.2 适用环境\n\n操作系统：Windows（PowerShell）/ Linux / macOS\nGit 版本：&gt;= 2.0\n项目类型：Python 项目"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#解决方案步骤",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#解决方案步骤",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "0.3 解决方案步骤",
+    "text": "0.3 解决方案步骤\n\n0.3.1 定位仓库根目录\n打开终端/命令行，切换到 Git 仓库根目录（以示例路径为例）：\n```bash # Windows PowerShell cd F:_planthoppers_shift"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#创建-编辑-.gitignore-文件",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#创建-编辑-.gitignore-文件",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "1.1 创建 / 编辑 .gitignore 文件",
+    "text": "1.1 创建 / 编辑 .gitignore 文件\n\n1.1.1 新建或打开 .gitignore"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#windows-powershell用记事本打开",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#windows-powershell用记事本打开",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "1.2 Windows PowerShell（用记事本打开）",
+    "text": "1.2 Windows PowerShell（用记事本打开）\nnotepad .gitignore"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#linuxmacos用vim打开",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#linuxmacos用vim打开",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "1.3 Linux/macOS（用vim打开）",
+    "text": "1.3 Linux/macOS（用vim打开）\nvim .gitignore"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#添加忽略规则",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#添加忽略规则",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "1.4 添加忽略规则",
+    "text": "1.4 添加忽略规则\n在 .gitignore 文件中写入以下规则（覆盖 Python 编译文件核心忽略项 + 通用推荐项）："
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#处理已被-git-跟踪的-.pyc-文件",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#处理已被-git-跟踪的-.pyc-文件",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "9.1 处理已被 Git 跟踪的 .pyc 文件",
+    "text": "9.1 处理已被 Git 跟踪的 .pyc 文件\n若 .pyc 文件 /pycache 目录已被 Git 提交过（即历史记录中有该文件），需先移除 Git 跟踪（仅移除索引，不删除本地文件）： # 递归移除所有已跟踪的 .pyc 文件 git rm –cached **/*.pyc # 移除已跟踪的 pycache 目录（若有） git rm –cached -r **/pycache"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#提交-.gitignore-规则",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#提交-.gitignore-规则",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "9.2 提交 .gitignore 规则",
+    "text": "9.2 提交 .gitignore 规则\n将 .gitignore 文件加入版本控制并提交，使规则生效： # 暂存 .gitignore 文件 git add .gitignore # 提交修改（备注清晰说明变更） git commit -m “feat: 添加.gitignore规则，忽略Python .pyc编译文件和__pycache__目录” # 推送到远程仓库（可选，同步到团队仓库） git push origin main"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#验证效果",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#验证效果",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "9.3 验证效果",
+    "text": "9.3 验证效果\n执行以下命令验证忽略规则是否生效： git status 预期结果：终端输出中不再出现 .pyc 文件、pycache 目录的「modified」或「Untracked files」提示。"
   },
   {
     "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html",
@@ -292,48 +481,6 @@
     "title": "学术论文常用缩写与写作规范",
     "section": "",
     "text": "首次出现是否“全称（缩写）”并后续一致？\n标题与摘要中的缩写是否必要且已定义？\n图表与附注是否给出缩写释义或“缩写表”？\n单位、数值与符号是否符合 SI 与期刊风格？\n统计量（P 值、区间、效应量）是否书写一致？\n参考文献与文内引文缩写是否统一格式？\n\n\n如需，我可以按您的研究方向（如遥感、生态、医学等）扩充专用缩写清单或将本页适配目标期刊格式。"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html",
-    "href": "posts/2025-6-10-paper_fig_size.html",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。\n\n\n\n\n\n用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图\n\n\n\n\n\n\n\n\nimport matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})\n\n\n\n\n\n分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt\n\n\n\n\n\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)\n\n\n\n\n图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
-    "href": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
-    "href": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "import matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
-    "href": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#代码示例",
-    "href": "posts/2025-6-10-paper_fig_size.html#代码示例",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#常见问题",
-    "href": "posts/2025-6-10-paper_fig_size.html#常见问题",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
   },
   {
     "objectID": "posts/2025-6-13-geedownload.html",

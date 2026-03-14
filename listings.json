@@ -1,7 +1,9 @@
 [
   {
-    "listing": "/index.html",
+    "listing": "/posts/index.html",
     "items": [
+      "/posts/2026-3-14-modern-terminal-tools.html",
+      "/posts/2026-3-4-git_ignore_pyc.html",
       "/posts/2026-1-4-front_and_backend_server.html",
       "/posts/2025-9-27-scientific_paper_abbreviations.html",
       "/posts/2025-9-1-geedownloadimages.html",
@@ -12,8 +14,10 @@
     ]
   },
   {
-    "listing": "/posts/index.html",
+    "listing": "/index.html",
     "items": [
+      "/posts/2026-3-14-modern-terminal-tools.html",
+      "/posts/2026-3-4-git_ignore_pyc.html",
       "/posts/2026-1-4-front_and_backend_server.html",
       "/posts/2025-9-27-scientific_paper_abbreviations.html",
       "/posts/2025-9-1-geedownloadimages.html",

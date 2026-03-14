@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2026-03-04">
+<meta name="description" content="python 文档的gitigonre文件配置。">
 
-<title>About – Binchen’s Tech Blog</title>
+<title>Git 忽略 Python .pyc 编译文件解决方案 – Binchen’s Tech Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +25,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-afa37c5c79185640b9c231024f4fe5ea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-afa37c5c79185640b9c231024f4fe5ea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,7 +72,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="floating nav-fixed quarto-light">
@@ -80,7 +82,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">Binchen’s Tech Blog</span>
     </a>
   </div>
@@ -91,15 +93,15 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./posts/"> 
+    <a class="nav-link" href="../posts/"> 
 <span class="menu-text">Posts</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./about.html" aria-current="page"> 
+    <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
 </ul>
@@ -112,23 +114,75 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
-  
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#问题背景" id="toc-问题背景" class="nav-link active" data-scroll-target="#问题背景"><span class="header-section-number">0.1</span> 问题背景</a></li>
+  <li><a href="#适用环境" id="toc-适用环境" class="nav-link" data-scroll-target="#适用环境"><span class="header-section-number">0.2</span> 适用环境</a></li>
+  <li><a href="#解决方案步骤" id="toc-解决方案步骤" class="nav-link" data-scroll-target="#解决方案步骤"><span class="header-section-number">0.3</span> 解决方案步骤</a>
+  <ul class="collapse">
+  <li><a href="#定位仓库根目录" id="toc-定位仓库根目录" class="nav-link" data-scroll-target="#定位仓库根目录"><span class="header-section-number">0.3.1</span> 定位仓库根目录</a></li>
+  </ul></li>
+  <li><a href="#linuxmacos" id="toc-linuxmacos" class="nav-link" data-scroll-target="#linuxmacos"><span class="header-section-number">1</span> Linux/macOS</a>
+  <ul class="collapse">
+  <li><a href="#创建-编辑-.gitignore-文件" id="toc-创建-编辑-.gitignore-文件" class="nav-link" data-scroll-target="#创建-编辑-.gitignore-文件"><span class="header-section-number">1.1</span> 创建 / 编辑 .gitignore 文件</a>
+  <ul class="collapse">
+  <li><a href="#新建或打开-.gitignore" id="toc-新建或打开-.gitignore" class="nav-link" data-scroll-target="#新建或打开-.gitignore"><span class="header-section-number">1.1.1</span> 新建或打开 .gitignore</a></li>
+  </ul></li>
+  <li><a href="#windows-powershell用记事本打开" id="toc-windows-powershell用记事本打开" class="nav-link" data-scroll-target="#windows-powershell用记事本打开"><span class="header-section-number">1.2</span> Windows PowerShell（用记事本打开）</a></li>
+  <li><a href="#linuxmacos用vim打开" id="toc-linuxmacos用vim打开" class="nav-link" data-scroll-target="#linuxmacos用vim打开"><span class="header-section-number">1.3</span> Linux/macOS（用vim打开）</a></li>
+  <li><a href="#添加忽略规则" id="toc-添加忽略规则" class="nav-link" data-scroll-target="#添加忽略规则"><span class="header-section-number">1.4</span> 添加忽略规则</a></li>
+  </ul></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"><span class="header-section-number">2</span> ————————–</a></li>
+  <li><a href="#python-编译文件忽略规则" id="toc-python-编译文件忽略规则" class="nav-link" data-scroll-target="#python-编译文件忽略规则"><span class="header-section-number">3</span> Python 编译文件忽略规则</a></li>
+  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1"><span class="header-section-number">4</span> ————————–</a></li>
+  <li><a href="#忽略所有-.pyc-编译文件" id="toc-忽略所有-.pyc-编译文件" class="nav-link" data-scroll-target="#忽略所有-.pyc-编译文件"><span class="header-section-number">5</span> 忽略所有 .pyc 编译文件</a></li>
+  <li><a href="#section-2" id="toc-section-2" class="nav-link" data-scroll-target="#section-2"><span class="header-section-number">6</span> ————————–</a></li>
+  <li><a href="#可选python-项目通用忽略项推荐添加" id="toc-可选python-项目通用忽略项推荐添加" class="nav-link" data-scroll-target="#可选python-项目通用忽略项推荐添加"><span class="header-section-number">7</span> 可选：Python 项目通用忽略项（推荐添加）</a></li>
+  <li><a href="#section-3" id="toc-section-3" class="nav-link" data-scroll-target="#section-3"><span class="header-section-number">8</span> ————————–</a></li>
+  <li><a href="#其他编译文件" id="toc-其他编译文件" class="nav-link" data-scroll-target="#其他编译文件"><span class="header-section-number">9</span> 其他编译文件</a>
+  <ul class="collapse">
+  <li><a href="#处理已被-git-跟踪的-.pyc-文件" id="toc-处理已被-git-跟踪的-.pyc-文件" class="nav-link" data-scroll-target="#处理已被-git-跟踪的-.pyc-文件"><span class="header-section-number">9.1</span> 处理已被 Git 跟踪的 .pyc 文件</a></li>
+  <li><a href="#提交-.gitignore-规则" id="toc-提交-.gitignore-规则" class="nav-link" data-scroll-target="#提交-.gitignore-规则"><span class="header-section-number">9.2</span> 提交 .gitignore 规则</a></li>
+  <li><a href="#验证效果" id="toc-验证效果" class="nav-link" data-scroll-target="#验证效果"><span class="header-section-number">9.3</span> 验证效果</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
 <!-- main -->
-<main class="content column-page" id="quarto-document-content">
+<main class="content column-page-right" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">About</h1>
+<h1 class="title">Git 忽略 Python .pyc 编译文件解决方案</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">运维</div>
+    <div class="quarto-category">后端</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    python 文档的gitigonre文件配置。
+  </div>
 </div>
 
 
-
-<div class="quarto-title-meta column-page">
+<div class="quarto-title-meta column-page-right">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 4, 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -138,79 +192,87 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div class="hero">
-<p>我是一名农业数据科学研究者，关注农业系统中的数据建模、遥感分析与智能决策。希望用更清晰的方法与流程，助力农业技术进步与可持续发展</p>
-</div>
-<div class="about-grid">
-<section id="研究方向" class="level3 about-card">
-<h3 class="anchored" data-anchor-id="研究方向">研究方向</h3>
+<section id="问题背景" class="level2" data-number="0.1">
+<h2 data-number="0.1" class="anchored" data-anchor-id="问题背景"><span class="header-section-number">0.1</span> 问题背景</h2>
+<p>在 Git 仓库中执行 <code>git status</code> 时，大量 Python 编译生成的 <code>.pyc</code> 文件、<code>__pycache__</code> 目录被标记为「修改未暂存」或「未跟踪文件」，干扰版本管理，需通过 <code>.gitignore</code> 规则永久忽略这类文件。</p>
+</section>
+<section id="适用环境" class="level2" data-number="0.2">
+<h2 data-number="0.2" class="anchored" data-anchor-id="适用环境"><span class="header-section-number">0.2</span> 适用环境</h2>
 <ul>
-<li>作物模型与机器学习融合</li>
-<li>遥感与 GIS 空间分析</li>
-<li>气候变化与农业适应</li>
+<li>操作系统：Windows（PowerShell）/ Linux / macOS</li>
+<li>Git 版本：&gt;= 2.0</li>
+<li>项目类型：Python 项目</li>
 </ul>
 </section>
-<section id="研究内容" class="level3 about-card">
-<h3 class="anchored" data-anchor-id="研究内容">研究内容</h3>
-<ul>
-<li>产量预测与不确定性分析</li>
-<li>农业监测与数据融合</li>
-<li>农业建模与智能决策</li>
-</ul>
+<section id="解决方案步骤" class="level2" data-number="0.3">
+<h2 data-number="0.3" class="anchored" data-anchor-id="解决方案步骤"><span class="header-section-number">0.3</span> 解决方案步骤</h2>
+<section id="定位仓库根目录" class="level3" data-number="0.3.1">
+<h3 data-number="0.3.1" class="anchored" data-anchor-id="定位仓库根目录"><span class="header-section-number">0.3.1</span> 定位仓库根目录</h3>
+<p>打开终端/命令行，切换到 Git 仓库根目录（以示例路径为例）：</p>
+<p>```bash # Windows PowerShell cd F:_planthoppers_shift</p>
 </section>
-<section id="方法与工具" class="level3 about-card">
-<h3 class="anchored" data-anchor-id="方法与工具">方法与工具</h3>
-<ul>
-<li>Python / R / GEE</li>
-<li>地统计与时空分析</li>
-<li>可复用的工程化流程</li>
-</ul>
 </section>
-</div>
-<section id="交流与合作" class="level2 section-title">
-<h2 class="section-title anchored" data-anchor-id="交流与合作">交流与合作</h2>
-<div class="contact-grid">
-<div class="contact-item">
-<i class="bi bi-envelope contact-icon"></i>
-<div>
-<p><strong>Email</strong><br>
-<a href="mailto:binc041208@gmail.com">binc041208@gmail.com</a></p>
-</div>
-</div>
-<div class="contact-item">
-<i class="bi bi-github contact-icon"></i>
-<div>
-<p><strong>GitHub</strong><br>
-<a href="https://github.com/chenbin98">github.com/chenbin98</a></p>
-</div>
-</div>
-<div class="contact-item">
-<i class="bi bi-linkedin contact-icon"></i>
-<div>
-<p><strong>LinkedIn</strong><br>
-<a href="https://www.linkedin.com/in/bin-chen-49292b312/">bin-chen-49292b312</a></p>
-</div>
-</div>
-<div class="contact-item">
-<i class="bi bi-journal-text contact-icon"></i>
-<div>
-<p><strong>ORCID</strong><br>
-<a href="https://orcid.org/my-orcid?orcid=0009-0000-8266-940X">0009-0000-8266-940X</a></p>
-</div>
-</div>
-<div class="contact-item">
-<i class="bi bi-journal-text contact-icon"></i>
-<div>
-<p><strong>Google Scholar</strong><br>
-<a href="https://scholar.google.com/citations?user=pN6ngXAAAAAJ&amp;hl=zh-CN">Bin Chen</a></p>
-</div>
-</div>
-</div>
-<div class="about-quote">
-<p>“Looking for like-minded friends to do something different together.”</p>
-</div>
+<section id="linuxmacos" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Linux/macOS</h1>
+<p>cd /path/to/rice_planthoppers_shift</p>
+<section id="创建-编辑-.gitignore-文件" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="创建-编辑-.gitignore-文件"><span class="header-section-number">1.1</span> 创建 / 编辑 .gitignore 文件</h2>
+<section id="新建或打开-.gitignore" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="新建或打开-.gitignore"><span class="header-section-number">1.1.1</span> 新建或打开 .gitignore</h3>
+</section>
+</section>
+<section id="windows-powershell用记事本打开" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="windows-powershell用记事本打开"><span class="header-section-number">1.2</span> Windows PowerShell（用记事本打开）</h2>
+<p>notepad .gitignore</p>
+</section>
+<section id="linuxmacos用vim打开" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="linuxmacos用vim打开"><span class="header-section-number">1.3</span> Linux/macOS（用vim打开）</h2>
+<p>vim .gitignore</p>
+</section>
+<section id="添加忽略规则" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="添加忽略规则"><span class="header-section-number">1.4</span> 添加忽略规则</h2>
+<p>在 .gitignore 文件中写入以下规则（覆盖 Python 编译文件核心忽略项 + 通用推荐项）：</p>
+</section>
+</section>
+<section id="section" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> ————————–</h1>
+</section>
+<section id="python-编译文件忽略规则" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Python 编译文件忽略规则</h1>
+</section>
+<section id="section-1" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> ————————–</h1>
+</section>
+<section id="忽略所有-.pyc-编译文件" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> 忽略所有 .pyc 编译文件</h1>
+<p>*.pyc # 忽略所有 <strong>pycache</strong> 缓存目录（含子目录） <strong>pycache</strong>/</p>
+</section>
+<section id="section-2" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> ————————–</h1>
+</section>
+<section id="可选python-项目通用忽略项推荐添加" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> 可选：Python 项目通用忽略项（推荐添加）</h1>
+</section>
+<section id="section-3" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> ————————–</h1>
+</section>
+<section id="其他编译文件" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> 其他编译文件</h1>
+<p><em>.pyo </em>.pyd # 虚拟环境目录 .venv/ venv/ env/ # 打包/构建目录 dist/ build/ *.egg-info/ # 测试缓存 .pytest_cache/ # IDE 配置（如VSCode） .vscode/</p>
+<section id="处理已被-git-跟踪的-.pyc-文件" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="处理已被-git-跟踪的-.pyc-文件"><span class="header-section-number">9.1</span> 处理已被 Git 跟踪的 .pyc 文件</h2>
+<p>若 .pyc 文件 /<strong>pycache</strong> 目录已被 Git 提交过（即历史记录中有该文件），需先移除 Git 跟踪（仅移除索引，不删除本地文件）： # 递归移除所有已跟踪的 .pyc 文件 git rm –cached **/*.pyc # 移除已跟踪的 <strong>pycache</strong> 目录（若有） git rm –cached -r **/<strong>pycache</strong></p>
+</section>
+<section id="提交-.gitignore-规则" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="提交-.gitignore-规则"><span class="header-section-number">9.2</span> 提交 .gitignore 规则</h2>
+<p>将 .gitignore 文件加入版本控制并提交，使规则生效： # 暂存 .gitignore 文件 git add .gitignore # 提交修改（备注清晰说明变更） git commit -m “feat: 添加.gitignore规则，忽略Python .pyc编译文件和__pycache__目录” # 推送到远程仓库（可选，同步到团队仓库） git push origin main</p>
+</section>
+<section id="验证效果" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="验证效果"><span class="header-section-number">9.3</span> 验证效果</h2>
+<p>执行以下命令验证忽略规则是否生效： git status 预期结果：终端输出中不再出现 .pyc 文件、<strong>pycache</strong> 目录的「modified」或「Untracked files」提示。</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
