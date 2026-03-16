@@ -210,27 +210,6 @@
     "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
   },
   {
-    "objectID": "posts/index.html",
-    "href": "posts/index.html",
-    "title": "技术文档",
-    "section": "",
-    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Binchen’s Tech Blog",
-    "section": "",
-    "text": "农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法\n\n浏览全部文章 → 关于我 →"
-  },
-  {
-    "objectID": "index.html#最新文章",
-    "href": "index.html#最新文章",
-    "title": "Binchen’s Tech Blog",
-    "section": "最新文章",
-    "text": "最新文章\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\nNo matching items"
-  },
-  {
     "objectID": "posts/2025-9-1-geedownloadimages.html",
     "href": "posts/2025-9-1-geedownloadimages.html",
     "title": "使用 Geemap 从 GEE 下载全球栅格数据",
@@ -285,6 +264,97 @@
     "title": "使用 Geemap 从 GEE 下载全球栅格数据",
     "section": "",
     "text": "geemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Binchen’s Tech Blog",
+    "section": "",
+    "text": "农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法\n\n浏览全部文章 → 关于我 →"
+  },
+  {
+    "objectID": "index.html#最新文章",
+    "href": "index.html#最新文章",
+    "title": "Binchen’s Tech Blog",
+    "section": "最新文章",
+    "text": "最新文章\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/index.html",
+    "href": "posts/index.html",
+    "title": "技术文档",
+    "section": "",
+    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html",
+    "href": "posts/2026-3-16-server-google-access-fix.html",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "",
+    "text": "在 阿里云中国大陆 ECS (Ubuntu 22.04) 上部署服务时，遇到服务器无法访问 Google API / Earth Engine (GEE) 的问题。\n服务器环境： - 云平台：阿里云 ECS - 地域：西南 1（成都） - 系统：Ubuntu 22.04 - 应用依赖：Google OAuth + Earth Engine API\n问题症状：\ncurl https://oauth2.googleapis.com/token\n# 返回 timeout / Connection reset"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#问题背景",
+    "href": "posts/2026-3-16-server-google-access-fix.html#问题背景",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "",
+    "text": "在 阿里云中国大陆 ECS (Ubuntu 22.04) 上部署服务时，遇到服务器无法访问 Google API / Earth Engine (GEE) 的问题。\n服务器环境： - 云平台：阿里云 ECS - 地域：西南 1（成都） - 系统：Ubuntu 22.04 - 应用依赖：Google OAuth + Earth Engine API\n问题症状：\ncurl https://oauth2.googleapis.com/token\n# 返回 timeout / Connection reset"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#问题排查",
+    "href": "posts/2026-3-16-server-google-access-fix.html#问题排查",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "2 问题排查",
+    "text": "2 问题排查\n\n2.1 测试 GitHub 访问\ncurl -I https://github.com\n结果：\nHTTP/2 200  ✅\n说明服务器可以访问部分国外网站。\n\n\n2.2 测试 Google 访问\ncurl -I https://google.com\n结果：\nConnection reset / timeout  ❌\n确认 中国大陆服务器无法直连 Google 服务。"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#解决思路",
+    "href": "posts/2026-3-16-server-google-access-fix.html#解决思路",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "3 解决思路",
+    "text": "3 解决思路\n整体思路：在服务器上部署代理客户端，使访问 Google API 的流量通过代理节点转发。\n服务器\n   ↓\n本地代理 (sing-box)\n   ↓\n机场节点 (hysteria2)\n   ↓\nGoogle API / GEE"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#解决方案",
+    "href": "posts/2026-3-16-server-google-access-fix.html#解决方案",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "4 解决方案",
+    "text": "4 解决方案\n\n4.1 1. 安装 sing-box\ncurl -fsSL https://sing-box.app/install.sh | bash\n\n\n4.2 2. 配置订阅\n编辑配置文件：\nnano /etc/sing-box/config.json\n添加机场订阅（hysteria2 协议）：\n{\n  \"outbounds\": [\n    {\n      \"type\": \"hysteria2\",\n      \"tag\": \"node1\",\n      \"server\": \"your.server.com\",\n      \"server_port\": 443,\n      \"password\": \"your_password\",\n      \"tls\": {\n        \"enabled\": true,\n        \"server_name\": \"your.server.com\"\n      }\n    }\n  ]\n}\n\n⚠️ 安全提示：如果曾公开分享过机场订阅 token，建议登录机场后台重新生成，防止他人盗用流量。\n\n\n\n4.3 3. 启动服务\n# 设置开机自启\nsudo systemctl enable sing-box\n\n# 启动服务\nsudo systemctl start sing-box\n\n# 查看状态\nsudo systemctl status sing-box\n\n\n4.4 4. 设置系统代理\n# 添加代理环境变量\necho 'export HTTP_PROXY=http://127.0.0.1:7890' &gt;&gt; ~/.bashrc\necho 'export HTTPS_PROXY=http://127.0.0.1:7890' &gt;&gt; ~/.bashrc\n\n# 立即生效\nsource ~/.bashrc\n\n\n4.5 5. 验证访问\ncurl -I https://google.com\n成功结果：\nHTTP/2 200  ✅\n或\nHTTP/2 404  ✅ (404 不是错误，只是 API 根路径没有资源)\n\n\n4.6 6. 测试 GEE\n重新运行 GEE 相关程序：\npython gee_test.py\n如果不再出现以下错误： - connection timeout - connection reset - token refresh failed\n说明 问题已解决 ✅"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#最终架构",
+    "href": "posts/2026-3-16-server-google-access-fix.html#最终架构",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "5 最终架构",
+    "text": "5 最终架构\n服务器网络结构：\nApplication (Python/GEE)\n     ↓\nHTTP_PROXY (127.0.0.1:7890)\n     ↓\nsing-box 代理\n     ↓\nHysteria2 节点\n     ↓\nGoogle OAuth / Earth Engine API"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#关键组件说明",
+    "href": "posts/2026-3-16-server-google-access-fix.html#关键组件说明",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "6 关键组件说明",
+    "text": "6 关键组件说明\n\n\n\n组件\n作用\n端口\n\n\n\n\nsing-box\n代理客户端\n7890\n\n\nhysteria2\n代理协议\n443\n\n\nHTTP_PROXY\n系统代理环境变量\n-"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#常见问题",
+    "href": "posts/2026-3-16-server-google-access-fix.html#常见问题",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "7 常见问题",
+    "text": "7 常见问题\n\n7.1 Q1: sing-box 启动失败？\n检查配置文件语法：\nsing-box check -c /etc/sing-box/config.json\n查看日志：\nsudo journalctl -u sing-box -f\n\n\n7.2 Q2: 代理速度慢？\n\n检查机场节点负载\n尝试切换其他节点\n检查服务器带宽限制\n\n\n\n7.3 Q3: Python 程序仍然无法访问？\n确认环境变量已生效：\necho $HTTP_PROXY\necho $HTTPS_PROXY\n或在 Python 代码中显式设置：\nimport os\nos.environ['HTTP_PROXY'] = 'http://127.0.0.1:7890'\nos.environ['HTTPS_PROXY'] = 'http://127.0.0.1:7890'\n\n\n7.4 Q4: Docker 容器内无法访问？\n方案 1： 在容器内设置代理\nENV HTTP_PROXY=http://127.0.0.1:7890\nENV HTTPS_PROXY=http://127.0.0.1:7890\n方案 2： 使用 host 网络模式\ndocker run --network host your_image"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#总结",
+    "href": "posts/2026-3-16-server-google-access-fix.html#总结",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "8 总结",
+    "text": "8 总结\n问题本质：\n中国大陆服务器无法直接访问 Google API\n解决方案：\n服务器部署代理客户端\n→ 使用机场节点转发流量\n→ 成功访问 Google / GEE\n核心优势： - ✅ 稳定可靠（sing-box 性能优秀） - ✅ 配置简单（只需 3 步） - ✅ 系统级代理（所有应用受益） - ✅ SSH 友好（命令行操作）"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#参考链接",
+    "href": "posts/2026-3-16-server-google-access-fix.html#参考链接",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "9 参考链接",
+    "text": "9 参考链接\n\nsing-box 官方文档\nHysteria2 协议文档\nGoogle Earth Engine Python API\n阿里云 ECS 网络配置\n\n\n本文可作为 中国大陆服务器访问 GEE 的通用解决方案参考。"
   },
   {
     "objectID": "posts/2025-6-8-local_package_install.html",
