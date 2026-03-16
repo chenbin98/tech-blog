@@ -1,0 +1,266 @@
+---
+title: "中国大陆服务器访问 Google API / Earth Engine 完整解决方案"
+date: "2026-03-16"
+categories: [运维开发，云计算]
+tags: [GEE, Google API, 代理，sing-box, 阿里云，ECS]
+description: "记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。"
+
+---
+
+## 问题背景
+
+在 **阿里云中国大陆 ECS (Ubuntu 22.04)** 上部署服务时，遇到服务器无法访问 **Google API / Earth Engine (GEE)** 的问题。
+
+**服务器环境：**
+- 云平台：阿里云 ECS
+- 地域：西南 1（成都）
+- 系统：Ubuntu 22.04
+- 应用依赖：Google OAuth + Earth Engine API
+
+**问题症状：**
+```bash
+curl https://oauth2.googleapis.com/token
+# 返回 timeout / Connection reset
+```
+
+---
+
+## 问题排查
+
+### 测试 GitHub 访问
+```bash
+curl -I https://github.com
+```
+结果：
+```
+HTTP/2 200  ✅
+```
+说明服务器可以访问部分国外网站。
+
+### 测试 Google 访问
+```bash
+curl -I https://google.com
+```
+结果：
+```
+Connection reset / timeout  ❌
+```
+确认 **中国大陆服务器无法直连 Google 服务**。
+
+---
+
+## 解决思路
+
+整体思路：**在服务器上部署代理客户端，使访问 Google API 的流量通过代理节点转发。**
+
+```
+服务器
+   ↓
+本地代理 (sing-box)
+   ↓
+机场节点 (hysteria2)
+   ↓
+Google API / GEE
+```
+
+---
+
+## 解决方案
+
+### 1. 安装 sing-box
+
+```bash
+curl -fsSL https://sing-box.app/install.sh | bash
+```
+
+### 2. 配置订阅
+
+编辑配置文件：
+```bash
+nano /etc/sing-box/config.json
+```
+
+添加机场订阅（hysteria2 协议）：
+```json
+{
+  "outbounds": [
+    {
+      "type": "hysteria2",
+      "tag": "node1",
+      "server": "your.server.com",
+      "server_port": 443,
+      "password": "your_password",
+      "tls": {
+        "enabled": true,
+        "server_name": "your.server.com"
+      }
+    }
+  ]
+}
+```
+
+> ⚠️ **安全提示**：如果曾公开分享过机场订阅 token，建议登录机场后台重新生成，防止他人盗用流量。
+
+### 3. 启动服务
+
+```bash
+# 设置开机自启
+sudo systemctl enable sing-box
+
+# 启动服务
+sudo systemctl start sing-box
+
+# 查看状态
+sudo systemctl status sing-box
+```
+
+### 4. 设置系统代理
+
+```bash
+# 添加代理环境变量
+echo 'export HTTP_PROXY=http://127.0.0.1:7890' >> ~/.bashrc
+echo 'export HTTPS_PROXY=http://127.0.0.1:7890' >> ~/.bashrc
+
+# 立即生效
+source ~/.bashrc
+```
+
+### 5. 验证访问
+
+```bash
+curl -I https://google.com
+```
+
+成功结果：
+```
+HTTP/2 200  ✅
+或
+HTTP/2 404  ✅ (404 不是错误，只是 API 根路径没有资源)
+```
+
+### 6. 测试 GEE
+
+重新运行 GEE 相关程序：
+```bash
+python gee_test.py
+```
+
+如果不再出现以下错误：
+- `connection timeout`
+- `connection reset`
+- `token refresh failed`
+
+说明 **问题已解决** ✅
+
+---
+
+## 最终架构
+
+服务器网络结构：
+
+```
+Application (Python/GEE)
+     ↓
+HTTP_PROXY (127.0.0.1:7890)
+     ↓
+sing-box 代理
+     ↓
+Hysteria2 节点
+     ↓
+Google OAuth / Earth Engine API
+```
+
+---
+
+## 关键组件说明
+
+| 组件 | 作用 | 端口 |
+|------|------|------|
+| **sing-box** | 代理客户端 | 7890 |
+| **hysteria2** | 代理协议 | 443 |
+| **HTTP_PROXY** | 系统代理环境变量 | - |
+
+---
+
+## 常见问题
+
+### Q1: sing-box 启动失败？
+
+**检查配置文件语法：**
+```bash
+sing-box check -c /etc/sing-box/config.json
+```
+
+**查看日志：**
+```bash
+sudo journalctl -u sing-box -f
+```
+
+### Q2: 代理速度慢？
+
+- 检查机场节点负载
+- 尝试切换其他节点
+- 检查服务器带宽限制
+
+### Q3: Python 程序仍然无法访问？
+
+**确认环境变量已生效：**
+```bash
+echo $HTTP_PROXY
+echo $HTTPS_PROXY
+```
+
+**或在 Python 代码中显式设置：**
+```python
+import os
+os.environ['HTTP_PROXY'] = 'http://127.0.0.1:7890'
+os.environ['HTTPS_PROXY'] = 'http://127.0.0.1:7890'
+```
+
+### Q4: Docker 容器内无法访问？
+
+**方案 1：** 在容器内设置代理
+```dockerfile
+ENV HTTP_PROXY=http://127.0.0.1:7890
+ENV HTTPS_PROXY=http://127.0.0.1:7890
+```
+
+**方案 2：** 使用 host 网络模式
+```bash
+docker run --network host your_image
+```
+
+---
+
+## 总结
+
+**问题本质：**
+```
+中国大陆服务器无法直接访问 Google API
+```
+
+**解决方案：**
+```
+服务器部署代理客户端
+→ 使用机场节点转发流量
+→ 成功访问 Google / GEE
+```
+
+**核心优势：**
+- ✅ 稳定可靠（sing-box 性能优秀）
+- ✅ 配置简单（只需 3 步）
+- ✅ 系统级代理（所有应用受益）
+- ✅ SSH 友好（命令行操作）
+
+---
+
+## 参考链接
+
+- [sing-box 官方文档](https://sing-box.app/)
+- [Hysteria2 协议文档](https://hysteria.network/)
+- [Google Earth Engine Python API](https://developers.google.com/earth-engine/tutorials/community/python-users-guide)
+- [阿里云 ECS 网络配置](https://help.aliyun.com/document_detail/25473.html)
+
+---
+
+*本文可作为 **中国大陆服务器访问 GEE 的通用解决方案参考**。*
