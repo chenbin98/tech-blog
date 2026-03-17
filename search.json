@@ -175,116 +175,39 @@
     "text": "9 参考链接\n\nGhostty 官网\nZoxide GitHub\nYazi 官网\nLazygit GitHub\nCatppuccin 主题\n\n\n最后更新：2026-03-14 | 测试环境：macOS 26.3.1 (arm64)"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-8-local_package_install.html",
+    "href": "posts/2025-6-8-local_package_install.html",
+    "title": "Python 本地包安装与更新指南",
     "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+    "text": "本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。\n\n\n\n\n首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall\n\n\n\n\n如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e .\n\n\n\n\n确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境\n\n\n\n\n如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-8-local_package_install.html#标准安装流程",
+    "href": "posts/2025-6-8-local_package_install.html#标准安装流程",
+    "title": "Python 本地包安装与更新指南",
     "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
+    "text": "首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-8-local_package_install.html#临时安装方法",
+    "href": "posts/2025-6-8-local_package_install.html#临时安装方法",
+    "title": "Python 本地包安装与更新指南",
     "section": "",
-    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
+    "text": "如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e ."
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-8-local_package_install.html#注意事项",
+    "href": "posts/2025-6-8-local_package_install.html#注意事项",
+    "title": "Python 本地包安装与更新指南",
     "section": "",
-    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
+    "text": "确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-8-local_package_install.html#常见问题",
+    "href": "posts/2025-6-8-local_package_install.html#常见问题",
+    "title": "Python 本地包安装与更新指南",
     "section": "",
-    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
-  },
-  {
-    "objectID": "posts/2025-9-1-geedownloadimages.html",
-    "href": "posts/2025-9-1-geedownloadimages.html",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的完整工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。\n该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。\n\n\n\n\n\n确保安装以下工具和库：\n\n\n\n工具/库\n用途\n安装命令\n\n\n\n\nPython\n核心编程环境\n从 python.org 下载\n\n\ngeemap\nGEE 可视化和数据下载\npip install geemap\n\n\nearthengine-api (ee)\nGEE Python API\npip install earthengine-api\n\n\ngeopandas\n读取矢量网格数据（用于分段）\npip install geopandas\n\n\nrasterio\n图像镶嵌和栅格处理\npip install rasterio\n\n\nGDAL\n栅格操作后端（多线程）\n随 rasterio 包含\n\n\n\n\n注意: 安装 earthengine-api 后，需要通过 earthengine authenticate 进行身份验证。\n\n\n\n\n\nGEE 栅格数据集 ID: 在 GEE 中识别目标数据集 ID\n\n示例：NPP 数据 MODIS/061/MOD17A3HGF\n示例：Landsat 8 数据 LANDSAT/LC08/C02/T1_L2\n\n全球矢量网格: 准备预分割的矢量网格（GeoPackage .gpkg 格式）\n\n将全球研究区域分割为较小的、可下载的块\n示例：WorldFishnet.gpkg（可根据数据分辨率自定义网格大小）\n\n\n\n\n\n\n\n\nimport ee\nimport geemap\nimport os\nimport geopandas as gpd\n\n\n\n# 身份验证 GEE（运行一次；如果已经身份验证则跳过）\n# ee.Authenticate()\n\n# 初始化 GEE API\nee.Initialize()\n\n\n\n\n\n# 为您的目标数据集自定义这些参数\nGEE_DATA_ID = \"MODIS/061/MOD17A3HGF\"  # 示例：MODIS NPP 数据集\nBAND_NAME = \"Npp\"                       # 目标波段名称\nTIME_RANGE = [\"2001-01-01\", \"2025-01-01\"]  # 时间范围（开始，结束）\nSCALING_FACTOR = 0.0001                 # 缩放因子，将 GEE 数据转换为实际值\n\n# 可视化参数\nVIS_PARAMS = {\n    \"min\": 0,\n    \"max\": 3,\n    \"palette\": [\n        \"ffffff\", \"ce7e45\", \"df923d\", \"f1b555\", \"fcd163\", \n        \"99b718\", \"74a901\", \"66a000\", \"529400\", \"3e8601\", \n        \"207401\", \"056201\", \"004c00\", \"023b01\", \"012e01\", \n        \"011d01\", \"011301\"\n    ]  # 根据数据集范围调整\n}\n\n\n\n# 加载 GEE 图像集合\nimage_collection = ee.ImageCollection(GEE_DATA_ID)\\\n    .filterDate(TIME_RANGE[0], TIME_RANGE[1])\\\n    .select(BAND_NAME)\n\n# 定义应用缩放因子的函数\ndef apply_scaling(image):\n    return image.multiply(SCALING_FACTOR)\n\n# 将缩放应用到集合\nscaled_collection = image_collection.map(apply_scaling)\n\n\n\n\n# 初始化 geemap 界面\nMap = geemap.Map(center=(40, 100), zoom=4)  # 以欧亚大陆为中心\n\n# 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）\npreview_image = scaled_collection.median()\n\n# 将图像添加到地图\nMap.addLayer(preview_image, VIS_PARAMS, f\"{GEE_DATA_ID.split('/')[-1]}_Preview\")\n\n# 添加颜色条图例\nMap.add_colorbar_branca(\n    colors=VIS_PARAMS[\"palette\"],\n    vmin=VIS_PARAMS[\"min\"],\n    vmax=VIS_PARAMS[\"max\"],\n    label=BAND_NAME,\n    position=\"bottomright\"\n)\n\n# 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）\nMap\n\n\n\n\n直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。\n\n\n# 文件路径（自定义这些）\nGRID_PATH = \"I:/geemap/roi/WorldFishnet.gpkg\"  # 矢量网格路径\nGRID_LAYER = \"WorldFish30\"                       # GeoPackage 中的图层名称\nOUTPUT_DIR = \"I:/geemap/GEE_Global_Data/\"        # 保存分段文件的目录\nRESOLUTION = 500                                  # 数据集分辨率（米）\nBATCH_SIZE = 5                                    # 每批处理的网格块数量\nSTART_YEAR = 2001                                 # 从此年开始恢复（如果下载被中断）\nSTART_GRID_INDEX = 0                             # 从此网格索引恢复（如果下载被中断）\nCRS = \"EPSG:4326\"                                # 目标坐标系（WGS84）\n\n\n\n# 使用 geopandas 加载矢量网格\ngrid_gdf = gpd.read_file(GRID_PATH, layer=GRID_LAYER)\n\n# 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection\ngrid_ee = geemap.gdf_to_ee(grid_gdf)\n\n# 创建输出目录（如果不存在）\nos.makedirs(OUTPUT_DIR, exist_ok=True)\n\n\n\n# 从时间范围获取年份列表\nyears = range(int(TIME_RANGE[0].split(\"-\")[0]), int(TIME_RANGE[1].split(\"-\")[0]))\n\n# 遍历每一年\nfor year in years:\n    # 跳过恢复开始年份之前的年份\n    if year &lt; START_YEAR:\n        continue\n    print(f\"🔄 正在处理 {year} 年的数据...\")\n\n    # 提取年度数据\n    annual_image = scaled_collection\\\n        .filter(ee.Filter.calendarRange(year, year, \"year\"))\\\n        .median()\n\n    # 获取网格块总数\n    total_grids = grid_ee.size().getInfo()\n\n    # 计算批次数\n    num_batches = (total_grids - START_GRID_INDEX + BATCH_SIZE - 1) // BATCH_SIZE\n\n    # 处理每批\n    for batch in range(num_batches):\n        batch_start = START_GRID_INDEX + batch * BATCH_SIZE\n        batch_end = min(batch_start + BATCH_SIZE, total_grids)\n        current_batch = grid_ee.toList(BATCH_SIZE, batch_start)\n\n        # 处理批次中的每个网格块\n        for i in range(batch_end - batch_start):\n            # 获取当前网格要素和几何形状\n            grid_feature = ee.Feature(current_batch.get(i))\n            grid_geom = grid_feature.geometry()\n\n            # 生成唯一文件名\n            grid_index = batch_start + i + 1\n            filename = f\"{BAND_NAME}_{year}_grid_{grid_index:04d}.tif\"\n            file_path = os.path.join(OUTPUT_DIR, filename)\n\n            # 如果文件已存在则跳过（断点续传功能）\n            if os.path.exists(file_path):\n                print(f\"⏭️  跳过现有文件: {filename}\")\n                continue\n\n            # 下载裁剪后的图像\n            try:\n                # 将年度图像裁剪到当前网格\n                clipped_image = annual_image.clip(grid_geom)\n\n                # 使用 geemap 下载\n                geemap.download_ee_image(\n                    image=clipped_image,\n                    filename=file_path,\n                    scale=RESOLUTION,\n                    region=grid_geom,\n                    crs=CRS,\n                    max_tile_size=1024  # 根据内存调整\n                )\n                print(f\"✅ 成功下载: {filename}\")\n\n            except Exception as e:\n                print(f\"❌ 下载 {filename} 失败: {str(e)}\")\n                continue\n\n    # 为下一年重置网格索引\n    START_GRID_INDEX = 0\n\nprint(\"🎉 所有下载任务完成！\")\n\n\n\n\n使用 rasterio 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。\n\n\n# 文件路径（自定义这些）\nINPUT_DIR = OUTPUT_DIR                    # 与下载输出目录相同\nMOSAIC_OUTPUT_DIR = \"I:/geemap/GEE_Global_Data/Mosaicked/\"  # 镶嵌文件的目录\nCOMPRESSION = \"LZW\"                       # 压缩方法（减少文件大小）\n\n\n\n# 启用 GDAL 多线程以加速镶嵌\nos.environ[\"GDAL_NUM_THREADS\"] = \"ALL_CPUS\"  # 使用所有可用 CPU\n\n\n\nimport re\nfrom rasterio.merge import merge\nfrom rasterio.enums import Resampling\n\n# 为镶嵌文件创建输出目录\nos.makedirs(MOSAIC_OUTPUT_DIR, exist_ok=True)\n\n# 按年份分组分段文件\nfile_pattern = re.compile(rf\"{BAND_NAME}_(\\d{{4}})_grid_\\d{{4}}\\.tif$\")\nyearly_files = {}\n\nfor filename in os.listdir(INPUT_DIR):\n    match = file_pattern.match(filename)\n    if match:\n        year = match.group(1)\n        file_path = os.path.join(INPUT_DIR, filename)\n        yearly_files.setdefault(year, []).append(file_path)\n\n# 镶嵌每年的文件\nfor year, file_list in yearly_files.items():\n    print(f\"🔗 正在镶嵌 {year} 年的 {len(file_list)} 个文件...\")\n    datasets = []\n\n    try:\n        # 打开所有分段文件\n        for file_path in file_list:\n            src = rasterio.open(file_path)\n            datasets.append(src)\n\n        # 执行镶嵌\n        mosaic_array, out_transform = merge(\n            datasets,\n            resampling=Resampling.nearest  # 对离散数据使用最近邻重采样\n        )\n\n        # 更新镶嵌文件的元数据\n        out_meta = datasets[0].meta.copy()\n        out_meta.update({\n            \"driver\": \"GTiff\",\n            \"height\": mosaic_array.shape[1],\n            \"width\": mosaic_array.shape[2],\n            \"transform\": out_transform,\n            \"compress\": COMPRESSION,\n            \"bigtiff\": \"YES\"  # 对大文件启用（&gt;4GB）\n        })\n\n        # 保存镶嵌文件\n        output_path = os.path.join(MOSAIC_OUTPUT_DIR, f\"{BAND_NAME}_{year}_Global.tif\")\n        with rasterio.open(output_path, \"w\", **out_meta) as dest:\n            dest.write(mosaic_array)\n\n        print(f\"✅ 成功镶嵌: {output_path}\")\n\n    except Exception as e:\n        print(f\"❌ 镶嵌 {year} 年数据失败: {str(e)}\")\n        continue\n\n    finally:\n        # 关闭所有打开的栅格数据集以释放内存\n        for ds in datasets:\n            ds.close()\n\nprint(\"🎉 所有镶嵌任务完成！\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n问题\n解决方案\n\n\n\n\nGEE 身份验证错误\n重新运行 ee.Authenticate() 并按照浏览器提示重新进行身份验证\n\n\n下载中断\n工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复\n\n\n内存过载\n减少 BATCH_SIZE（如从 5 到 3）或 max_tile_size（如从 1024 到 512）\n\n\n镶嵌失败\n确保所有分段文件具有相同的 CRS 和分辨率\n\n\n\n\n\n\n\n非年度数据: 对于月度/季节性数据，修改时间过滤器\n# 示例：夏季数据\nee.Filter.calendarRange(year, year, \"year\")\\\n  .filter(ee.Filter.calendarRange(6, 8, \"month\"))\n不同数据集: 更新 GEE_DATA_ID、BAND_NAME、SCALING_FACTOR 和 VIS_PARAMS\n网格调整: 根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）\n\n\n\n\n\n\ngeemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
-  },
-  {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#概述",
-    "href": "posts/2025-9-1-geedownloadimages.html#概述",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的完整工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。\n该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。"
-  },
-  {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#前置要求",
-    "href": "posts/2025-9-1-geedownloadimages.html#前置要求",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "确保安装以下工具和库：\n\n\n\n工具/库\n用途\n安装命令\n\n\n\n\nPython\n核心编程环境\n从 python.org 下载\n\n\ngeemap\nGEE 可视化和数据下载\npip install geemap\n\n\nearthengine-api (ee)\nGEE Python API\npip install earthengine-api\n\n\ngeopandas\n读取矢量网格数据（用于分段）\npip install geopandas\n\n\nrasterio\n图像镶嵌和栅格处理\npip install rasterio\n\n\nGDAL\n栅格操作后端（多线程）\n随 rasterio 包含\n\n\n\n\n注意: 安装 earthengine-api 后，需要通过 earthengine authenticate 进行身份验证。\n\n\n\n\n\nGEE 栅格数据集 ID: 在 GEE 中识别目标数据集 ID\n\n示例：NPP 数据 MODIS/061/MOD17A3HGF\n示例：Landsat 8 数据 LANDSAT/LC08/C02/T1_L2\n\n全球矢量网格: 准备预分割的矢量网格（GeoPackage .gpkg 格式）\n\n将全球研究区域分割为较小的、可下载的块\n示例：WorldFishnet.gpkg（可根据数据分辨率自定义网格大小）"
-  },
-  {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-1初始化环境和预览数据",
-    "href": "posts/2025-9-1-geedownloadimages.html#步骤-1初始化环境和预览数据",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "import ee\nimport geemap\nimport os\nimport geopandas as gpd\n\n\n\n# 身份验证 GEE（运行一次；如果已经身份验证则跳过）\n# ee.Authenticate()\n\n# 初始化 GEE API\nee.Initialize()\n\n\n\n\n\n# 为您的目标数据集自定义这些参数\nGEE_DATA_ID = \"MODIS/061/MOD17A3HGF\"  # 示例：MODIS NPP 数据集\nBAND_NAME = \"Npp\"                       # 目标波段名称\nTIME_RANGE = [\"2001-01-01\", \"2025-01-01\"]  # 时间范围（开始，结束）\nSCALING_FACTOR = 0.0001                 # 缩放因子，将 GEE 数据转换为实际值\n\n# 可视化参数\nVIS_PARAMS = {\n    \"min\": 0,\n    \"max\": 3,\n    \"palette\": [\n        \"ffffff\", \"ce7e45\", \"df923d\", \"f1b555\", \"fcd163\", \n        \"99b718\", \"74a901\", \"66a000\", \"529400\", \"3e8601\", \n        \"207401\", \"056201\", \"004c00\", \"023b01\", \"012e01\", \n        \"011d01\", \"011301\"\n    ]  # 根据数据集范围调整\n}\n\n\n\n# 加载 GEE 图像集合\nimage_collection = ee.ImageCollection(GEE_DATA_ID)\\\n    .filterDate(TIME_RANGE[0], TIME_RANGE[1])\\\n    .select(BAND_NAME)\n\n# 定义应用缩放因子的函数\ndef apply_scaling(image):\n    return image.multiply(SCALING_FACTOR)\n\n# 将缩放应用到集合\nscaled_collection = image_collection.map(apply_scaling)\n\n\n\n\n# 初始化 geemap 界面\nMap = geemap.Map(center=(40, 100), zoom=4)  # 以欧亚大陆为中心\n\n# 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）\npreview_image = scaled_collection.median()\n\n# 将图像添加到地图\nMap.addLayer(preview_image, VIS_PARAMS, f\"{GEE_DATA_ID.split('/')[-1]}_Preview\")\n\n# 添加颜色条图例\nMap.add_colorbar_branca(\n    colors=VIS_PARAMS[\"palette\"],\n    vmin=VIS_PARAMS[\"min\"],\n    vmax=VIS_PARAMS[\"max\"],\n    label=BAND_NAME,\n    position=\"bottomright\"\n)\n\n# 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）\nMap"
-  },
-  {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-2支持断点续传的分段下载",
-    "href": "posts/2025-9-1-geedownloadimages.html#步骤-2支持断点续传的分段下载",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。\n\n\n# 文件路径（自定义这些）\nGRID_PATH = \"I:/geemap/roi/WorldFishnet.gpkg\"  # 矢量网格路径\nGRID_LAYER = \"WorldFish30\"                       # GeoPackage 中的图层名称\nOUTPUT_DIR = \"I:/geemap/GEE_Global_Data/\"        # 保存分段文件的目录\nRESOLUTION = 500                                  # 数据集分辨率（米）\nBATCH_SIZE = 5                                    # 每批处理的网格块数量\nSTART_YEAR = 2001                                 # 从此年开始恢复（如果下载被中断）\nSTART_GRID_INDEX = 0                             # 从此网格索引恢复（如果下载被中断）\nCRS = \"EPSG:4326\"                                # 目标坐标系（WGS84）\n\n\n\n# 使用 geopandas 加载矢量网格\ngrid_gdf = gpd.read_file(GRID_PATH, layer=GRID_LAYER)\n\n# 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection\ngrid_ee = geemap.gdf_to_ee(grid_gdf)\n\n# 创建输出目录（如果不存在）\nos.makedirs(OUTPUT_DIR, exist_ok=True)\n\n\n\n# 从时间范围获取年份列表\nyears = range(int(TIME_RANGE[0].split(\"-\")[0]), int(TIME_RANGE[1].split(\"-\")[0]))\n\n# 遍历每一年\nfor year in years:\n    # 跳过恢复开始年份之前的年份\n    if year &lt; START_YEAR:\n        continue\n    print(f\"🔄 正在处理 {year} 年的数据...\")\n\n    # 提取年度数据\n    annual_image = scaled_collection\\\n        .filter(ee.Filter.calendarRange(year, year, \"year\"))\\\n        .median()\n\n    # 获取网格块总数\n    total_grids = grid_ee.size().getInfo()\n\n    # 计算批次数\n    num_batches = (total_grids - START_GRID_INDEX + BATCH_SIZE - 1) // BATCH_SIZE\n\n    # 处理每批\n    for batch in range(num_batches):\n        batch_start = START_GRID_INDEX + batch * BATCH_SIZE\n        batch_end = min(batch_start + BATCH_SIZE, total_grids)\n        current_batch = grid_ee.toList(BATCH_SIZE, batch_start)\n\n        # 处理批次中的每个网格块\n        for i in range(batch_end - batch_start):\n            # 获取当前网格要素和几何形状\n            grid_feature = ee.Feature(current_batch.get(i))\n            grid_geom = grid_feature.geometry()\n\n            # 生成唯一文件名\n            grid_index = batch_start + i + 1\n            filename = f\"{BAND_NAME}_{year}_grid_{grid_index:04d}.tif\"\n            file_path = os.path.join(OUTPUT_DIR, filename)\n\n            # 如果文件已存在则跳过（断点续传功能）\n            if os.path.exists(file_path):\n                print(f\"⏭️  跳过现有文件: {filename}\")\n                continue\n\n            # 下载裁剪后的图像\n            try:\n                # 将年度图像裁剪到当前网格\n                clipped_image = annual_image.clip(grid_geom)\n\n                # 使用 geemap 下载\n                geemap.download_ee_image(\n                    image=clipped_image,\n                    filename=file_path,\n                    scale=RESOLUTION,\n                    region=grid_geom,\n                    crs=CRS,\n                    max_tile_size=1024  # 根据内存调整\n                )\n                print(f\"✅ 成功下载: {filename}\")\n\n            except Exception as e:\n                print(f\"❌ 下载 {filename} 失败: {str(e)}\")\n                continue\n\n    # 为下一年重置网格索引\n    START_GRID_INDEX = 0\n\nprint(\"🎉 所有下载任务完成！\")"
-  },
-  {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-3镶嵌分段文件",
-    "href": "posts/2025-9-1-geedownloadimages.html#步骤-3镶嵌分段文件",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "使用 rasterio 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。\n\n\n# 文件路径（自定义这些）\nINPUT_DIR = OUTPUT_DIR                    # 与下载输出目录相同\nMOSAIC_OUTPUT_DIR = \"I:/geemap/GEE_Global_Data/Mosaicked/\"  # 镶嵌文件的目录\nCOMPRESSION = \"LZW\"                       # 压缩方法（减少文件大小）\n\n\n\n# 启用 GDAL 多线程以加速镶嵌\nos.environ[\"GDAL_NUM_THREADS\"] = \"ALL_CPUS\"  # 使用所有可用 CPU\n\n\n\nimport re\nfrom rasterio.merge import merge\nfrom rasterio.enums import Resampling\n\n# 为镶嵌文件创建输出目录\nos.makedirs(MOSAIC_OUTPUT_DIR, exist_ok=True)\n\n# 按年份分组分段文件\nfile_pattern = re.compile(rf\"{BAND_NAME}_(\\d{{4}})_grid_\\d{{4}}\\.tif$\")\nyearly_files = {}\n\nfor filename in os.listdir(INPUT_DIR):\n    match = file_pattern.match(filename)\n    if match:\n        year = match.group(1)\n        file_path = os.path.join(INPUT_DIR, filename)\n        yearly_files.setdefault(year, []).append(file_path)\n\n# 镶嵌每年的文件\nfor year, file_list in yearly_files.items():\n    print(f\"🔗 正在镶嵌 {year} 年的 {len(file_list)} 个文件...\")\n    datasets = []\n\n    try:\n        # 打开所有分段文件\n        for file_path in file_list:\n            src = rasterio.open(file_path)\n            datasets.append(src)\n\n        # 执行镶嵌\n        mosaic_array, out_transform = merge(\n            datasets,\n            resampling=Resampling.nearest  # 对离散数据使用最近邻重采样\n        )\n\n        # 更新镶嵌文件的元数据\n        out_meta = datasets[0].meta.copy()\n        out_meta.update({\n            \"driver\": \"GTiff\",\n            \"height\": mosaic_array.shape[1],\n            \"width\": mosaic_array.shape[2],\n            \"transform\": out_transform,\n            \"compress\": COMPRESSION,\n            \"bigtiff\": \"YES\"  # 对大文件启用（&gt;4GB）\n        })\n\n        # 保存镶嵌文件\n        output_path = os.path.join(MOSAIC_OUTPUT_DIR, f\"{BAND_NAME}_{year}_Global.tif\")\n        with rasterio.open(output_path, \"w\", **out_meta) as dest:\n            dest.write(mosaic_array)\n\n        print(f\"✅ 成功镶嵌: {output_path}\")\n\n    except Exception as e:\n        print(f\"❌ 镶嵌 {year} 年数据失败: {str(e)}\")\n        continue\n\n    finally:\n        # 关闭所有打开的栅格数据集以释放内存\n        for ds in datasets:\n            ds.close()\n\nprint(\"🎉 所有镶嵌任务完成！\")"
-  },
-  {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#注意事项和故障排除",
-    "href": "posts/2025-9-1-geedownloadimages.html#注意事项和故障排除",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "问题\n解决方案\n\n\n\n\nGEE 身份验证错误\n重新运行 ee.Authenticate() 并按照浏览器提示重新进行身份验证\n\n\n下载中断\n工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复\n\n\n内存过载\n减少 BATCH_SIZE（如从 5 到 3）或 max_tile_size（如从 1024 到 512）\n\n\n镶嵌失败\n确保所有分段文件具有相同的 CRS 和分辨率\n\n\n\n\n\n\n\n非年度数据: 对于月度/季节性数据，修改时间过滤器\n# 示例：夏季数据\nee.Filter.calendarRange(year, year, \"year\")\\\n  .filter(ee.Filter.calendarRange(6, 8, \"month\"))\n不同数据集: 更新 GEE_DATA_ID、BAND_NAME、SCALING_FACTOR 和 VIS_PARAMS\n网格调整: 根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）"
-  },
-  {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#参考资料",
-    "href": "posts/2025-9-1-geedownloadimages.html#参考资料",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "geemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Binchen’s Tech Blog",
-    "section": "",
-    "text": "农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法\n\n浏览全部文章 → 关于我 →"
-  },
-  {
-    "objectID": "index.html#最新文章",
-    "href": "index.html#最新文章",
-    "title": "Binchen’s Tech Blog",
-    "section": "最新文章",
-    "text": "最新文章\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "posts/index.html",
-    "href": "posts/index.html",
-    "title": "技术文档",
-    "section": "",
-    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
+    "text": "如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
   },
   {
     "objectID": "posts/2026-3-16-server-google-access-fix.html",
@@ -357,39 +280,179 @@
     "text": "9 参考链接\n\nsing-box 官方文档\nHysteria2 协议文档\nGoogle Earth Engine Python API\n阿里云 ECS 网络配置\n\n\n本文可作为 中国大陆服务器访问 GEE 的通用解决方案参考。"
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html",
-    "href": "posts/2025-6-8-local_package_install.html",
-    "title": "Python 本地包安装与更新指南",
+    "objectID": "posts/index.html",
+    "href": "posts/index.html",
+    "title": "技术文档",
     "section": "",
-    "text": "本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。\n\n\n\n\n首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall\n\n\n\n\n如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e .\n\n\n\n\n确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境\n\n\n\n\n如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
+    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html#标准安装流程",
-    "href": "posts/2025-6-8-local_package_install.html#标准安装流程",
-    "title": "Python 本地包安装与更新指南",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Binchen’s Tech Blog",
     "section": "",
-    "text": "首先，在 cbgeo 目录下使用 base 环境构建包：\nconda activate base\npython setup.py sdist bdist_wheel\n\n\n\n使用 pip 安装构建好的包：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl\n\n\n\n如果需要更新已安装的包，使用 --force-reinstall 参数：\npip install dist/cbgeo_pkg-0.1.0-py3-none-any.whl --force-reinstall"
+    "text": "农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法\n\n浏览全部文章 → 关于我 →"
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html#临时安装方法",
-    "href": "posts/2025-6-8-local_package_install.html#临时安装方法",
-    "title": "Python 本地包安装与更新指南",
-    "section": "",
-    "text": "如果只需要临时使用包，可以采用以下方法：\n\n创建新的 conda 环境（可选）：\n\nconda create -n myenv python=3.x\nconda activate myenv\n\n进入 setup.py 所在目录：\n\ncd path/to/package/directory\n\n使用 pip 直接安装：\n\npip install -e ."
+    "objectID": "index.html#最新文章",
+    "href": "index.html#最新文章",
+    "title": "Binchen’s Tech Blog",
+    "section": "最新文章",
+    "text": "最新文章\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\nNo matching items"
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html#注意事项",
-    "href": "posts/2025-6-8-local_package_install.html#注意事项",
-    "title": "Python 本地包安装与更新指南",
+    "objectID": "posts/2025-9-1-geedownloadimages.html",
+    "href": "posts/2025-9-1-geedownloadimages.html",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
     "section": "",
-    "text": "确保已安装 wheel 和 setuptools 包\n使用 -e 参数进行开发模式安装，方便调试和修改\n安装前检查 Python 环境版本兼容性\n建议在虚拟环境中进行安装，避免影响系统 Python 环境"
+    "text": "本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的完整工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。\n该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。\n\n\n\n\n\n确保安装以下工具和库：\n\n\n\n工具/库\n用途\n安装命令\n\n\n\n\nPython\n核心编程环境\n从 python.org 下载\n\n\ngeemap\nGEE 可视化和数据下载\npip install geemap\n\n\nearthengine-api (ee)\nGEE Python API\npip install earthengine-api\n\n\ngeopandas\n读取矢量网格数据（用于分段）\npip install geopandas\n\n\nrasterio\n图像镶嵌和栅格处理\npip install rasterio\n\n\nGDAL\n栅格操作后端（多线程）\n随 rasterio 包含\n\n\n\n\n注意: 安装 earthengine-api 后，需要通过 earthengine authenticate 进行身份验证。\n\n\n\n\n\nGEE 栅格数据集 ID: 在 GEE 中识别目标数据集 ID\n\n示例：NPP 数据 MODIS/061/MOD17A3HGF\n示例：Landsat 8 数据 LANDSAT/LC08/C02/T1_L2\n\n全球矢量网格: 准备预分割的矢量网格（GeoPackage .gpkg 格式）\n\n将全球研究区域分割为较小的、可下载的块\n示例：WorldFishnet.gpkg（可根据数据分辨率自定义网格大小）\n\n\n\n\n\n\n\n\nimport ee\nimport geemap\nimport os\nimport geopandas as gpd\n\n\n\n# 身份验证 GEE（运行一次；如果已经身份验证则跳过）\n# ee.Authenticate()\n\n# 初始化 GEE API\nee.Initialize()\n\n\n\n\n\n# 为您的目标数据集自定义这些参数\nGEE_DATA_ID = \"MODIS/061/MOD17A3HGF\"  # 示例：MODIS NPP 数据集\nBAND_NAME = \"Npp\"                       # 目标波段名称\nTIME_RANGE = [\"2001-01-01\", \"2025-01-01\"]  # 时间范围（开始，结束）\nSCALING_FACTOR = 0.0001                 # 缩放因子，将 GEE 数据转换为实际值\n\n# 可视化参数\nVIS_PARAMS = {\n    \"min\": 0,\n    \"max\": 3,\n    \"palette\": [\n        \"ffffff\", \"ce7e45\", \"df923d\", \"f1b555\", \"fcd163\", \n        \"99b718\", \"74a901\", \"66a000\", \"529400\", \"3e8601\", \n        \"207401\", \"056201\", \"004c00\", \"023b01\", \"012e01\", \n        \"011d01\", \"011301\"\n    ]  # 根据数据集范围调整\n}\n\n\n\n# 加载 GEE 图像集合\nimage_collection = ee.ImageCollection(GEE_DATA_ID)\\\n    .filterDate(TIME_RANGE[0], TIME_RANGE[1])\\\n    .select(BAND_NAME)\n\n# 定义应用缩放因子的函数\ndef apply_scaling(image):\n    return image.multiply(SCALING_FACTOR)\n\n# 将缩放应用到集合\nscaled_collection = image_collection.map(apply_scaling)\n\n\n\n\n# 初始化 geemap 界面\nMap = geemap.Map(center=(40, 100), zoom=4)  # 以欧亚大陆为中心\n\n# 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）\npreview_image = scaled_collection.median()\n\n# 将图像添加到地图\nMap.addLayer(preview_image, VIS_PARAMS, f\"{GEE_DATA_ID.split('/')[-1]}_Preview\")\n\n# 添加颜色条图例\nMap.add_colorbar_branca(\n    colors=VIS_PARAMS[\"palette\"],\n    vmin=VIS_PARAMS[\"min\"],\n    vmax=VIS_PARAMS[\"max\"],\n    label=BAND_NAME,\n    position=\"bottomright\"\n)\n\n# 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）\nMap\n\n\n\n\n直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。\n\n\n# 文件路径（自定义这些）\nGRID_PATH = \"I:/geemap/roi/WorldFishnet.gpkg\"  # 矢量网格路径\nGRID_LAYER = \"WorldFish30\"                       # GeoPackage 中的图层名称\nOUTPUT_DIR = \"I:/geemap/GEE_Global_Data/\"        # 保存分段文件的目录\nRESOLUTION = 500                                  # 数据集分辨率（米）\nBATCH_SIZE = 5                                    # 每批处理的网格块数量\nSTART_YEAR = 2001                                 # 从此年开始恢复（如果下载被中断）\nSTART_GRID_INDEX = 0                             # 从此网格索引恢复（如果下载被中断）\nCRS = \"EPSG:4326\"                                # 目标坐标系（WGS84）\n\n\n\n# 使用 geopandas 加载矢量网格\ngrid_gdf = gpd.read_file(GRID_PATH, layer=GRID_LAYER)\n\n# 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection\ngrid_ee = geemap.gdf_to_ee(grid_gdf)\n\n# 创建输出目录（如果不存在）\nos.makedirs(OUTPUT_DIR, exist_ok=True)\n\n\n\n# 从时间范围获取年份列表\nyears = range(int(TIME_RANGE[0].split(\"-\")[0]), int(TIME_RANGE[1].split(\"-\")[0]))\n\n# 遍历每一年\nfor year in years:\n    # 跳过恢复开始年份之前的年份\n    if year &lt; START_YEAR:\n        continue\n    print(f\"🔄 正在处理 {year} 年的数据...\")\n\n    # 提取年度数据\n    annual_image = scaled_collection\\\n        .filter(ee.Filter.calendarRange(year, year, \"year\"))\\\n        .median()\n\n    # 获取网格块总数\n    total_grids = grid_ee.size().getInfo()\n\n    # 计算批次数\n    num_batches = (total_grids - START_GRID_INDEX + BATCH_SIZE - 1) // BATCH_SIZE\n\n    # 处理每批\n    for batch in range(num_batches):\n        batch_start = START_GRID_INDEX + batch * BATCH_SIZE\n        batch_end = min(batch_start + BATCH_SIZE, total_grids)\n        current_batch = grid_ee.toList(BATCH_SIZE, batch_start)\n\n        # 处理批次中的每个网格块\n        for i in range(batch_end - batch_start):\n            # 获取当前网格要素和几何形状\n            grid_feature = ee.Feature(current_batch.get(i))\n            grid_geom = grid_feature.geometry()\n\n            # 生成唯一文件名\n            grid_index = batch_start + i + 1\n            filename = f\"{BAND_NAME}_{year}_grid_{grid_index:04d}.tif\"\n            file_path = os.path.join(OUTPUT_DIR, filename)\n\n            # 如果文件已存在则跳过（断点续传功能）\n            if os.path.exists(file_path):\n                print(f\"⏭️  跳过现有文件: {filename}\")\n                continue\n\n            # 下载裁剪后的图像\n            try:\n                # 将年度图像裁剪到当前网格\n                clipped_image = annual_image.clip(grid_geom)\n\n                # 使用 geemap 下载\n                geemap.download_ee_image(\n                    image=clipped_image,\n                    filename=file_path,\n                    scale=RESOLUTION,\n                    region=grid_geom,\n                    crs=CRS,\n                    max_tile_size=1024  # 根据内存调整\n                )\n                print(f\"✅ 成功下载: {filename}\")\n\n            except Exception as e:\n                print(f\"❌ 下载 {filename} 失败: {str(e)}\")\n                continue\n\n    # 为下一年重置网格索引\n    START_GRID_INDEX = 0\n\nprint(\"🎉 所有下载任务完成！\")\n\n\n\n\n使用 rasterio 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。\n\n\n# 文件路径（自定义这些）\nINPUT_DIR = OUTPUT_DIR                    # 与下载输出目录相同\nMOSAIC_OUTPUT_DIR = \"I:/geemap/GEE_Global_Data/Mosaicked/\"  # 镶嵌文件的目录\nCOMPRESSION = \"LZW\"                       # 压缩方法（减少文件大小）\n\n\n\n# 启用 GDAL 多线程以加速镶嵌\nos.environ[\"GDAL_NUM_THREADS\"] = \"ALL_CPUS\"  # 使用所有可用 CPU\n\n\n\nimport re\nfrom rasterio.merge import merge\nfrom rasterio.enums import Resampling\n\n# 为镶嵌文件创建输出目录\nos.makedirs(MOSAIC_OUTPUT_DIR, exist_ok=True)\n\n# 按年份分组分段文件\nfile_pattern = re.compile(rf\"{BAND_NAME}_(\\d{{4}})_grid_\\d{{4}}\\.tif$\")\nyearly_files = {}\n\nfor filename in os.listdir(INPUT_DIR):\n    match = file_pattern.match(filename)\n    if match:\n        year = match.group(1)\n        file_path = os.path.join(INPUT_DIR, filename)\n        yearly_files.setdefault(year, []).append(file_path)\n\n# 镶嵌每年的文件\nfor year, file_list in yearly_files.items():\n    print(f\"🔗 正在镶嵌 {year} 年的 {len(file_list)} 个文件...\")\n    datasets = []\n\n    try:\n        # 打开所有分段文件\n        for file_path in file_list:\n            src = rasterio.open(file_path)\n            datasets.append(src)\n\n        # 执行镶嵌\n        mosaic_array, out_transform = merge(\n            datasets,\n            resampling=Resampling.nearest  # 对离散数据使用最近邻重采样\n        )\n\n        # 更新镶嵌文件的元数据\n        out_meta = datasets[0].meta.copy()\n        out_meta.update({\n            \"driver\": \"GTiff\",\n            \"height\": mosaic_array.shape[1],\n            \"width\": mosaic_array.shape[2],\n            \"transform\": out_transform,\n            \"compress\": COMPRESSION,\n            \"bigtiff\": \"YES\"  # 对大文件启用（&gt;4GB）\n        })\n\n        # 保存镶嵌文件\n        output_path = os.path.join(MOSAIC_OUTPUT_DIR, f\"{BAND_NAME}_{year}_Global.tif\")\n        with rasterio.open(output_path, \"w\", **out_meta) as dest:\n            dest.write(mosaic_array)\n\n        print(f\"✅ 成功镶嵌: {output_path}\")\n\n    except Exception as e:\n        print(f\"❌ 镶嵌 {year} 年数据失败: {str(e)}\")\n        continue\n\n    finally:\n        # 关闭所有打开的栅格数据集以释放内存\n        for ds in datasets:\n            ds.close()\n\nprint(\"🎉 所有镶嵌任务完成！\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n问题\n解决方案\n\n\n\n\nGEE 身份验证错误\n重新运行 ee.Authenticate() 并按照浏览器提示重新进行身份验证\n\n\n下载中断\n工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复\n\n\n内存过载\n减少 BATCH_SIZE（如从 5 到 3）或 max_tile_size（如从 1024 到 512）\n\n\n镶嵌失败\n确保所有分段文件具有相同的 CRS 和分辨率\n\n\n\n\n\n\n\n非年度数据: 对于月度/季节性数据，修改时间过滤器\n# 示例：夏季数据\nee.Filter.calendarRange(year, year, \"year\")\\\n  .filter(ee.Filter.calendarRange(6, 8, \"month\"))\n不同数据集: 更新 GEE_DATA_ID、BAND_NAME、SCALING_FACTOR 和 VIS_PARAMS\n网格调整: 根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）\n\n\n\n\n\n\ngeemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
   },
   {
-    "objectID": "posts/2025-6-8-local_package_install.html#常见问题",
-    "href": "posts/2025-6-8-local_package_install.html#常见问题",
-    "title": "Python 本地包安装与更新指南",
+    "objectID": "posts/2025-9-1-geedownloadimages.html#概述",
+    "href": "posts/2025-9-1-geedownloadimages.html#概述",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
     "section": "",
-    "text": "如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
+    "text": "本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的完整工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。\n该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#前置要求",
+    "href": "posts/2025-9-1-geedownloadimages.html#前置要求",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "确保安装以下工具和库：\n\n\n\n工具/库\n用途\n安装命令\n\n\n\n\nPython\n核心编程环境\n从 python.org 下载\n\n\ngeemap\nGEE 可视化和数据下载\npip install geemap\n\n\nearthengine-api (ee)\nGEE Python API\npip install earthengine-api\n\n\ngeopandas\n读取矢量网格数据（用于分段）\npip install geopandas\n\n\nrasterio\n图像镶嵌和栅格处理\npip install rasterio\n\n\nGDAL\n栅格操作后端（多线程）\n随 rasterio 包含\n\n\n\n\n注意: 安装 earthengine-api 后，需要通过 earthengine authenticate 进行身份验证。\n\n\n\n\n\nGEE 栅格数据集 ID: 在 GEE 中识别目标数据集 ID\n\n示例：NPP 数据 MODIS/061/MOD17A3HGF\n示例：Landsat 8 数据 LANDSAT/LC08/C02/T1_L2\n\n全球矢量网格: 准备预分割的矢量网格（GeoPackage .gpkg 格式）\n\n将全球研究区域分割为较小的、可下载的块\n示例：WorldFishnet.gpkg（可根据数据分辨率自定义网格大小）"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-1初始化环境和预览数据",
+    "href": "posts/2025-9-1-geedownloadimages.html#步骤-1初始化环境和预览数据",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "import ee\nimport geemap\nimport os\nimport geopandas as gpd\n\n\n\n# 身份验证 GEE（运行一次；如果已经身份验证则跳过）\n# ee.Authenticate()\n\n# 初始化 GEE API\nee.Initialize()\n\n\n\n\n\n# 为您的目标数据集自定义这些参数\nGEE_DATA_ID = \"MODIS/061/MOD17A3HGF\"  # 示例：MODIS NPP 数据集\nBAND_NAME = \"Npp\"                       # 目标波段名称\nTIME_RANGE = [\"2001-01-01\", \"2025-01-01\"]  # 时间范围（开始，结束）\nSCALING_FACTOR = 0.0001                 # 缩放因子，将 GEE 数据转换为实际值\n\n# 可视化参数\nVIS_PARAMS = {\n    \"min\": 0,\n    \"max\": 3,\n    \"palette\": [\n        \"ffffff\", \"ce7e45\", \"df923d\", \"f1b555\", \"fcd163\", \n        \"99b718\", \"74a901\", \"66a000\", \"529400\", \"3e8601\", \n        \"207401\", \"056201\", \"004c00\", \"023b01\", \"012e01\", \n        \"011d01\", \"011301\"\n    ]  # 根据数据集范围调整\n}\n\n\n\n# 加载 GEE 图像集合\nimage_collection = ee.ImageCollection(GEE_DATA_ID)\\\n    .filterDate(TIME_RANGE[0], TIME_RANGE[1])\\\n    .select(BAND_NAME)\n\n# 定义应用缩放因子的函数\ndef apply_scaling(image):\n    return image.multiply(SCALING_FACTOR)\n\n# 将缩放应用到集合\nscaled_collection = image_collection.map(apply_scaling)\n\n\n\n\n# 初始化 geemap 界面\nMap = geemap.Map(center=(40, 100), zoom=4)  # 以欧亚大陆为中心\n\n# 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）\npreview_image = scaled_collection.median()\n\n# 将图像添加到地图\nMap.addLayer(preview_image, VIS_PARAMS, f\"{GEE_DATA_ID.split('/')[-1]}_Preview\")\n\n# 添加颜色条图例\nMap.add_colorbar_branca(\n    colors=VIS_PARAMS[\"palette\"],\n    vmin=VIS_PARAMS[\"min\"],\n    vmax=VIS_PARAMS[\"max\"],\n    label=BAND_NAME,\n    position=\"bottomright\"\n)\n\n# 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）\nMap"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-2支持断点续传的分段下载",
+    "href": "posts/2025-9-1-geedownloadimages.html#步骤-2支持断点续传的分段下载",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。\n\n\n# 文件路径（自定义这些）\nGRID_PATH = \"I:/geemap/roi/WorldFishnet.gpkg\"  # 矢量网格路径\nGRID_LAYER = \"WorldFish30\"                       # GeoPackage 中的图层名称\nOUTPUT_DIR = \"I:/geemap/GEE_Global_Data/\"        # 保存分段文件的目录\nRESOLUTION = 500                                  # 数据集分辨率（米）\nBATCH_SIZE = 5                                    # 每批处理的网格块数量\nSTART_YEAR = 2001                                 # 从此年开始恢复（如果下载被中断）\nSTART_GRID_INDEX = 0                             # 从此网格索引恢复（如果下载被中断）\nCRS = \"EPSG:4326\"                                # 目标坐标系（WGS84）\n\n\n\n# 使用 geopandas 加载矢量网格\ngrid_gdf = gpd.read_file(GRID_PATH, layer=GRID_LAYER)\n\n# 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection\ngrid_ee = geemap.gdf_to_ee(grid_gdf)\n\n# 创建输出目录（如果不存在）\nos.makedirs(OUTPUT_DIR, exist_ok=True)\n\n\n\n# 从时间范围获取年份列表\nyears = range(int(TIME_RANGE[0].split(\"-\")[0]), int(TIME_RANGE[1].split(\"-\")[0]))\n\n# 遍历每一年\nfor year in years:\n    # 跳过恢复开始年份之前的年份\n    if year &lt; START_YEAR:\n        continue\n    print(f\"🔄 正在处理 {year} 年的数据...\")\n\n    # 提取年度数据\n    annual_image = scaled_collection\\\n        .filter(ee.Filter.calendarRange(year, year, \"year\"))\\\n        .median()\n\n    # 获取网格块总数\n    total_grids = grid_ee.size().getInfo()\n\n    # 计算批次数\n    num_batches = (total_grids - START_GRID_INDEX + BATCH_SIZE - 1) // BATCH_SIZE\n\n    # 处理每批\n    for batch in range(num_batches):\n        batch_start = START_GRID_INDEX + batch * BATCH_SIZE\n        batch_end = min(batch_start + BATCH_SIZE, total_grids)\n        current_batch = grid_ee.toList(BATCH_SIZE, batch_start)\n\n        # 处理批次中的每个网格块\n        for i in range(batch_end - batch_start):\n            # 获取当前网格要素和几何形状\n            grid_feature = ee.Feature(current_batch.get(i))\n            grid_geom = grid_feature.geometry()\n\n            # 生成唯一文件名\n            grid_index = batch_start + i + 1\n            filename = f\"{BAND_NAME}_{year}_grid_{grid_index:04d}.tif\"\n            file_path = os.path.join(OUTPUT_DIR, filename)\n\n            # 如果文件已存在则跳过（断点续传功能）\n            if os.path.exists(file_path):\n                print(f\"⏭️  跳过现有文件: {filename}\")\n                continue\n\n            # 下载裁剪后的图像\n            try:\n                # 将年度图像裁剪到当前网格\n                clipped_image = annual_image.clip(grid_geom)\n\n                # 使用 geemap 下载\n                geemap.download_ee_image(\n                    image=clipped_image,\n                    filename=file_path,\n                    scale=RESOLUTION,\n                    region=grid_geom,\n                    crs=CRS,\n                    max_tile_size=1024  # 根据内存调整\n                )\n                print(f\"✅ 成功下载: {filename}\")\n\n            except Exception as e:\n                print(f\"❌ 下载 {filename} 失败: {str(e)}\")\n                continue\n\n    # 为下一年重置网格索引\n    START_GRID_INDEX = 0\n\nprint(\"🎉 所有下载任务完成！\")"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-3镶嵌分段文件",
+    "href": "posts/2025-9-1-geedownloadimages.html#步骤-3镶嵌分段文件",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "使用 rasterio 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。\n\n\n# 文件路径（自定义这些）\nINPUT_DIR = OUTPUT_DIR                    # 与下载输出目录相同\nMOSAIC_OUTPUT_DIR = \"I:/geemap/GEE_Global_Data/Mosaicked/\"  # 镶嵌文件的目录\nCOMPRESSION = \"LZW\"                       # 压缩方法（减少文件大小）\n\n\n\n# 启用 GDAL 多线程以加速镶嵌\nos.environ[\"GDAL_NUM_THREADS\"] = \"ALL_CPUS\"  # 使用所有可用 CPU\n\n\n\nimport re\nfrom rasterio.merge import merge\nfrom rasterio.enums import Resampling\n\n# 为镶嵌文件创建输出目录\nos.makedirs(MOSAIC_OUTPUT_DIR, exist_ok=True)\n\n# 按年份分组分段文件\nfile_pattern = re.compile(rf\"{BAND_NAME}_(\\d{{4}})_grid_\\d{{4}}\\.tif$\")\nyearly_files = {}\n\nfor filename in os.listdir(INPUT_DIR):\n    match = file_pattern.match(filename)\n    if match:\n        year = match.group(1)\n        file_path = os.path.join(INPUT_DIR, filename)\n        yearly_files.setdefault(year, []).append(file_path)\n\n# 镶嵌每年的文件\nfor year, file_list in yearly_files.items():\n    print(f\"🔗 正在镶嵌 {year} 年的 {len(file_list)} 个文件...\")\n    datasets = []\n\n    try:\n        # 打开所有分段文件\n        for file_path in file_list:\n            src = rasterio.open(file_path)\n            datasets.append(src)\n\n        # 执行镶嵌\n        mosaic_array, out_transform = merge(\n            datasets,\n            resampling=Resampling.nearest  # 对离散数据使用最近邻重采样\n        )\n\n        # 更新镶嵌文件的元数据\n        out_meta = datasets[0].meta.copy()\n        out_meta.update({\n            \"driver\": \"GTiff\",\n            \"height\": mosaic_array.shape[1],\n            \"width\": mosaic_array.shape[2],\n            \"transform\": out_transform,\n            \"compress\": COMPRESSION,\n            \"bigtiff\": \"YES\"  # 对大文件启用（&gt;4GB）\n        })\n\n        # 保存镶嵌文件\n        output_path = os.path.join(MOSAIC_OUTPUT_DIR, f\"{BAND_NAME}_{year}_Global.tif\")\n        with rasterio.open(output_path, \"w\", **out_meta) as dest:\n            dest.write(mosaic_array)\n\n        print(f\"✅ 成功镶嵌: {output_path}\")\n\n    except Exception as e:\n        print(f\"❌ 镶嵌 {year} 年数据失败: {str(e)}\")\n        continue\n\n    finally:\n        # 关闭所有打开的栅格数据集以释放内存\n        for ds in datasets:\n            ds.close()\n\nprint(\"🎉 所有镶嵌任务完成！\")"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#注意事项和故障排除",
+    "href": "posts/2025-9-1-geedownloadimages.html#注意事项和故障排除",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "问题\n解决方案\n\n\n\n\nGEE 身份验证错误\n重新运行 ee.Authenticate() 并按照浏览器提示重新进行身份验证\n\n\n下载中断\n工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复\n\n\n内存过载\n减少 BATCH_SIZE（如从 5 到 3）或 max_tile_size（如从 1024 到 512）\n\n\n镶嵌失败\n确保所有分段文件具有相同的 CRS 和分辨率\n\n\n\n\n\n\n\n非年度数据: 对于月度/季节性数据，修改时间过滤器\n# 示例：夏季数据\nee.Filter.calendarRange(year, year, \"year\")\\\n  .filter(ee.Filter.calendarRange(6, 8, \"month\"))\n不同数据集: 更新 GEE_DATA_ID、BAND_NAME、SCALING_FACTOR 和 VIS_PARAMS\n网格调整: 根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#参考资料",
+    "href": "posts/2025-9-1-geedownloadimages.html#参考资料",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "geemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "title": "机器学习与传统作物模型的未来展望",
+    "section": "",
+    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html",
+    "href": "posts/2026-3-17-github-connection-fix.html",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "",
+    "text": "今天在执行 git push 推送代码到 GitHub 时，遇到了连接超时错误：\nfatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': \nFailed to connect to github.com port 443 after 75003 ms: Couldn't connect to server\n等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#问题背景",
+    "href": "posts/2026-3-17-github-connection-fix.html#问题背景",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "",
+    "text": "今天在执行 git push 推送代码到 GitHub 时，遇到了连接超时错误：\nfatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': \nFailed to connect to github.com port 443 after 75003 ms: Couldn't connect to server\n等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#问题诊断过程",
+    "href": "posts/2026-3-17-github-connection-fix.html#问题诊断过程",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "2 问题诊断过程",
+    "text": "2 问题诊断过程\n\n2.1 1. 检查基础网络连接\n首先确认网络本身是否正常：\n# 测试 GitHub 是否可达\ncurl -I https://github.com\n\n# 检查 DNS 解析\nping -c 2 github.com\n结果：网络本身是通的，DNS 解析正常，说明不是基础网络问题。\n\n\n\n2.2 2. 检查 Git 配置\n检查是否有代理设置或其他配置问题：\n# 检查代理设置\ngit config --global --get http.proxy\ngit config --global --get https.proxy\n\n# 检查 SSL 验证设置\ngit config --global --get http.sslVerify\n结果：无代理设置，SSL 验证默认开启。\n\n\n\n2.3 3. 详细诊断 Git 连接\n使用详细日志模式诊断具体错误：\nGIT_CURL_VERBOSE=1 git ls-remote origin 2&gt;&1 | tail -30\n关键发现： - ✅ SSL 证书验证通过 - ❌ 连接能建立，但请求发送后超时 - ❌ 错误信息：Error in the HTTP/2 framing layer\n结论：问题出在 HTTP/2 协议层，GitHub 的 HTTP/2 连接在某些网络环境下不稳定。"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#解决方案",
+    "href": "posts/2026-3-17-github-connection-fix.html#解决方案",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "3 解决方案",
+    "text": "3 解决方案\n\n3.1 方案一：禁用 HTTP/2，使用 HTTP/1.1（推荐，本次生效）\nGit 默认使用 HTTP/2 协议，但在国内网络环境下可能不稳定。强制使用 HTTP/1.1 可以提高兼容性。\n# 1. 全局设置 Git 使用 HTTP/1.1\ngit config --global http.version HTTP/1.1\n\n# 2. 增加缓冲区大小，避免大文件推送失败\ngit config --global http.postBuffer 524288000\n\n# 3. 禁用低速限制（避免慢速连接被中断）\ngit config --global http.lowSpeedLimit 0\ngit config --global http.lowSpeedTime 9999\n\n# 4. 重新推送\ngit push --set-upstream origin main\n原理： - http.version HTTP/1.1：强制使用 HTTP/1.1 协议，避免 HTTP/2 兼容性问题 - http.postBuffer 524288000：设置 500MB 缓冲区，适合大文件推送 - http.lowSpeedLimit 0：禁用低速限制，避免慢速连接被中断\n效果：✅ 本次问题已解决，推送成功。\n\n\n\n3.2 方案二：配置代理（如果方案一无效）\n如果你使用代理软件（Clash、Surge、Shadowsocks 等），可以配置 Git 通过代理连接：\n# 查找代理端口（常见端口：7890, 1087, 6153 等）\n# Clash 默认端口通常是 7890\n\n# 设置 Git 代理\ngit config --global http.proxy http://127.0.0.1:7890\ngit config --global https.proxy http://127.0.0.1:7890\n\n# 推送\ngit push --set-upstream origin main\n\n# 取消代理（如果需要）\ngit config --global --unset http.proxy\ngit config --global --unset https.proxy\n\n\n\n3.3 方案三：改用 SSH 协议（长期推荐）\nSSH 协议比 HTTPS 更稳定，且不需要每次输入密码。\n# 1. 查看现有 SSH 公钥\ncat ~/.ssh/id_ed25519.pub\n\n# 2. 如果没有密钥，生成新的\nssh-keygen -t ed25519 -C \"your_email@example.com\"\n\n# 3. 将公钥添加到 GitHub\n# 访问：https://github.com/settings/keys\n# 点击 \"New SSH key\"，粘贴公钥内容\n\n# 4. 测试 SSH 连接\nssh -T git@github.com\n# 成功输出：Hi chenbin98! You've successfully authenticated...\n\n# 5. 切换 remote 为 SSH\ngit remote set-url origin git@github.com:chenbin98/meteo_data_download.git\n\n# 6. 推送\ngit push --set-upstream origin main\n优势： - ✅ 不需要每次输入密码 - ✅ 连接更稳定 - ✅ 不受 HTTPS 代理问题影响"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#常用-git-远程操作命令",
+    "href": "posts/2026-3-17-github-connection-fix.html#常用-git-远程操作命令",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "4 常用 Git 远程操作命令",
+    "text": "4 常用 Git 远程操作命令\n# 查看远程仓库\ngit remote -v\n\n# 设置 upstream 并推送\ngit push --set-upstream origin main\n\n# 后续推送（已设置 upstream 后）\ngit push\n\n# 拉取远程更新\ngit pull\n\n# 查看当前分支跟踪情况\ngit branch -vv"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#故障排查流程图",
+    "href": "posts/2026-3-17-github-connection-fix.html#故障排查流程图",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "5 故障排查流程图",
+    "text": "5 故障排查流程图\ngit push 失败\n    │\n    ▼\n检查网络：curl/ping github.com\n    │\n    ├── 不通 → 检查网络/代理\n    │\n    ▼ 通\n检查 Git 配置：git config --get http.proxy\n    │\n    ├── 有代理 → 确认代理是否正确\n    │\n    ▼ 无代理\n详细诊断：GIT_CURL_VERBOSE=1 git ls-remote origin\n    │\n    ├── SSL 失败 → 检查证书/时间设置\n    ├── HTTP/2 错误 → 改用 HTTP/1.1 ✓\n    └── 认证失败 → 检查凭证/SSH 密钥"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#方案对比",
+    "href": "posts/2026-3-17-github-connection-fix.html#方案对比",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "6 方案对比",
+    "text": "6 方案对比\n\n\n\n\n\n\n\n\n\n方案\n优点\n缺点\n适用场景\n\n\n\n\nHTTP/1.1\n配置简单，立竿见影\n每次推送可能仍需输入密码\n临时解决/快速修复\n\n\n代理\n可访问被墙资源\n依赖代理软件稳定性\n代理环境用户\n\n\nSSH\n最稳定，无需密码\n需要配置 SSH 密钥\n长期使用推荐"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#总结",
+    "href": "posts/2026-3-17-github-connection-fix.html#总结",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "7 总结",
+    "text": "7 总结\n本次解决的关键命令：\n# 1. 禁用 HTTP/2\ngit config --global http.version HTTP/1.1\n\n# 2. 增加缓冲区\ngit config --global http.postBuffer 524288000\n\n# 3. 禁用低速限制\ngit config --global http.lowSpeedLimit 0\ngit config --global http.lowSpeedTime 9999\n\n# 4. 推送\ngit push --set-upstream origin main\n长期建议：配置 SSH 密钥，切换到 SSH 协议，获得更稳定的连接体验。"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#参考链接",
+    "href": "posts/2026-3-17-github-connection-fix.html#参考链接",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "8 参考链接",
+    "text": "8 参考链接\n\nGit 配置文档\nGitHub SSH 连接指南\nGit 代理设置\n\n\n文档生成时间：2026-03-17\n问题状态：✅ 已解决"
   },
   {
     "objectID": "posts/2026-3-4-git_ignore_pyc.html",
