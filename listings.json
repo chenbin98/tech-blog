@@ -1,6 +1,6 @@
 [
   {
-    "listing": "/posts/index.html",
+    "listing": "/index.html",
     "items": [
       "/posts/2026-3-17-github-connection-fix.html",
       "/posts/2026-3-16-server-google-access-fix.html",
@@ -16,7 +16,7 @@
     ]
   },
   {
-    "listing": "/index.html",
+    "listing": "/posts/index.html",
     "items": [
       "/posts/2026-3-17-github-connection-fix.html",
       "/posts/2026-3-16-server-google-access-fix.html",
