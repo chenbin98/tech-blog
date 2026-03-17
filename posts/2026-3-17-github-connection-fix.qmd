@@ -1,0 +1,246 @@
+---
+title: "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1"
+date: "2026-03-17"
+categories: [运维，开发工具]
+tags: [Git, GitHub, 网络问题]
+description: "解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。"
+
+---
+
+## 问题背景
+
+今天在执行 `git push` 推送代码到 GitHub 时，遇到了连接超时错误：
+
+```bash
+fatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': 
+Failed to connect to github.com port 443 after 75003 ms: Couldn't connect to server
+```
+
+等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。
+
+## 问题诊断过程
+
+### 1. 检查基础网络连接
+
+首先确认网络本身是否正常：
+
+```bash
+# 测试 GitHub 是否可达
+curl -I https://github.com
+
+# 检查 DNS 解析
+ping -c 2 github.com
+```
+
+**结果**：网络本身是通的，DNS 解析正常，说明不是基础网络问题。
+
+---
+
+### 2. 检查 Git 配置
+
+检查是否有代理设置或其他配置问题：
+
+```bash
+# 检查代理设置
+git config --global --get http.proxy
+git config --global --get https.proxy
+
+# 检查 SSL 验证设置
+git config --global --get http.sslVerify
+```
+
+**结果**：无代理设置，SSL 验证默认开启。
+
+---
+
+### 3. 详细诊断 Git 连接
+
+使用详细日志模式诊断具体错误：
+
+```bash
+GIT_CURL_VERBOSE=1 git ls-remote origin 2>&1 | tail -30
+```
+
+**关键发现**：
+- ✅ SSL 证书验证通过
+- ❌ 连接能建立，但请求发送后超时
+- ❌ 错误信息：`Error in the HTTP/2 framing layer`
+
+**结论**：问题出在 **HTTP/2 协议层**，GitHub 的 HTTP/2 连接在某些网络环境下不稳定。
+
+---
+
+## 解决方案
+
+### 方案一：禁用 HTTP/2，使用 HTTP/1.1（推荐，本次生效）
+
+Git 默认使用 HTTP/2 协议，但在国内网络环境下可能不稳定。强制使用 HTTP/1.1 可以提高兼容性。
+
+```bash
+# 1. 全局设置 Git 使用 HTTP/1.1
+git config --global http.version HTTP/1.1
+
+# 2. 增加缓冲区大小，避免大文件推送失败
+git config --global http.postBuffer 524288000
+
+# 3. 禁用低速限制（避免慢速连接被中断）
+git config --global http.lowSpeedLimit 0
+git config --global http.lowSpeedTime 9999
+
+# 4. 重新推送
+git push --set-upstream origin main
+```
+
+**原理**：
+- `http.version HTTP/1.1`：强制使用 HTTP/1.1 协议，避免 HTTP/2 兼容性问题
+- `http.postBuffer 524288000`：设置 500MB 缓冲区，适合大文件推送
+- `http.lowSpeedLimit 0`：禁用低速限制，避免慢速连接被中断
+
+**效果**：✅ 本次问题已解决，推送成功。
+
+---
+
+### 方案二：配置代理（如果方案一无效）
+
+如果你使用代理软件（Clash、Surge、Shadowsocks 等），可以配置 Git 通过代理连接：
+
+```bash
+# 查找代理端口（常见端口：7890, 1087, 6153 等）
+# Clash 默认端口通常是 7890
+
+# 设置 Git 代理
+git config --global http.proxy http://127.0.0.1:7890
+git config --global https.proxy http://127.0.0.1:7890
+
+# 推送
+git push --set-upstream origin main
+
+# 取消代理（如果需要）
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+```
+
+---
+
+### 方案三：改用 SSH 协议（长期推荐）
+
+SSH 协议比 HTTPS 更稳定，且不需要每次输入密码。
+
+```bash
+# 1. 查看现有 SSH 公钥
+cat ~/.ssh/id_ed25519.pub
+
+# 2. 如果没有密钥，生成新的
+ssh-keygen -t ed25519 -C "your_email@example.com"
+
+# 3. 将公钥添加到 GitHub
+# 访问：https://github.com/settings/keys
+# 点击 "New SSH key"，粘贴公钥内容
+
+# 4. 测试 SSH 连接
+ssh -T git@github.com
+# 成功输出：Hi chenbin98! You've successfully authenticated...
+
+# 5. 切换 remote 为 SSH
+git remote set-url origin git@github.com:chenbin98/meteo_data_download.git
+
+# 6. 推送
+git push --set-upstream origin main
+```
+
+**优势**：
+- ✅ 不需要每次输入密码
+- ✅ 连接更稳定
+- ✅ 不受 HTTPS 代理问题影响
+
+---
+
+## 常用 Git 远程操作命令
+
+```bash
+# 查看远程仓库
+git remote -v
+
+# 设置 upstream 并推送
+git push --set-upstream origin main
+
+# 后续推送（已设置 upstream 后）
+git push
+
+# 拉取远程更新
+git pull
+
+# 查看当前分支跟踪情况
+git branch -vv
+```
+
+---
+
+## 故障排查流程图
+
+```
+git push 失败
+    │
+    ▼
+检查网络：curl/ping github.com
+    │
+    ├── 不通 → 检查网络/代理
+    │
+    ▼ 通
+检查 Git 配置：git config --get http.proxy
+    │
+    ├── 有代理 → 确认代理是否正确
+    │
+    ▼ 无代理
+详细诊断：GIT_CURL_VERBOSE=1 git ls-remote origin
+    │
+    ├── SSL 失败 → 检查证书/时间设置
+    ├── HTTP/2 错误 → 改用 HTTP/1.1 ✓
+    └── 认证失败 → 检查凭证/SSH 密钥
+```
+
+---
+
+## 方案对比
+
+| 方案 | 优点 | 缺点 | 适用场景 |
+|------|------|------|----------|
+| **HTTP/1.1** | 配置简单，立竿见影 | 每次推送可能仍需输入密码 | 临时解决/快速修复 |
+| **代理** | 可访问被墙资源 | 依赖代理软件稳定性 | 代理环境用户 |
+| **SSH** | 最稳定，无需密码 | 需要配置 SSH 密钥 | 长期使用推荐 |
+
+---
+
+## 总结
+
+**本次解决的关键命令**：
+
+```bash
+# 1. 禁用 HTTP/2
+git config --global http.version HTTP/1.1
+
+# 2. 增加缓冲区
+git config --global http.postBuffer 524288000
+
+# 3. 禁用低速限制
+git config --global http.lowSpeedLimit 0
+git config --global http.lowSpeedTime 9999
+
+# 4. 推送
+git push --set-upstream origin main
+```
+
+**长期建议**：配置 SSH 密钥，切换到 SSH 协议，获得更稳定的连接体验。
+
+---
+
+## 参考链接
+
+- [Git 配置文档](https://git-scm.com/docs/git-config)
+- [GitHub SSH 连接指南](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+- [Git 代理设置](https://gist.github.com/demurgos/9f6f7d0e0d2a6e7e37c0)
+
+---
+
+*文档生成时间：2026-03-17*  
+*问题状态：✅ 已解决*
