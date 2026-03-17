@@ -63,7 +63,7 @@ number-sections: false
 <i class="bi bi-journal-text contact-icon"></i>
 <div>
 **ORCID**  
-[0009-0000-8266-940X](https://orcid.org/my-orcid?orcid=0009-0000-8266-940X)
+[0009-0000-8266-940X](https://orcid.org/0009-0000-8266-940X)
 </div>
 :::
 
