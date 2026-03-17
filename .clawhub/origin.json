@@ -1,0 +1,11 @@
+{
+  "name": "blog-post-publisher",
+  "version": "2.0.0",
+  "description": "Generate technical blog posts and optionally commit or push them to the tech-blog repository.",
+  "author": "bin",
+  "homepage": "https://github.com/openclaw/openclaw",
+  "license": "MIT",
+  "tags": ["blog", "writing", "git", "quarto", "publishing"],
+  "entryPoint": "SKILL.md",
+  "updatedAt": "2026-03-15T14:50:00+08:00"
+}

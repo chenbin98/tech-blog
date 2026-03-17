@@ -7,7 +7,7 @@ listing:
   id: latest-posts
   contents: "posts/20*.qmd"
   sort: "date desc"
-  max-items: 3
+  max-items: 4
   type: default
   fields: [title, date, description]
   sort-ui: false

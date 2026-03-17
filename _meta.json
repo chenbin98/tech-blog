@@ -1,0 +1,13 @@
+{
+  "name": "blog-post-publisher",
+  "version": "2.0.0",
+  "description": "Generate technical blog posts and optionally commit or push them to the tech-blog repository.",
+  "location": "~/.openclaw/workspace/skills/blog-post-publisher",
+  "enabled": true,
+  "autoLoad": true,
+  "requiredEnv": [],
+  "dependencies": [
+    "quarto",
+    "git"
+  ]
+}
