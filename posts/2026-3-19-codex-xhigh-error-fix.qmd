@@ -1,0 +1,179 @@
+---
+title: "Codex 报错 `unknown variant 'xhigh'` 的原因与解决方法"
+author: "Binchen Chen"
+date: "2026-03-19"
+categories:
+  - Codex
+  - 错误排查
+  - 配置管理
+tags:
+  - codex
+  - config
+  - troubleshooting
+  - CLI
+description: "解决 Codex CLI 启动时报错 `unknown variant 'xhigh'` 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。"
+---
+
+## 问题现象
+
+在终端运行 `codex` 时，出现如下报错：
+
+```text
+Error loading configuration: unknown variant `xhigh`, expected one of `minimal`, `low`, `medium`, `high`
+in `model_reasoning_effort`
+```
+
+这说明 Codex 在读取配置文件时，发现 `model_reasoning_effort` 被设置成了当前版本不支持的值 `xhigh`。
+
+---
+
+## 报错原因
+
+根本原因是：
+
+- 本地 Codex 配置文件中存在如下配置：
+
+```toml
+model_reasoning_effort = "xhigh"
+```
+
+- 但当前 CLI 版本只支持以下四个取值：
+
+```toml
+minimal
+low
+medium
+high
+```
+
+也就是说，当前环境下 `xhigh` 这个枚举值无法被解析，因此启动失败。
+
+### 常见触发场景
+
+- 之前在某些图形界面、IDE 插件或其他环境中，把 reasoning effort 设成了更高档位；
+- 该设置被写入 `~/.codex/config.toml`；
+- 但当前终端里的 `codex` CLI 版本并不支持 `xhigh`；
+- 于是每次启动都会报错。
+
+---
+
+## 解决思路
+
+处理方法很直接：
+
+1. 先备份原始配置文件；
+2. 把配置文件里的所有 `"xhigh"` 替换成 `"high"`；
+3. 重新运行 `codex`。
+
+---
+
+## 解决方法
+
+### 一键修复命令
+
+```bash
+# 1. 备份配置文件
+cp ~/.codex/config.toml ~/.codex/config.toml.bak
+
+# 2. 批量替换配置值
+perl -0pi -e 's/"xhigh"/"high"/g' ~/.codex/config.toml
+
+# 3. 重新运行 Codex
+codex
+```
+
+### 命令说明
+
+#### 备份配置文件
+
+```bash
+cp ~/.codex/config.toml ~/.codex/config.toml.bak
+```
+
+**作用**：
+
+- 将当前配置文件复制一份作为备份；
+- 如果后续修改有问题，可以随时恢复。
+
+#### 批量替换配置值
+
+```bash
+perl -0pi -e 's/"xhigh"/"high"/g' ~/.codex/config.toml
+```
+
+**作用**：
+
+- 直接原地修改 `~/.codex/config.toml`；
+- 将文件中所有 `"xhigh"` 全部替换成 `"high"`；
+- 不需要手动打开编辑器逐行查找。
+
+---
+
+## 手动检查与编辑
+
+如果想手动检查配置中是否仍然包含 `xhigh`：
+
+```bash
+grep -n "xhigh" ~/.codex/config.toml
+```
+
+也可以直接打开文件手动编辑：
+
+```bash
+code ~/.codex/config.toml
+```
+
+把类似下面的内容：
+
+```toml
+model_reasoning_effort = "xhigh"
+plan_mode_reasoning_effort = "xhigh"
+```
+
+改成：
+
+```toml
+model_reasoning_effort = "high"
+plan_mode_reasoning_effort = "high"
+```
+
+---
+
+## 如果问题再次出现
+
+如果已经修改了 `~/.codex/config.toml`，但还是报同样错误，可能还有其他位置也存在配置文件，例如项目目录下的：
+
+```bash
+./.codex/config.toml
+```
+
+可以用下面命令全局搜索：
+
+```bash
+grep -Rn 'xhigh' ~/.codex ./.codex 2>/dev/null
+```
+
+如果项目配置里也有 `xhigh`，同样需要改掉。
+
+---
+
+## 总结
+
+这个报错不是 `codex` 本身坏了，而是**配置文件里写了当前 CLI 不支持的 `model_reasoning_effort = "xhigh"`**。
+
+把它改成 `high` 即可恢复正常。
+
+### 推荐保留的最终修复命令
+
+```bash
+cp ~/.codex/config.toml ~/.codex/config.toml.bak
+perl -0pi -e 's/"xhigh"/"high"/g' ~/.codex/config.toml
+codex
+```
+
+---
+
+## 参考资料
+
+- [Codex 官方文档](https://github.com/openai/codex)
+- [Codex 配置指南](https://github.com/openai/codex#configuration)
