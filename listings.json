@@ -1,7 +1,8 @@
 [
   {
-    "listing": "/index.html",
+    "listing": "/posts/index.html",
     "items": [
+      "/posts/2026-3-19-codex-xhigh-error-fix.html",
       "/posts/2026-3-17-github-connection-fix.html",
       "/posts/2026-3-16-server-google-access-fix.html",
       "/posts/2026-3-14-modern-terminal-tools.html",
@@ -16,8 +17,9 @@
     ]
   },
   {
-    "listing": "/posts/index.html",
+    "listing": "/index.html",
     "items": [
+      "/posts/2026-3-19-codex-xhigh-error-fix.html",
       "/posts/2026-3-17-github-connection-fix.html",
       "/posts/2026-3-16-server-google-access-fix.html",
       "/posts/2026-3-14-modern-terminal-tools.html",

@@ -6,8 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Binchen Chen">
+<meta name="dcterms.date" content="2026-03-19">
+<meta name="description" content="解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。">
 
-<title>技术文档 – Binchen’s Tech Blog</title>
+<title>Codex 报错 unknown variant 'xhigh' 的原因与解决方法 – Binchen's Tech Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +23,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,8 +68,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -70,65 +106,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -172,24 +150,71 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
-  
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#问题现象" id="toc-问题现象" class="nav-link active" data-scroll-target="#问题现象"><span class="header-section-number">1</span> 问题现象</a></li>
+  <li><a href="#报错原因" id="toc-报错原因" class="nav-link" data-scroll-target="#报错原因"><span class="header-section-number">2</span> 报错原因</a>
+  <ul class="collapse">
+  <li><a href="#常见触发场景" id="toc-常见触发场景" class="nav-link" data-scroll-target="#常见触发场景"><span class="header-section-number">2.1</span> 常见触发场景</a></li>
+  </ul></li>
+  <li><a href="#解决思路" id="toc-解决思路" class="nav-link" data-scroll-target="#解决思路"><span class="header-section-number">3</span> 解决思路</a></li>
+  <li><a href="#解决方法" id="toc-解决方法" class="nav-link" data-scroll-target="#解决方法"><span class="header-section-number">4</span> 解决方法</a>
+  <ul class="collapse">
+  <li><a href="#一键修复命令" id="toc-一键修复命令" class="nav-link" data-scroll-target="#一键修复命令"><span class="header-section-number">4.1</span> 一键修复命令</a></li>
+  <li><a href="#命令说明" id="toc-命令说明" class="nav-link" data-scroll-target="#命令说明"><span class="header-section-number">4.2</span> 命令说明</a></li>
+  </ul></li>
+  <li><a href="#手动检查与编辑" id="toc-手动检查与编辑" class="nav-link" data-scroll-target="#手动检查与编辑"><span class="header-section-number">5</span> 手动检查与编辑</a></li>
+  <li><a href="#如果问题再次出现" id="toc-如果问题再次出现" class="nav-link" data-scroll-target="#如果问题再次出现"><span class="header-section-number">6</span> 如果问题再次出现</a></li>
+  <li><a href="#总结" id="toc-总结" class="nav-link" data-scroll-target="#总结"><span class="header-section-number">7</span> 总结</a>
+  <ul class="collapse">
+  <li><a href="#推荐保留的最终修复命令" id="toc-推荐保留的最终修复命令" class="nav-link" data-scroll-target="#推荐保留的最终修复命令"><span class="header-section-number">7.1</span> 推荐保留的最终修复命令</a></li>
+  </ul></li>
+  <li><a href="#参考资料" id="toc-参考资料" class="nav-link" data-scroll-target="#参考资料"><span class="header-section-number">8</span> 参考资料</a></li>
+  </ul>
+</nav>
+</nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
-<main class="content column-page" id="quarto-document-content">
+<main class="content column-page-right" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">技术文档</h1>
+<h1 class="title">Codex 报错 <code>unknown variant 'xhigh'</code> 的原因与解决方法</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Codex</div>
+    <div class="quarto-category">错误排查</div>
+    <div class="quarto-category">配置管理</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    解决 Codex CLI 启动时报错 <code>unknown variant 'xhigh'</code> 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。
+  </div>
 </div>
 
 
+<div class="quarto-title-meta column-page-right">
 
-<div class="quarto-title-meta column-page">
-
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Binchen Chen </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 19, 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -199,283 +224,133 @@ window.Quarto = {
 </header>
 
 
-<p>聚焦农业数据科学与相关工具的实践记录，方便下次查找</p>
+<section id="问题现象" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="问题现象"><span class="header-section-number">1</span> 问题现象</h2>
+<p>在终端运行 <code>codex</code> 时，出现如下报错：</p>
+<pre class="text"><code>Error loading configuration: unknown variant `xhigh`, expected one of `minimal`, `low`, `medium`, `high`
+in `model_reasoning_effort`</code></pre>
+<p>这说明 Codex 在读取配置文件时，发现 <code>model_reasoning_effort</code> 被设置成了当前版本不支持的值 <code>xhigh</code>。</p>
+<hr>
+</section>
+<section id="报错原因" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="报错原因"><span class="header-section-number">2</span> 报错原因</h2>
+<p>根本原因是：</p>
+<ul>
+<li>本地 Codex 配置文件中存在如下配置：</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">model_reasoning_effort</span> <span class="op">=</span> <span class="st">"xhigh"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>但当前 CLI 版本只支持以下四个取值：</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">minimal</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">low</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">medium</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dt">high</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>也就是说，当前环境下 <code>xhigh</code> 这个枚举值无法被解析，因此启动失败。</p>
+<section id="常见触发场景" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="常见触发场景"><span class="header-section-number">2.1</span> 常见触发场景</h3>
+<ul>
+<li>之前在某些图形界面、IDE 插件或其他环境中，把 reasoning effort 设成了更高档位；</li>
+<li>该设置被写入 <code>~/.codex/config.toml</code>；</li>
+<li>但当前终端里的 <code>codex</code> CLI 版本并不支持 <code>xhigh</code>；</li>
+<li>于是每次启动都会报错。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="解决思路" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="解决思路"><span class="header-section-number">3</span> 解决思路</h2>
+<p>处理方法很直接：</p>
+<ol type="1">
+<li>先备份原始配置文件；</li>
+<li>把配置文件里的所有 <code>"xhigh"</code> 替换成 <code>"high"</code>；</li>
+<li>重新运行 <code>codex</code>。</li>
+</ol>
+<hr>
+</section>
+<section id="解决方法" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="解决方法"><span class="header-section-number">4</span> 解决方法</h2>
+<section id="一键修复命令" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="一键修复命令"><span class="header-section-number">4.1</span> 一键修复命令</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 备份配置文件</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ~/.codex/config.toml ~/.codex/config.toml.bak</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 批量替换配置值</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">perl</span> <span class="at">-0pi</span> <span class="at">-e</span> <span class="st">'s/"xhigh"/"high"/g'</span> ~/.codex/config.toml</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 重新运行 Codex</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">codex</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="命令说明" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="命令说明"><span class="header-section-number">4.2</span> 命令说明</h3>
+<section id="备份配置文件" class="level4" data-number="4.2.1">
+<h4 data-number="4.2.1" class="anchored" data-anchor-id="备份配置文件"><span class="header-section-number">4.2.1</span> 备份配置文件</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ~/.codex/config.toml ~/.codex/config.toml.bak</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>将当前配置文件复制一份作为备份；</li>
+<li>如果后续修改有问题，可以随时恢复。</li>
+</ul>
+</section>
+<section id="批量替换配置值" class="level4" data-number="4.2.2">
+<h4 data-number="4.2.2" class="anchored" data-anchor-id="批量替换配置值"><span class="header-section-number">4.2.2</span> 批量替换配置值</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">perl</span> <span class="at">-0pi</span> <span class="at">-e</span> <span class="st">'s/"xhigh"/"high"/g'</span> ~/.codex/config.toml</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>直接原地修改 <code>~/.codex/config.toml</code>；</li>
+<li>将文件中所有 <code>"xhigh"</code> 全部替换成 <code>"high"</code>；</li>
+<li>不需要手动打开编辑器逐行查找。</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section id="手动检查与编辑" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="手动检查与编辑"><span class="header-section-number">5</span> 手动检查与编辑</h2>
+<p>如果想手动检查配置中是否仍然包含 <code>xhigh</code>：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-n</span> <span class="st">"xhigh"</span> ~/.codex/config.toml</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>也可以直接打开文件手动编辑：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">code</span> ~/.codex/config.toml</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>把类似下面的内容：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">model_reasoning_effort</span> <span class="op">=</span> <span class="st">"xhigh"</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="dt">plan_mode_reasoning_effort</span> <span class="op">=</span> <span class="st">"xhigh"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>改成：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">model_reasoning_effort</span> <span class="op">=</span> <span class="st">"high"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">plan_mode_reasoning_effort</span> <span class="op">=</span> <span class="st">"high"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="如果问题再次出现" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="如果问题再次出现"><span class="header-section-number">6</span> 如果问题再次出现</h2>
+<p>如果已经修改了 <code>~/.codex/config.toml</code>，但还是报同样错误，可能还有其他位置也存在配置文件，例如项目目录下的：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./.codex/config.toml</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>可以用下面命令全局搜索：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-Rn</span> <span class="st">'xhigh'</span> ~/.codex ./.codex <span class="dv">2</span><span class="op">&gt;</span>/dev/null</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>如果项目配置里也有 <code>xhigh</code>，同样需要改掉。</p>
+<hr>
+</section>
+<section id="总结" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="总结"><span class="header-section-number">7</span> 总结</h2>
+<p>这个报错不是 <code>codex</code> 本身坏了，而是<strong>配置文件里写了当前 CLI 不支持的 <code>model_reasoning_effort = "xhigh"</code></strong>。</p>
+<p>把它改成 <code>high</code> 即可恢复正常。</p>
+<section id="推荐保留的最终修复命令" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="推荐保留的最终修复命令"><span class="header-section-number">7.1</span> 推荐保留的最终修复命令</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ~/.codex/config.toml ~/.codex/config.toml.bak</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">perl</span> <span class="at">-0pi</span> <span class="at">-e</span> <span class="st">'s/"xhigh"/"high"/g'</span> ~/.codex/config.toml</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ex">codex</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="参考资料" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="参考资料"><span class="header-section-number">8</span> 参考资料</h2>
+<ul>
+<li><a href="https://github.com/openai/codex">Codex 官方文档</a></li>
+<li><a href="https://github.com/openai/codex#configuration">Codex 配置指南</a></li>
+</ul>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="Q29kZXglMkMlRTklOTQlOTklRTglQUYlQUYlRTYlOEUlOTIlRTYlOUYlQTUlMkMlRTklODUlOEQlRTclQkQlQUUlRTclQUUlQTElRTclOTAlODY=" data-listing-date-sort="1773878400000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="131">
-<div class="thumbnail"><a href="../posts/2026-3-19-codex-xhigh-error-fix.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2026-3-19-codex-xhigh-error-fix.html" class="no-external">Codex 报错 <code>unknown variant 'xhigh'</code> 的原因与解决方法</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2026-3-19-codex-xhigh-error-fix.html" class="no-external">
-<p>解决 Codex CLI 启动时报错 <code>unknown variant 'xhigh'</code> 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2026-3-19-codex-xhigh-error-fix.html" class="no-external">
-<div class="listing-date">
-Mar 19, 2026
-</div>
-<div class="listing-author">
-Binchen Chen
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="JUU4JUJGJTkwJUU3JUJCJUI0JUVGJUJDJThDJUU1JUJDJTgwJUU1JThGJTkxJUU1JUI3JUE1JUU1JTg1JUI3" data-listing-date-sort="1773705600000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="434">
-<div class="thumbnail"><a href="../posts/2026-3-17-github-connection-fix.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2026-3-17-github-connection-fix.html" class="no-external">GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2026-3-17-github-connection-fix.html" class="no-external">
-<p>解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2026-3-17-github-connection-fix.html" class="no-external">
-<div class="listing-date">
-Mar 17, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="JUU4JUJGJTkwJUU3JUJCJUI0JUU1JUJDJTgwJUU1JThGJTkxJUVGJUJDJThDJUU0JUJBJTkxJUU4JUFFJUExJUU3JUFFJTk3" data-listing-date-sort="1773619200000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="355">
-<div class="thumbnail"><a href="../posts/2026-3-16-server-google-access-fix.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2026-3-16-server-google-access-fix.html" class="no-external">中国大陆服务器访问 Google API / Earth Engine 完整解决方案</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2026-3-16-server-google-access-fix.html" class="no-external">
-<p>记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2026-3-16-server-google-access-fix.html" class="no-external">
-<div class="listing-date">
-Mar 16, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="JUU1JUJDJTgwJUU1JThGJTkxJUU1JUI3JUE1JUU1JTg1JUI3JTJDJUU4JUJGJTkwJUU3JUJCJUI0" data-listing-date-sort="1773446400000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="872">
-<div class="thumbnail"><a href="../posts/2026-3-14-modern-terminal-tools.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2026-3-14-modern-terminal-tools.html" class="no-external">现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2026-3-14-modern-terminal-tools.html" class="no-external">
-<p>终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2026-3-14-modern-terminal-tools.html" class="no-external">
-<div class="listing-date">
-Mar 14, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="JUU4JUJGJTkwJUU3JUJCJUI0JTJDJUU1JTkwJThFJUU3JUFCJUFG" data-listing-date-sort="1772582400000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="123">
-<div class="thumbnail"><a href="../posts/2026-3-4-git_ignore_pyc.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2026-3-4-git_ignore_pyc.html" class="no-external">Git 忽略 Python .pyc 编译文件解决方案</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2026-3-4-git_ignore_pyc.html" class="no-external">
-<p>python 文档的gitigonre文件配置。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2026-3-4-git_ignore_pyc.html" class="no-external">
-<div class="listing-date">
-Mar 4, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="JUU5JTgzJUE4JUU3JUJEJUIyJTJDJUU1JTkwJThFJUU3JUFCJUFG" data-listing-date-sort="1767484800000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="139">
-<div class="thumbnail"><a href="../posts/2026-1-4-front_and_backend_server.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2026-1-4-front_and_backend_server.html" class="no-external">后端服务部署：systemd + venv + Nginx</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2026-1-4-front_and_backend_server.html" class="no-external">
-<p>以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2026-1-4-front_and_backend_server.html" class="no-external">
-<div class="listing-date">
-Jan 4, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="6" data-categories="JUU1JUFEJUE2JUU2JTlDJUFGJUU1JTg2JTk5JUU0JUJEJTlD" data-listing-date-sort="1758931200000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="388">
-<div class="thumbnail"><a href="../posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">学术论文常用缩写与写作规范</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">
-<p>整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-9-27-scientific_paper_abbreviations.html" class="no-external">
-<div class="listing-date">
-Sep 27, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="7" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDR0VF" data-listing-date-sort="1756684800000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1825">
-<div class="thumbnail"><a href="../posts/2025-9-1-geedownloadimages.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-9-1-geedownloadimages.html" class="no-external">使用 Geemap 从 GEE 下载全球栅格数据</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-9-1-geedownloadimages.html" class="no-external">
-<p>本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-9-1-geedownloadimages.html" class="no-external">
-<div class="listing-date">
-Sep 1, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="8" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDR0VF" data-listing-date-sort="1749772800000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="77">
-<div class="thumbnail"><a href="../posts/2025-6-13-geedownload.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-13-geedownload.html" class="no-external">解决 Google Earth Engine 认证问题的最新方法</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-13-geedownload.html" class="no-external">
-最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-13-geedownload.html" class="no-external">
-<div class="listing-date">
-Jun 13, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="9" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDJUU2JTk1JUIwJUU2JThEJUFFJUU1JThGJUFGJUU4JUE3JTg2JUU1JThDJTk2" data-listing-date-sort="1749513600000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="216">
-<div class="thumbnail"><a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">Python 论文图片尺寸规范指南</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">
-在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-10-paper_fig_size.html" class="no-external">
-<div class="listing-date">
-Jun 10, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="10" data-categories="JUU2JThBJTgwJUU2JTlDJUFGJUU2JTk1JTk5JUU3JUE4JThCJTJDUHl0aG9u" data-listing-date-sort="1749340800000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="81">
-<div class="thumbnail"><a href="../posts/2025-6-8-local_package_install.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-8-local_package_install.html" class="no-external">Python 本地包安装与更新指南</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-8-local_package_install.html" class="no-external">
-本文介绍如何在本地构建、安装和更新 Python 包，特别是针对 cbgeo 包的安装方法。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-8-local_package_install.html" class="no-external">
-<div class="listing-date">
-Jun 8, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="11" data-categories="JUU1JTg2JTlDJUU0JUI4JTlBJUU2JThBJTgwJUU2JTlDJUFGJTJDJUU2JTlDJUJBJUU1JTk5JUE4JUU1JUFEJUE2JUU0JUI5JUEw" data-listing-date-sort="1748736000000" data-listing-file-modified-sort="1773911599994" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="41">
-<div class="thumbnail"><a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">机器学习与传统作物模型的未来展望</a>
-</h3>
-<div class="delink listing-description"><a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">
-农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。
-</a></div>
-</div>
-<div class="metadata">
-<a href="../posts/2025-6-1-machine_leaning_vs_crop_model.html" class="no-external">
-<div class="listing-date">
-Jun 1, 2025
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
