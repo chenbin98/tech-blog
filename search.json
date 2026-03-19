@@ -382,7 +382,7 @@
     "href": "index.html#最新文章",
     "title": "Binchen’s Tech Blog",
     "section": "最新文章",
-    "text": "最新文章\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\nNo matching items"
+    "text": "最新文章\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/2025-9-1-geedownloadimages.html",
