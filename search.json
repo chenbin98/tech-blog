@@ -1,17 +1,283 @@
 [
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
+    "objectID": "posts/2025-9-1-geedownloadimages.html",
+    "href": "posts/2025-9-1-geedownloadimages.html",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
     "section": "",
-    "text": "我是一名农业数据科学研究者，关注农业系统中的数据建模、遥感分析与智能决策。希望用更清晰的方法与流程，助力农业技术进步与可持续发展"
+    "text": "本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的完整工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。\n该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。\n\n\n\n\n\n确保安装以下工具和库：\n\n\n\n工具/库\n用途\n安装命令\n\n\n\n\nPython\n核心编程环境\n从 python.org 下载\n\n\ngeemap\nGEE 可视化和数据下载\npip install geemap\n\n\nearthengine-api (ee)\nGEE Python API\npip install earthengine-api\n\n\ngeopandas\n读取矢量网格数据（用于分段）\npip install geopandas\n\n\nrasterio\n图像镶嵌和栅格处理\npip install rasterio\n\n\nGDAL\n栅格操作后端（多线程）\n随 rasterio 包含\n\n\n\n\n注意: 安装 earthengine-api 后，需要通过 earthengine authenticate 进行身份验证。\n\n\n\n\n\nGEE 栅格数据集 ID: 在 GEE 中识别目标数据集 ID\n\n示例：NPP 数据 MODIS/061/MOD17A3HGF\n示例：Landsat 8 数据 LANDSAT/LC08/C02/T1_L2\n\n全球矢量网格: 准备预分割的矢量网格（GeoPackage .gpkg 格式）\n\n将全球研究区域分割为较小的、可下载的块\n示例：WorldFishnet.gpkg（可根据数据分辨率自定义网格大小）\n\n\n\n\n\n\n\n\nimport ee\nimport geemap\nimport os\nimport geopandas as gpd\n\n\n\n# 身份验证 GEE（运行一次；如果已经身份验证则跳过）\n# ee.Authenticate()\n\n# 初始化 GEE API\nee.Initialize()\n\n\n\n\n\n# 为您的目标数据集自定义这些参数\nGEE_DATA_ID = \"MODIS/061/MOD17A3HGF\"  # 示例：MODIS NPP 数据集\nBAND_NAME = \"Npp\"                       # 目标波段名称\nTIME_RANGE = [\"2001-01-01\", \"2025-01-01\"]  # 时间范围（开始，结束）\nSCALING_FACTOR = 0.0001                 # 缩放因子，将 GEE 数据转换为实际值\n\n# 可视化参数\nVIS_PARAMS = {\n    \"min\": 0,\n    \"max\": 3,\n    \"palette\": [\n        \"ffffff\", \"ce7e45\", \"df923d\", \"f1b555\", \"fcd163\", \n        \"99b718\", \"74a901\", \"66a000\", \"529400\", \"3e8601\", \n        \"207401\", \"056201\", \"004c00\", \"023b01\", \"012e01\", \n        \"011d01\", \"011301\"\n    ]  # 根据数据集范围调整\n}\n\n\n\n# 加载 GEE 图像集合\nimage_collection = ee.ImageCollection(GEE_DATA_ID)\\\n    .filterDate(TIME_RANGE[0], TIME_RANGE[1])\\\n    .select(BAND_NAME)\n\n# 定义应用缩放因子的函数\ndef apply_scaling(image):\n    return image.multiply(SCALING_FACTOR)\n\n# 将缩放应用到集合\nscaled_collection = image_collection.map(apply_scaling)\n\n\n\n\n# 初始化 geemap 界面\nMap = geemap.Map(center=(40, 100), zoom=4)  # 以欧亚大陆为中心\n\n# 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）\npreview_image = scaled_collection.median()\n\n# 将图像添加到地图\nMap.addLayer(preview_image, VIS_PARAMS, f\"{GEE_DATA_ID.split('/')[-1]}_Preview\")\n\n# 添加颜色条图例\nMap.add_colorbar_branca(\n    colors=VIS_PARAMS[\"palette\"],\n    vmin=VIS_PARAMS[\"min\"],\n    vmax=VIS_PARAMS[\"max\"],\n    label=BAND_NAME,\n    position=\"bottomright\"\n)\n\n# 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）\nMap\n\n\n\n\n直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。\n\n\n# 文件路径（自定义这些）\nGRID_PATH = \"I:/geemap/roi/WorldFishnet.gpkg\"  # 矢量网格路径\nGRID_LAYER = \"WorldFish30\"                       # GeoPackage 中的图层名称\nOUTPUT_DIR = \"I:/geemap/GEE_Global_Data/\"        # 保存分段文件的目录\nRESOLUTION = 500                                  # 数据集分辨率（米）\nBATCH_SIZE = 5                                    # 每批处理的网格块数量\nSTART_YEAR = 2001                                 # 从此年开始恢复（如果下载被中断）\nSTART_GRID_INDEX = 0                             # 从此网格索引恢复（如果下载被中断）\nCRS = \"EPSG:4326\"                                # 目标坐标系（WGS84）\n\n\n\n# 使用 geopandas 加载矢量网格\ngrid_gdf = gpd.read_file(GRID_PATH, layer=GRID_LAYER)\n\n# 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection\ngrid_ee = geemap.gdf_to_ee(grid_gdf)\n\n# 创建输出目录（如果不存在）\nos.makedirs(OUTPUT_DIR, exist_ok=True)\n\n\n\n# 从时间范围获取年份列表\nyears = range(int(TIME_RANGE[0].split(\"-\")[0]), int(TIME_RANGE[1].split(\"-\")[0]))\n\n# 遍历每一年\nfor year in years:\n    # 跳过恢复开始年份之前的年份\n    if year &lt; START_YEAR:\n        continue\n    print(f\"🔄 正在处理 {year} 年的数据...\")\n\n    # 提取年度数据\n    annual_image = scaled_collection\\\n        .filter(ee.Filter.calendarRange(year, year, \"year\"))\\\n        .median()\n\n    # 获取网格块总数\n    total_grids = grid_ee.size().getInfo()\n\n    # 计算批次数\n    num_batches = (total_grids - START_GRID_INDEX + BATCH_SIZE - 1) // BATCH_SIZE\n\n    # 处理每批\n    for batch in range(num_batches):\n        batch_start = START_GRID_INDEX + batch * BATCH_SIZE\n        batch_end = min(batch_start + BATCH_SIZE, total_grids)\n        current_batch = grid_ee.toList(BATCH_SIZE, batch_start)\n\n        # 处理批次中的每个网格块\n        for i in range(batch_end - batch_start):\n            # 获取当前网格要素和几何形状\n            grid_feature = ee.Feature(current_batch.get(i))\n            grid_geom = grid_feature.geometry()\n\n            # 生成唯一文件名\n            grid_index = batch_start + i + 1\n            filename = f\"{BAND_NAME}_{year}_grid_{grid_index:04d}.tif\"\n            file_path = os.path.join(OUTPUT_DIR, filename)\n\n            # 如果文件已存在则跳过（断点续传功能）\n            if os.path.exists(file_path):\n                print(f\"⏭️  跳过现有文件: {filename}\")\n                continue\n\n            # 下载裁剪后的图像\n            try:\n                # 将年度图像裁剪到当前网格\n                clipped_image = annual_image.clip(grid_geom)\n\n                # 使用 geemap 下载\n                geemap.download_ee_image(\n                    image=clipped_image,\n                    filename=file_path,\n                    scale=RESOLUTION,\n                    region=grid_geom,\n                    crs=CRS,\n                    max_tile_size=1024  # 根据内存调整\n                )\n                print(f\"✅ 成功下载: {filename}\")\n\n            except Exception as e:\n                print(f\"❌ 下载 {filename} 失败: {str(e)}\")\n                continue\n\n    # 为下一年重置网格索引\n    START_GRID_INDEX = 0\n\nprint(\"🎉 所有下载任务完成！\")\n\n\n\n\n使用 rasterio 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。\n\n\n# 文件路径（自定义这些）\nINPUT_DIR = OUTPUT_DIR                    # 与下载输出目录相同\nMOSAIC_OUTPUT_DIR = \"I:/geemap/GEE_Global_Data/Mosaicked/\"  # 镶嵌文件的目录\nCOMPRESSION = \"LZW\"                       # 压缩方法（减少文件大小）\n\n\n\n# 启用 GDAL 多线程以加速镶嵌\nos.environ[\"GDAL_NUM_THREADS\"] = \"ALL_CPUS\"  # 使用所有可用 CPU\n\n\n\nimport re\nfrom rasterio.merge import merge\nfrom rasterio.enums import Resampling\n\n# 为镶嵌文件创建输出目录\nos.makedirs(MOSAIC_OUTPUT_DIR, exist_ok=True)\n\n# 按年份分组分段文件\nfile_pattern = re.compile(rf\"{BAND_NAME}_(\\d{{4}})_grid_\\d{{4}}\\.tif$\")\nyearly_files = {}\n\nfor filename in os.listdir(INPUT_DIR):\n    match = file_pattern.match(filename)\n    if match:\n        year = match.group(1)\n        file_path = os.path.join(INPUT_DIR, filename)\n        yearly_files.setdefault(year, []).append(file_path)\n\n# 镶嵌每年的文件\nfor year, file_list in yearly_files.items():\n    print(f\"🔗 正在镶嵌 {year} 年的 {len(file_list)} 个文件...\")\n    datasets = []\n\n    try:\n        # 打开所有分段文件\n        for file_path in file_list:\n            src = rasterio.open(file_path)\n            datasets.append(src)\n\n        # 执行镶嵌\n        mosaic_array, out_transform = merge(\n            datasets,\n            resampling=Resampling.nearest  # 对离散数据使用最近邻重采样\n        )\n\n        # 更新镶嵌文件的元数据\n        out_meta = datasets[0].meta.copy()\n        out_meta.update({\n            \"driver\": \"GTiff\",\n            \"height\": mosaic_array.shape[1],\n            \"width\": mosaic_array.shape[2],\n            \"transform\": out_transform,\n            \"compress\": COMPRESSION,\n            \"bigtiff\": \"YES\"  # 对大文件启用（&gt;4GB）\n        })\n\n        # 保存镶嵌文件\n        output_path = os.path.join(MOSAIC_OUTPUT_DIR, f\"{BAND_NAME}_{year}_Global.tif\")\n        with rasterio.open(output_path, \"w\", **out_meta) as dest:\n            dest.write(mosaic_array)\n\n        print(f\"✅ 成功镶嵌: {output_path}\")\n\n    except Exception as e:\n        print(f\"❌ 镶嵌 {year} 年数据失败: {str(e)}\")\n        continue\n\n    finally:\n        # 关闭所有打开的栅格数据集以释放内存\n        for ds in datasets:\n            ds.close()\n\nprint(\"🎉 所有镶嵌任务完成！\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n问题\n解决方案\n\n\n\n\nGEE 身份验证错误\n重新运行 ee.Authenticate() 并按照浏览器提示重新进行身份验证\n\n\n下载中断\n工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复\n\n\n内存过载\n减少 BATCH_SIZE（如从 5 到 3）或 max_tile_size（如从 1024 到 512）\n\n\n镶嵌失败\n确保所有分段文件具有相同的 CRS 和分辨率\n\n\n\n\n\n\n\n非年度数据: 对于月度/季节性数据，修改时间过滤器\n# 示例：夏季数据\nee.Filter.calendarRange(year, year, \"year\")\\\n  .filter(ee.Filter.calendarRange(6, 8, \"month\"))\n不同数据集: 更新 GEE_DATA_ID、BAND_NAME、SCALING_FACTOR 和 VIS_PARAMS\n网格调整: 根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）\n\n\n\n\n\n\ngeemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
   },
   {
-    "objectID": "about.html#交流与合作",
-    "href": "about.html#交流与合作",
-    "title": "About",
-    "section": "交流与合作",
-    "text": "交流与合作\n\n\n\n\nEmail\nbinc041208@gmail.com\n\n\n\n\n\nGitHub\ngithub.com/chenbin98\n\n\n\n\n\nLinkedIn\nbin-chen-49292b312\n\n\n\n\n\nORCID\n0009-0000-8266-940X\n\n\n\n\n\nGoogle Scholar\nBin Chen\n\n\n\n\n“Looking for like-minded friends to do something different together.”"
+    "objectID": "posts/2025-9-1-geedownloadimages.html#概述",
+    "href": "posts/2025-9-1-geedownloadimages.html#概述",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的完整工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。\n该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#前置要求",
+    "href": "posts/2025-9-1-geedownloadimages.html#前置要求",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "确保安装以下工具和库：\n\n\n\n工具/库\n用途\n安装命令\n\n\n\n\nPython\n核心编程环境\n从 python.org 下载\n\n\ngeemap\nGEE 可视化和数据下载\npip install geemap\n\n\nearthengine-api (ee)\nGEE Python API\npip install earthengine-api\n\n\ngeopandas\n读取矢量网格数据（用于分段）\npip install geopandas\n\n\nrasterio\n图像镶嵌和栅格处理\npip install rasterio\n\n\nGDAL\n栅格操作后端（多线程）\n随 rasterio 包含\n\n\n\n\n注意: 安装 earthengine-api 后，需要通过 earthengine authenticate 进行身份验证。\n\n\n\n\n\nGEE 栅格数据集 ID: 在 GEE 中识别目标数据集 ID\n\n示例：NPP 数据 MODIS/061/MOD17A3HGF\n示例：Landsat 8 数据 LANDSAT/LC08/C02/T1_L2\n\n全球矢量网格: 准备预分割的矢量网格（GeoPackage .gpkg 格式）\n\n将全球研究区域分割为较小的、可下载的块\n示例：WorldFishnet.gpkg（可根据数据分辨率自定义网格大小）"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-1初始化环境和预览数据",
+    "href": "posts/2025-9-1-geedownloadimages.html#步骤-1初始化环境和预览数据",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "import ee\nimport geemap\nimport os\nimport geopandas as gpd\n\n\n\n# 身份验证 GEE（运行一次；如果已经身份验证则跳过）\n# ee.Authenticate()\n\n# 初始化 GEE API\nee.Initialize()\n\n\n\n\n\n# 为您的目标数据集自定义这些参数\nGEE_DATA_ID = \"MODIS/061/MOD17A3HGF\"  # 示例：MODIS NPP 数据集\nBAND_NAME = \"Npp\"                       # 目标波段名称\nTIME_RANGE = [\"2001-01-01\", \"2025-01-01\"]  # 时间范围（开始，结束）\nSCALING_FACTOR = 0.0001                 # 缩放因子，将 GEE 数据转换为实际值\n\n# 可视化参数\nVIS_PARAMS = {\n    \"min\": 0,\n    \"max\": 3,\n    \"palette\": [\n        \"ffffff\", \"ce7e45\", \"df923d\", \"f1b555\", \"fcd163\", \n        \"99b718\", \"74a901\", \"66a000\", \"529400\", \"3e8601\", \n        \"207401\", \"056201\", \"004c00\", \"023b01\", \"012e01\", \n        \"011d01\", \"011301\"\n    ]  # 根据数据集范围调整\n}\n\n\n\n# 加载 GEE 图像集合\nimage_collection = ee.ImageCollection(GEE_DATA_ID)\\\n    .filterDate(TIME_RANGE[0], TIME_RANGE[1])\\\n    .select(BAND_NAME)\n\n# 定义应用缩放因子的函数\ndef apply_scaling(image):\n    return image.multiply(SCALING_FACTOR)\n\n# 将缩放应用到集合\nscaled_collection = image_collection.map(apply_scaling)\n\n\n\n\n# 初始化 geemap 界面\nMap = geemap.Map(center=(40, 100), zoom=4)  # 以欧亚大陆为中心\n\n# 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）\npreview_image = scaled_collection.median()\n\n# 将图像添加到地图\nMap.addLayer(preview_image, VIS_PARAMS, f\"{GEE_DATA_ID.split('/')[-1]}_Preview\")\n\n# 添加颜色条图例\nMap.add_colorbar_branca(\n    colors=VIS_PARAMS[\"palette\"],\n    vmin=VIS_PARAMS[\"min\"],\n    vmax=VIS_PARAMS[\"max\"],\n    label=BAND_NAME,\n    position=\"bottomright\"\n)\n\n# 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）\nMap"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-2支持断点续传的分段下载",
+    "href": "posts/2025-9-1-geedownloadimages.html#步骤-2支持断点续传的分段下载",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。\n\n\n# 文件路径（自定义这些）\nGRID_PATH = \"I:/geemap/roi/WorldFishnet.gpkg\"  # 矢量网格路径\nGRID_LAYER = \"WorldFish30\"                       # GeoPackage 中的图层名称\nOUTPUT_DIR = \"I:/geemap/GEE_Global_Data/\"        # 保存分段文件的目录\nRESOLUTION = 500                                  # 数据集分辨率（米）\nBATCH_SIZE = 5                                    # 每批处理的网格块数量\nSTART_YEAR = 2001                                 # 从此年开始恢复（如果下载被中断）\nSTART_GRID_INDEX = 0                             # 从此网格索引恢复（如果下载被中断）\nCRS = \"EPSG:4326\"                                # 目标坐标系（WGS84）\n\n\n\n# 使用 geopandas 加载矢量网格\ngrid_gdf = gpd.read_file(GRID_PATH, layer=GRID_LAYER)\n\n# 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection\ngrid_ee = geemap.gdf_to_ee(grid_gdf)\n\n# 创建输出目录（如果不存在）\nos.makedirs(OUTPUT_DIR, exist_ok=True)\n\n\n\n# 从时间范围获取年份列表\nyears = range(int(TIME_RANGE[0].split(\"-\")[0]), int(TIME_RANGE[1].split(\"-\")[0]))\n\n# 遍历每一年\nfor year in years:\n    # 跳过恢复开始年份之前的年份\n    if year &lt; START_YEAR:\n        continue\n    print(f\"🔄 正在处理 {year} 年的数据...\")\n\n    # 提取年度数据\n    annual_image = scaled_collection\\\n        .filter(ee.Filter.calendarRange(year, year, \"year\"))\\\n        .median()\n\n    # 获取网格块总数\n    total_grids = grid_ee.size().getInfo()\n\n    # 计算批次数\n    num_batches = (total_grids - START_GRID_INDEX + BATCH_SIZE - 1) // BATCH_SIZE\n\n    # 处理每批\n    for batch in range(num_batches):\n        batch_start = START_GRID_INDEX + batch * BATCH_SIZE\n        batch_end = min(batch_start + BATCH_SIZE, total_grids)\n        current_batch = grid_ee.toList(BATCH_SIZE, batch_start)\n\n        # 处理批次中的每个网格块\n        for i in range(batch_end - batch_start):\n            # 获取当前网格要素和几何形状\n            grid_feature = ee.Feature(current_batch.get(i))\n            grid_geom = grid_feature.geometry()\n\n            # 生成唯一文件名\n            grid_index = batch_start + i + 1\n            filename = f\"{BAND_NAME}_{year}_grid_{grid_index:04d}.tif\"\n            file_path = os.path.join(OUTPUT_DIR, filename)\n\n            # 如果文件已存在则跳过（断点续传功能）\n            if os.path.exists(file_path):\n                print(f\"⏭️  跳过现有文件: {filename}\")\n                continue\n\n            # 下载裁剪后的图像\n            try:\n                # 将年度图像裁剪到当前网格\n                clipped_image = annual_image.clip(grid_geom)\n\n                # 使用 geemap 下载\n                geemap.download_ee_image(\n                    image=clipped_image,\n                    filename=file_path,\n                    scale=RESOLUTION,\n                    region=grid_geom,\n                    crs=CRS,\n                    max_tile_size=1024  # 根据内存调整\n                )\n                print(f\"✅ 成功下载: {filename}\")\n\n            except Exception as e:\n                print(f\"❌ 下载 {filename} 失败: {str(e)}\")\n                continue\n\n    # 为下一年重置网格索引\n    START_GRID_INDEX = 0\n\nprint(\"🎉 所有下载任务完成！\")"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-3镶嵌分段文件",
+    "href": "posts/2025-9-1-geedownloadimages.html#步骤-3镶嵌分段文件",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "使用 rasterio 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。\n\n\n# 文件路径（自定义这些）\nINPUT_DIR = OUTPUT_DIR                    # 与下载输出目录相同\nMOSAIC_OUTPUT_DIR = \"I:/geemap/GEE_Global_Data/Mosaicked/\"  # 镶嵌文件的目录\nCOMPRESSION = \"LZW\"                       # 压缩方法（减少文件大小）\n\n\n\n# 启用 GDAL 多线程以加速镶嵌\nos.environ[\"GDAL_NUM_THREADS\"] = \"ALL_CPUS\"  # 使用所有可用 CPU\n\n\n\nimport re\nfrom rasterio.merge import merge\nfrom rasterio.enums import Resampling\n\n# 为镶嵌文件创建输出目录\nos.makedirs(MOSAIC_OUTPUT_DIR, exist_ok=True)\n\n# 按年份分组分段文件\nfile_pattern = re.compile(rf\"{BAND_NAME}_(\\d{{4}})_grid_\\d{{4}}\\.tif$\")\nyearly_files = {}\n\nfor filename in os.listdir(INPUT_DIR):\n    match = file_pattern.match(filename)\n    if match:\n        year = match.group(1)\n        file_path = os.path.join(INPUT_DIR, filename)\n        yearly_files.setdefault(year, []).append(file_path)\n\n# 镶嵌每年的文件\nfor year, file_list in yearly_files.items():\n    print(f\"🔗 正在镶嵌 {year} 年的 {len(file_list)} 个文件...\")\n    datasets = []\n\n    try:\n        # 打开所有分段文件\n        for file_path in file_list:\n            src = rasterio.open(file_path)\n            datasets.append(src)\n\n        # 执行镶嵌\n        mosaic_array, out_transform = merge(\n            datasets,\n            resampling=Resampling.nearest  # 对离散数据使用最近邻重采样\n        )\n\n        # 更新镶嵌文件的元数据\n        out_meta = datasets[0].meta.copy()\n        out_meta.update({\n            \"driver\": \"GTiff\",\n            \"height\": mosaic_array.shape[1],\n            \"width\": mosaic_array.shape[2],\n            \"transform\": out_transform,\n            \"compress\": COMPRESSION,\n            \"bigtiff\": \"YES\"  # 对大文件启用（&gt;4GB）\n        })\n\n        # 保存镶嵌文件\n        output_path = os.path.join(MOSAIC_OUTPUT_DIR, f\"{BAND_NAME}_{year}_Global.tif\")\n        with rasterio.open(output_path, \"w\", **out_meta) as dest:\n            dest.write(mosaic_array)\n\n        print(f\"✅ 成功镶嵌: {output_path}\")\n\n    except Exception as e:\n        print(f\"❌ 镶嵌 {year} 年数据失败: {str(e)}\")\n        continue\n\n    finally:\n        # 关闭所有打开的栅格数据集以释放内存\n        for ds in datasets:\n            ds.close()\n\nprint(\"🎉 所有镶嵌任务完成！\")"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#注意事项和故障排除",
+    "href": "posts/2025-9-1-geedownloadimages.html#注意事项和故障排除",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "问题\n解决方案\n\n\n\n\nGEE 身份验证错误\n重新运行 ee.Authenticate() 并按照浏览器提示重新进行身份验证\n\n\n下载中断\n工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复\n\n\n内存过载\n减少 BATCH_SIZE（如从 5 到 3）或 max_tile_size（如从 1024 到 512）\n\n\n镶嵌失败\n确保所有分段文件具有相同的 CRS 和分辨率\n\n\n\n\n\n\n\n非年度数据: 对于月度/季节性数据，修改时间过滤器\n# 示例：夏季数据\nee.Filter.calendarRange(year, year, \"year\")\\\n  .filter(ee.Filter.calendarRange(6, 8, \"month\"))\n不同数据集: 更新 GEE_DATA_ID、BAND_NAME、SCALING_FACTOR 和 VIS_PARAMS\n网格调整: 根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）"
+  },
+  {
+    "objectID": "posts/2025-9-1-geedownloadimages.html#参考资料",
+    "href": "posts/2025-9-1-geedownloadimages.html#参考资料",
+    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "section": "",
+    "text": "geemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html",
+    "href": "posts/2026-3-14-modern-terminal-tools.html",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "",
+    "text": "传统终端命令（cd, ls, git status）功能强大但体验原始。今天介绍的四个工具能让终端拥有GUI 般的易用性，同时保持SSH 友好和低资源占用。\n核心优势： - ⚡ 性能更快（Rust/Zig/Go 编写，GPU 加速） - 🎨 美观现代（主题、透明度、连字字体） - ⌨️ 键盘优先（手不离开键盘完成所有操作） - 🔧 可组合性（管道、脚本、自动化）"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#为什么需要这些工具",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#为什么需要这些工具",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "",
+    "text": "传统终端命令（cd, ls, git status）功能强大但体验原始。今天介绍的四个工具能让终端拥有GUI 般的易用性，同时保持SSH 友好和低资源占用。\n核心优势： - ⚡ 性能更快（Rust/Zig/Go 编写，GPU 加速） - 🎨 美观现代（主题、透明度、连字字体） - ⌨️ 键盘优先（手不离开键盘完成所有操作） - 🔧 可组合性（管道、脚本、自动化）"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#工具清单",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#工具清单",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "2 工具清单",
+    "text": "2 工具清单\n\n\n\n工具\n类别\n作用\n替代\n\n\n\n\nGhostty\n终端模拟器\n提供终端窗口\niTerm2, Terminal.app\n\n\nYazi\n文件管理器\n浏览/管理文件\nls+cd+cat\n\n\nLazygit\nGit 界面\n可视化 Git 操作\ngit status/diff/add\n\n\nZoxide\n目录跳转\n智能目录导航\ncd"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#安装macos",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#安装macos",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "3 安装（macOS）",
+    "text": "3 安装（macOS）\n\n3.1 1. 安装 Homebrew（如果没有）\n/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\n\n\n3.2 2. 安装所有工具\n# 终端模拟器\nbrew install --cask ghostty\n\n# 终端工具\nbrew install zoxide lazygit yazi\n\n# 字体（支持图标显示）\nbrew install --cask jetbrains-mono-nerd-font\n\n\n3.3 3. 初始化配置\n# 创建配置目录\nmkdir -p ~/.config/ghostty ~/.config/yazi ~/.config/lazygit"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#配置详解",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#配置详解",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "4 配置详解",
+    "text": "4 配置详解\n\n4.1 Ghostty 配置\n编辑 ~/.config/ghostty/config：\n# 字体配置\nfont-family = \"JetBrainsMono Nerd Font\"\nfont-size = 13\n\n# 主题（Catppuccin Mocha - 深色护眼）\ntheme = \"catppuccin-mocha\"\nbackground = \"#1e1e2e\"\nforeground = \"#cdd6f4\"\n\n# 窗口设置\ninitial-window-size = \"1200x800\"\nwindow-padding-x = 12\nwindow-padding-y = 12\nbackground-opacity = 0.92\n\n# 快捷键\nkeybind = \"cmd+t=new_tab\"\nkeybind = \"cmd+w=close\"\nkeybind = \"cmd+d=split:right\"\nkeybind = \"cmd+shift+d=split:down\"\nkeybind = \"cmd+f=show_search\"\nkeybind = \"cmd+c=copy_to_clipboard\"\nkeybind = \"cmd+v=paste_from_clipboard\"\n核心快捷键：\n\n\n\n快捷键\n功能\n\n\n\n\nCmd+T\n新建标签页\n\n\nCmd+D\n右分屏\n\n\nCmd+Shift+D\n下分屏\n\n\nCmd+W\n关闭标签页\n\n\nCmd+Enter\n全屏切换\n\n\nCmd+F\n搜索\n\n\nCmd+Plus/Minus\n字体缩放\n\n\n\n\n\n\n4.2 Zoxide 配置\n编辑 ~/.zshrc（或 ~/.bashrc）：\n# 初始化 zoxide\neval \"$(zoxide init zsh)\"\n\n# 快捷别名\nalias z=\"z\"\nalias zi=\"z -i\"  # 交互式选择\n基本用法：\n# 跳转到包含关键词的目录\nz projects          # 跳转到 ~/projects 或 /work/projects\nz ai                # 跳转到包含\"ai\"的目录\n\n# 模糊匹配（超好用！）\nz proj/ai           # 匹配 ~/projects/ai-tool\n\n# 列出所有记录\nz\n\n# 交互式选择（推荐）\nzi\n\n# 跳转并列出文件\nz projects -\n智能学习： Zoxide 会记录你常去的目录，去得越多的地方优先级越高。\n\n\n\n4.3 Yazi 配置\n编辑 ~/.config/yazi/yazi.toml：\n[manager]\nshow_hidden = true\nsort_by = \"alphabetical\"\nsort_dir_first = true\n\n[preview]\ncode_syntax_highlight = true\ncode_max_lines = 1000\nimage_quality = 75\n\n[opener]\nedit = [\n  { run = '${EDITOR:-vi} \"$@\"', block = true, for = \"unix\" },\n]\nopen = [\n  { run = 'open \"$1\"', for = \"macos\" },\n]\n基本用法：\n# 启动 yazi\ny\nya\n\n# 从指定目录启动\ny ~/projects\n核心快捷键：\n\n\n\n按键\n功能\n\n\n\n\nj/k\n上/下移动\n\n\nl\n进入目录/打开文件\n\n\nh\n返回上级目录\n\n\nTab\n切换预览面板\n\n\n/\n搜索文件\n\n\na\n新建文件/目录\n\n\nr\n重命名\n\n\nd\n删除（到回收站）\n\n\nc\n复制\n\n\nx\n剪切\n\n\np\n粘贴\n\n\n.\n显示/隐藏文件\n\n\nq\n退出\n\n\n\n预览功能： - 代码文件：语法高亮 - 图片：缩略图预览 - PDF：第一页预览 - 视频：封面预览\n\n\n\n4.4 Lazygit 配置\n编辑 ~/.config/lazygit/config.yml：\ngui:\n  theme:\n    activeBorderColor:\n      - \"#89b4fa\"\n      - \"bold\"\n    selectedLineBgColor:\n      - \"#313244\"\n  \n  mouseEvents: true\n  showFileTree: true\n  \ngit:\n  autoRefresh: true\n  autoRefreshPeriod: 5\n基本用法：\n# 在项目目录中启动\ncd ~/your-project\nlg\nlazygit\n界面布局：\n┌─ Files ─────────────┬─ Diff ──────────────┐\n│ M src/main.rs       │ @@ -12,7 +12,9 @@   │\n│ M Cargo.toml        │  fn main() {        │\n│ ? README.md         │ +   // new code     │\n│                     │      old code       │\n└─────────────────────┴─────────────────────┘\n┌─ Branches ──────────┬─ Commits ───────────┐\n│ * feature/auth      │ abc123 Add login    │\n│   main              │ def456 Fix bug      │\n│   develop           │ 789xyz Update deps  │\n└─────────────────────┴─────────────────────┘\n核心快捷键：\n\n\n\n按键\n功能\n\n\n\n\nj/k\n上/下移动\n\n\nSpace\n选择/取消选择文件\n\n\na\n添加文件到暂存区\n\n\nc\n提交（Commit）\n\n\np\n推送（Push）\n\n\nP\n拉取（Pull）\n\n\nb\n切换分支\n\n\nB\n创建分支\n\n\nm\n合并分支\n\n\nr\n刷新\n\n\nq\n退出\n\n\n?\n查看完整快捷键列表\n\n\n\n高级功能： - 部分提交：选中部分代码行提交 - 交互式 Rebase：可视化调整提交历史 - 冲突解决：分屏对比，点击选择保留哪边 - 暂存区管理：分开查看暂存和未暂存的变更"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#完整工作流示例",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#完整工作流示例",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "5 完整工作流示例",
+    "text": "5 完整工作流示例\n\n5.1 场景：开发新功能并提交\n# 1. 用 zoxide 快速跳转项目\nz ai-project\n\n# 2. 用 yazi 浏览文件结构\ny\n\n# 3. 编辑代码（用你喜欢的编辑器）\ncode .\n\n# 4. 用 lazygit 查看变更并提交\nlg\n# → Space 选择文件\n# → c 输入提交信息\n# → p 推送到远程\n\n# 5. 分屏查看日志（Ghostty 原生支持）\nCmd+D  # 右分屏\ntail -f logs/app.log\n\n\n5.2 场景：多项目并行开发\n# Ghostty 分屏工作流\n\n# 左侧：项目 A\nz project-a\nlg\n\n# 右侧：项目 B（Cmd+D 分屏）\nz project-b\ny\n\n# 下方：系统监控（Cmd+Shift+D 分屏）\nhtop"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#常见问题",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#常见问题",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "6 常见问题",
+    "text": "6 常见问题\n\n6.1 Q1: 字体显示异常？\nA: 确保安装了 Nerd Font 并在配置中指定：\nfont-family = \"JetBrainsMono Nerd Font\"\n\n\n6.2 Q2: Yazi 预览乱码？\nA: 安装 bat 和 ffmpegthumbnailer：\nbrew install bat ffmpeg\n\n\n6.3 Q3: Lazygit 中文乱码？\nA: 确保终端支持 UTF-8（Ghostty 默认支持）。\n\n\n6.4 Q4: Zoxide 找不到目录？\nA: 需要先用 cd 去几次，Zoxide 会学习你的习惯。"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#进阶技巧",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#进阶技巧",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "7 进阶技巧",
+    "text": "7 进阶技巧\n\n7.1 Zoxide 高级用法\n# 删除记录\nzoxide remove ~/old-project\n\n# 导出记录\nzoxide query --list &gt; directories.txt\n\n# 在 Yazi 中集成\n# ~/.config/yazi/keymap.toml\n[[manager.prepend_keymap]]\non   = [ \"c\", \"z\" ]\nrun  = \"plugin zoxide\"\ndesc = \"Jump to a directory using zoxide\"\n\n\n7.2 Yazi 插件推荐\n# 安装插件管理器\ngit clone https://github.com/yazi-rs/plugins.git ~/.config/yazi/plugins\n\n# 推荐插件\n# - zoxide.yazi: 目录跳转\n# - git.yazi: Git 状态显示\n# - full-border.yazi: 美化边框\n\n\n7.3 Lazygit 自定义命令\n# ~/.config/lazygit/config.yml\ncustomCommands:\n  - key: \"&lt;c-r&gt;\"\n    command: \"git reset --hard HEAD~1\"\n    description: \"回滚上一个提交\"\n    context: \"commits\"\n    prompts:\n      - type: \"confirm\"\n        title: \"确认回滚\"\n        body: \"确定要删除上一个提交吗？\""
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#总结",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#总结",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "8 总结",
+    "text": "8 总结\n这套工具组合能显著提升终端开发体验：\n\n\n\n工具\n学习成本\n效率提升\n推荐指数\n\n\n\n\nGhostty\n⭐\n⭐⭐⭐\n⭐⭐⭐⭐⭐\n\n\nZoxide\n⭐\n⭐⭐⭐\n⭐⭐⭐⭐⭐\n\n\nLazygit\n⭐⭐\n⭐⭐⭐⭐⭐\n⭐⭐⭐⭐⭐\n\n\nYazi\n⭐⭐\n⭐⭐⭐⭐\n⭐⭐⭐⭐\n\n\n\n建议学习路径： 1. 第 1 周：Ghostty + Zoxide（最低学习成本） 2. 第 2 周：Lazygit（Git 复杂操作救星） 3. 第 3 周：Yazi（文件管理进阶）\n最终目标： 手不离开键盘，完成所有开发工作！"
+  },
+  {
+    "objectID": "posts/2026-3-14-modern-terminal-tools.html#参考链接",
+    "href": "posts/2026-3-14-modern-terminal-tools.html#参考链接",
+    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
+    "section": "9 参考链接",
+    "text": "9 参考链接\n\nGhostty 官网\nZoxide GitHub\nYazi 官网\nLazygit GitHub\nCatppuccin 主题\n\n\n最后更新：2026-03-14 | 测试环境：macOS 26.3.1 (arm64)"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html",
+    "href": "posts/2026-1-4-front_and_backend_server.html",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。\n\n\nsudo apt-get update\nsudo apt-get install -y python3-venv python3-pip\n\n\n\ncd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env\n\n\n\n\n\nsudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target\n\n\n\n\nsudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f\n\n\n\n\n\nsudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}\n\n\n\n\n\n重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
+    "href": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo apt-get update\nsudo apt-get install -y python3-venv python3-pip"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
+    "href": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "cd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
+    "href": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#启动服务",
+    "href": "posts/2026-1-4-front_and_backend_server.html#启动服务",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
+    "href": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}"
+  },
+  {
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
+    "href": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html",
+    "href": "posts/2025-6-10-paper_fig_size.html",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。\n\n\n\n\n\n用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图\n\n\n\n\n\n\n\n\nimport matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})\n\n\n\n\n\n分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt\n\n\n\n\n\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)\n\n\n\n\n图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
+    "href": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
+    "href": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "import matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
+    "href": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html#代码示例",
+    "href": "posts/2025-6-10-paper_fig_size.html#代码示例",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)"
+  },
+  {
+    "objectID": "posts/2025-6-10-paper_fig_size.html#常见问题",
+    "href": "posts/2025-6-10-paper_fig_size.html#常见问题",
+    "title": "Python 论文图片尺寸规范指南",
+    "section": "",
+    "text": "图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html",
+    "href": "posts/2026-3-17-github-connection-fix.html",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "",
+    "text": "今天在执行 git push 推送代码到 GitHub 时，遇到了连接超时错误：\nfatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': \nFailed to connect to github.com port 443 after 75003 ms: Couldn't connect to server\n等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#问题背景",
+    "href": "posts/2026-3-17-github-connection-fix.html#问题背景",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "",
+    "text": "今天在执行 git push 推送代码到 GitHub 时，遇到了连接超时错误：\nfatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': \nFailed to connect to github.com port 443 after 75003 ms: Couldn't connect to server\n等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#问题诊断过程",
+    "href": "posts/2026-3-17-github-connection-fix.html#问题诊断过程",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "2 问题诊断过程",
+    "text": "2 问题诊断过程\n\n2.1 1. 检查基础网络连接\n首先确认网络本身是否正常：\n# 测试 GitHub 是否可达\ncurl -I https://github.com\n\n# 检查 DNS 解析\nping -c 2 github.com\n结果：网络本身是通的，DNS 解析正常，说明不是基础网络问题。\n\n\n\n2.2 2. 检查 Git 配置\n检查是否有代理设置或其他配置问题：\n# 检查代理设置\ngit config --global --get http.proxy\ngit config --global --get https.proxy\n\n# 检查 SSL 验证设置\ngit config --global --get http.sslVerify\n结果：无代理设置，SSL 验证默认开启。\n\n\n\n2.3 3. 详细诊断 Git 连接\n使用详细日志模式诊断具体错误：\nGIT_CURL_VERBOSE=1 git ls-remote origin 2&gt;&1 | tail -30\n关键发现： - ✅ SSL 证书验证通过 - ❌ 连接能建立，但请求发送后超时 - ❌ 错误信息：Error in the HTTP/2 framing layer\n结论：问题出在 HTTP/2 协议层，GitHub 的 HTTP/2 连接在某些网络环境下不稳定。"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#解决方案",
+    "href": "posts/2026-3-17-github-connection-fix.html#解决方案",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "3 解决方案",
+    "text": "3 解决方案\n\n3.1 方案一：禁用 HTTP/2，使用 HTTP/1.1（推荐，本次生效）\nGit 默认使用 HTTP/2 协议，但在国内网络环境下可能不稳定。强制使用 HTTP/1.1 可以提高兼容性。\n# 1. 全局设置 Git 使用 HTTP/1.1\ngit config --global http.version HTTP/1.1\n\n# 2. 增加缓冲区大小，避免大文件推送失败\ngit config --global http.postBuffer 524288000\n\n# 3. 禁用低速限制（避免慢速连接被中断）\ngit config --global http.lowSpeedLimit 0\ngit config --global http.lowSpeedTime 9999\n\n# 4. 重新推送\ngit push --set-upstream origin main\n原理： - http.version HTTP/1.1：强制使用 HTTP/1.1 协议，避免 HTTP/2 兼容性问题 - http.postBuffer 524288000：设置 500MB 缓冲区，适合大文件推送 - http.lowSpeedLimit 0：禁用低速限制，避免慢速连接被中断\n效果：✅ 本次问题已解决，推送成功。\n\n\n\n3.2 方案二：配置代理（如果方案一无效）\n如果你使用代理软件（Clash、Surge、Shadowsocks 等），可以配置 Git 通过代理连接：\n# 查找代理端口（常见端口：7890, 1087, 6153 等）\n# Clash 默认端口通常是 7890\n\n# 设置 Git 代理\ngit config --global http.proxy http://127.0.0.1:7890\ngit config --global https.proxy http://127.0.0.1:7890\n\n# 推送\ngit push --set-upstream origin main\n\n# 取消代理（如果需要）\ngit config --global --unset http.proxy\ngit config --global --unset https.proxy\n\n\n\n3.3 方案三：改用 SSH 协议（长期推荐）\nSSH 协议比 HTTPS 更稳定，且不需要每次输入密码。\n# 1. 查看现有 SSH 公钥\ncat ~/.ssh/id_ed25519.pub\n\n# 2. 如果没有密钥，生成新的\nssh-keygen -t ed25519 -C \"your_email@example.com\"\n\n# 3. 将公钥添加到 GitHub\n# 访问：https://github.com/settings/keys\n# 点击 \"New SSH key\"，粘贴公钥内容\n\n# 4. 测试 SSH 连接\nssh -T git@github.com\n# 成功输出：Hi chenbin98! You've successfully authenticated...\n\n# 5. 切换 remote 为 SSH\ngit remote set-url origin git@github.com:chenbin98/meteo_data_download.git\n\n# 6. 推送\ngit push --set-upstream origin main\n优势： - ✅ 不需要每次输入密码 - ✅ 连接更稳定 - ✅ 不受 HTTPS 代理问题影响"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#常用-git-远程操作命令",
+    "href": "posts/2026-3-17-github-connection-fix.html#常用-git-远程操作命令",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "4 常用 Git 远程操作命令",
+    "text": "4 常用 Git 远程操作命令\n# 查看远程仓库\ngit remote -v\n\n# 设置 upstream 并推送\ngit push --set-upstream origin main\n\n# 后续推送（已设置 upstream 后）\ngit push\n\n# 拉取远程更新\ngit pull\n\n# 查看当前分支跟踪情况\ngit branch -vv"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#故障排查流程图",
+    "href": "posts/2026-3-17-github-connection-fix.html#故障排查流程图",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "5 故障排查流程图",
+    "text": "5 故障排查流程图\ngit push 失败\n    │\n    ▼\n检查网络：curl/ping github.com\n    │\n    ├── 不通 → 检查网络/代理\n    │\n    ▼ 通\n检查 Git 配置：git config --get http.proxy\n    │\n    ├── 有代理 → 确认代理是否正确\n    │\n    ▼ 无代理\n详细诊断：GIT_CURL_VERBOSE=1 git ls-remote origin\n    │\n    ├── SSL 失败 → 检查证书/时间设置\n    ├── HTTP/2 错误 → 改用 HTTP/1.1 ✓\n    └── 认证失败 → 检查凭证/SSH 密钥"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#方案对比",
+    "href": "posts/2026-3-17-github-connection-fix.html#方案对比",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "6 方案对比",
+    "text": "6 方案对比\n\n\n\n\n\n\n\n\n\n方案\n优点\n缺点\n适用场景\n\n\n\n\nHTTP/1.1\n配置简单，立竿见影\n每次推送可能仍需输入密码\n临时解决/快速修复\n\n\n代理\n可访问被墙资源\n依赖代理软件稳定性\n代理环境用户\n\n\nSSH\n最稳定，无需密码\n需要配置 SSH 密钥\n长期使用推荐"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#总结",
+    "href": "posts/2026-3-17-github-connection-fix.html#总结",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "7 总结",
+    "text": "7 总结\n本次解决的关键命令：\n# 1. 禁用 HTTP/2\ngit config --global http.version HTTP/1.1\n\n# 2. 增加缓冲区\ngit config --global http.postBuffer 524288000\n\n# 3. 禁用低速限制\ngit config --global http.lowSpeedLimit 0\ngit config --global http.lowSpeedTime 9999\n\n# 4. 推送\ngit push --set-upstream origin main\n长期建议：配置 SSH 密钥，切换到 SSH 协议，获得更稳定的连接体验。"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#参考链接",
+    "href": "posts/2026-3-17-github-connection-fix.html#参考链接",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "8 参考链接",
+    "text": "8 参考链接\n\nGit 配置文档\nGitHub SSH 连接指南\nGit 代理设置\n\n\n文档生成时间：2026-03-17\n问题状态：✅ 已解决"
   },
   {
     "objectID": "posts/2025-6-13-geedownload.html",
@@ -40,6 +306,251 @@
     "title": "解决 Google Earth Engine 认证问题的最新方法",
     "section": "",
     "text": "如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html",
+    "href": "posts/2026-3-4-git_ignore_pyc.html",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "",
+    "text": "在 Git 仓库中执行 git status 时，大量 Python 编译生成的 .pyc 文件、__pycache__ 目录被标记为「修改未暂存」或「未跟踪文件」，干扰版本管理，需通过 .gitignore 规则永久忽略这类文件。"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#问题背景",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#问题背景",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "",
+    "text": "在 Git 仓库中执行 git status 时，大量 Python 编译生成的 .pyc 文件、__pycache__ 目录被标记为「修改未暂存」或「未跟踪文件」，干扰版本管理，需通过 .gitignore 规则永久忽略这类文件。"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#适用环境",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#适用环境",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "0.2 适用环境",
+    "text": "0.2 适用环境\n\n操作系统：Windows（PowerShell）/ Linux / macOS\nGit 版本：&gt;= 2.0\n项目类型：Python 项目"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#解决方案步骤",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#解决方案步骤",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "0.3 解决方案步骤",
+    "text": "0.3 解决方案步骤\n\n0.3.1 定位仓库根目录\n打开终端/命令行，切换到 Git 仓库根目录（以示例路径为例）：\n```bash # Windows PowerShell cd F:_planthoppers_shift"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#创建-编辑-.gitignore-文件",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#创建-编辑-.gitignore-文件",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "1.1 创建 / 编辑 .gitignore 文件",
+    "text": "1.1 创建 / 编辑 .gitignore 文件\n\n1.1.1 新建或打开 .gitignore"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#windows-powershell用记事本打开",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#windows-powershell用记事本打开",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "1.2 Windows PowerShell（用记事本打开）",
+    "text": "1.2 Windows PowerShell（用记事本打开）\nnotepad .gitignore"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#linuxmacos用vim打开",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#linuxmacos用vim打开",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "1.3 Linux/macOS（用vim打开）",
+    "text": "1.3 Linux/macOS（用vim打开）\nvim .gitignore"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#添加忽略规则",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#添加忽略规则",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "1.4 添加忽略规则",
+    "text": "1.4 添加忽略规则\n在 .gitignore 文件中写入以下规则（覆盖 Python 编译文件核心忽略项 + 通用推荐项）："
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#处理已被-git-跟踪的-.pyc-文件",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#处理已被-git-跟踪的-.pyc-文件",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "9.1 处理已被 Git 跟踪的 .pyc 文件",
+    "text": "9.1 处理已被 Git 跟踪的 .pyc 文件\n若 .pyc 文件 /pycache 目录已被 Git 提交过（即历史记录中有该文件），需先移除 Git 跟踪（仅移除索引，不删除本地文件）： # 递归移除所有已跟踪的 .pyc 文件 git rm –cached **/*.pyc # 移除已跟踪的 pycache 目录（若有） git rm –cached -r **/pycache"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#提交-.gitignore-规则",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#提交-.gitignore-规则",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "9.2 提交 .gitignore 规则",
+    "text": "9.2 提交 .gitignore 规则\n将 .gitignore 文件加入版本控制并提交，使规则生效： # 暂存 .gitignore 文件 git add .gitignore # 提交修改（备注清晰说明变更） git commit -m “feat: 添加.gitignore规则，忽略Python .pyc编译文件和__pycache__目录” # 推送到远程仓库（可选，同步到团队仓库） git push origin main"
+  },
+  {
+    "objectID": "posts/2026-3-4-git_ignore_pyc.html#验证效果",
+    "href": "posts/2026-3-4-git_ignore_pyc.html#验证效果",
+    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "section": "9.3 验证效果",
+    "text": "9.3 验证效果\n执行以下命令验证忽略规则是否生效： git status 预期结果：终端输出中不再出现 .pyc 文件、pycache 目录的「modified」或「Untracked files」提示。"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Binchen’s Tech Blog",
+    "section": "",
+    "text": "农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法\n\n浏览全部文章 → 关于我 →"
+  },
+  {
+    "objectID": "index.html#最新文章",
+    "href": "index.html#最新文章",
+    "title": "Binchen’s Tech Blog",
+    "section": "最新文章",
+    "text": "最新文章\n\n\n\n\n\n气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化\n\n\n介绍如何通过 Docker 本地部署气象数据服务，结合 OpenAPI 规范和 AI 代码生成，实现标准化的气象数据自动化下载流程\n\n\n\n\n\nApr 1, 2026\n\n\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "SKILL.html",
+    "href": "SKILL.html",
+    "title": "1 Blog Post Publisher Skill",
+    "section": "",
+    "text": "自动将用户的技术分享需求转化为博客文章，并提交到本地 tech-blog 仓库。\n\n\n\n\nname: blog-post-publisher\nversion: 2.0.0\ndescription: 技术博客文章生成与发布工具\nauthor: bin\nlocation: ~/.openclaw/workspace/skills/blog-post-publisher\n\n\n\n\n\n\n\n用户提供一个主题或想法\n自动生成结构完整的技术文章\n遵循 Quarto Markdown 格式规范\n\n\n\n\n\n统一的文件命名（YYYY-M-D-主题.qmd）\n标准化的 Frontmatter（标题、日期、分类、标签）\n一致的写作风格和质量\n\n\n\n\n\n自动添加到 Git 仓库\n提交信息规范化\n可选推送到远程仓库\n\n\n\n\n\n\n重要： 本技能已集成到 OpenClaw workspace，博客项目也在同一位置。\n\n技能目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n博客根目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n文章目录： ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n配置文件： ~/.openclaw/workspace/skills/blog-post-publisher/_quarto.yml\n样式文件： ~/.openclaw/workspace/skills/blog-post-publisher/styles.css\n\n\n\n\n\n\n\n用户会给你一个主题，例如： - “写一个 post，介绍今天安装的终端工具” - “写一篇关于 Python 虚拟环境的教程” - “记录一下今天解决的那个 Git 问题”\n\n\n\n# 查看博客项目结构\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n\n# 查看现有文章格式（学习写作风格）\ncat ~/.openclaw/workspace/skills/blog-post-publisher/posts/最新文章.qmd\n\n\n\n文章格式（Quarto Markdown）：\n---\ntitle: \"文章标题\"\ndate: \"2026-XX-XX\"\ncategories: [分类 1, 分类 2]\ntags: [标签 1, 标签 2]\ndescription: \"一句话描述\"\n---\n\n## 问题背景/引言\n说明为什么写这篇文章，解决什么问题\n\n## 适用环境\n- 操作系统\n- 软件版本\n- 项目类型\n\n## 解决方案/教程内容\n分步骤说明，包含代码示例\n\n## 常见问题\nQ&A 格式\n\n## 总结\n表格对比、建议等\n\n## 参考链接\n相关文档、GitHub 仓库等\n写作要点： - ✅ 标题清晰，包含关键词 - ✅ 代码块标注语言（bash,python 等） - ✅ 使用表格对比 - ✅ 提供可执行的命令 - ✅ 包含常见问题解答\n\n\n\n# 文件命名格式：YYYY-M-D-主题.qmd\n# 例如：2026-3-14-modern-terminal-tools.qmd\n\ncat &gt; ~/.openclaw/workspace/skills/blog-post-publisher/posts/2026-3-14-主题.qmd &lt;&lt; 'EOF'\n[文章内容]\nEOF\n\n\n\ncd ~/.openclaw/workspace/skills/blog-post-publisher\n\n# 查看状态\ngit status\n\n# 添加新文章\ngit add posts/2026-3-14-主题.qmd\n\n# 提交（清晰说明变更）\ngit commit -m \"feat: 添加 [主题] 教程\"\n\n# 推送\ngit push origin main\n\n\n\n告诉用户： - ✅ 文章已发布 - 📝 文章标题和位置 - 🔗 GitHub 仓库链接（如果可以访问）\n\n\n\n\n\n\nQuarto：博客静态站点生成器\nGit：版本控制\nGitHub：远程仓库\n\n\n\n\n\n\n\n用户输入： &gt; 写一个 post，把今天我们刚安装的”Ghostty、Yazi、Lazygit、Zoxide”工具，写一个新手教程指导\n执行步骤： 1. 收集工具信息（功能、配置、快捷键） 2. 按照格式撰写文章 3. 保存为 2026-3-14-modern-terminal-tools.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 记录一下今天解决的 Git 忽略.pyc 文件的问题\n执行步骤： 1. 回顾问题背景和解决方案 2. 按照格式撰写文章 3. 保存为 2026-3-4-git_ignore_pyc.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 写一篇前端后端服务器对比的文章\n执行步骤： 1. 收集对比信息（功能、性能、使用场景） 2. 用表格展示对比 3. 保存文章 4. Git 提交推送\n\n\n\n\n\n\n日期格式： 使用 2026-03-14（YYYY-MM-DD）\n文件名： 使用 2026-3-14-主题.qmd（短横线分隔）\n提交信息： 清晰说明变更（feat: 添加 XXX 教程）\n网络问题： 如果 push 失败，告知用户本地已提交\n文章质量： 确保代码示例可执行，步骤清晰\n\n\n\n\n\n\n自动构建并预览（quarto render）\n自动检查拼写错误\n自动生成摘要\n支持多语言文章\n自动添加标签和分类\n\n\n\n\n\n\nv2.0.0 (2026-03-15): 迁移到 workspace 目录，规范化管理\nv1.0.0 (2026-03-14): 初始版本\n\n\n创建时间：2026-03-14\n最后更新：2026-03-15"
+  },
+  {
+    "objectID": "SKILL.html#技能信息",
+    "href": "SKILL.html#技能信息",
+    "title": "1 Blog Post Publisher Skill",
+    "section": "",
+    "text": "name: blog-post-publisher\nversion: 2.0.0\ndescription: 技术博客文章生成与发布工具\nauthor: bin\nlocation: ~/.openclaw/workspace/skills/blog-post-publisher"
+  },
+  {
+    "objectID": "SKILL.html#核心功能",
+    "href": "SKILL.html#核心功能",
+    "title": "1 Blog Post Publisher Skill",
+    "section": "",
+    "text": "用户提供一个主题或想法\n自动生成结构完整的技术文章\n遵循 Quarto Markdown 格式规范\n\n\n\n\n\n统一的文件命名（YYYY-M-D-主题.qmd）\n标准化的 Frontmatter（标题、日期、分类、标签）\n一致的写作风格和质量\n\n\n\n\n\n自动添加到 Git 仓库\n提交信息规范化\n可选推送到远程仓库"
+  },
+  {
+    "objectID": "SKILL.html#项目路径",
+    "href": "SKILL.html#项目路径",
+    "title": "1 Blog Post Publisher Skill",
+    "section": "",
+    "text": "重要： 本技能已集成到 OpenClaw workspace，博客项目也在同一位置。\n\n技能目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n博客根目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n文章目录： ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n配置文件： ~/.openclaw/workspace/skills/blog-post-publisher/_quarto.yml\n样式文件： ~/.openclaw/workspace/skills/blog-post-publisher/styles.css"
+  },
+  {
+    "objectID": "SKILL.html#工作流程",
+    "href": "SKILL.html#工作流程",
+    "title": "1 Blog Post Publisher Skill",
+    "section": "",
+    "text": "用户会给你一个主题，例如： - “写一个 post，介绍今天安装的终端工具” - “写一篇关于 Python 虚拟环境的教程” - “记录一下今天解决的那个 Git 问题”\n\n\n\n# 查看博客项目结构\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n\n# 查看现有文章格式（学习写作风格）\ncat ~/.openclaw/workspace/skills/blog-post-publisher/posts/最新文章.qmd\n\n\n\n文章格式（Quarto Markdown）：\n---\ntitle: \"文章标题\"\ndate: \"2026-XX-XX\"\ncategories: [分类 1, 分类 2]\ntags: [标签 1, 标签 2]\ndescription: \"一句话描述\"\n---\n\n## 问题背景/引言\n说明为什么写这篇文章，解决什么问题\n\n## 适用环境\n- 操作系统\n- 软件版本\n- 项目类型\n\n## 解决方案/教程内容\n分步骤说明，包含代码示例\n\n## 常见问题\nQ&A 格式\n\n## 总结\n表格对比、建议等\n\n## 参考链接\n相关文档、GitHub 仓库等\n写作要点： - ✅ 标题清晰，包含关键词 - ✅ 代码块标注语言（bash,python 等） - ✅ 使用表格对比 - ✅ 提供可执行的命令 - ✅ 包含常见问题解答\n\n\n\n# 文件命名格式：YYYY-M-D-主题.qmd\n# 例如：2026-3-14-modern-terminal-tools.qmd\n\ncat &gt; ~/.openclaw/workspace/skills/blog-post-publisher/posts/2026-3-14-主题.qmd &lt;&lt; 'EOF'\n[文章内容]\nEOF\n\n\n\ncd ~/.openclaw/workspace/skills/blog-post-publisher\n\n# 查看状态\ngit status\n\n# 添加新文章\ngit add posts/2026-3-14-主题.qmd\n\n# 提交（清晰说明变更）\ngit commit -m \"feat: 添加 [主题] 教程\"\n\n# 推送\ngit push origin main\n\n\n\n告诉用户： - ✅ 文章已发布 - 📝 文章标题和位置 - 🔗 GitHub 仓库链接（如果可以访问）"
+  },
+  {
+    "objectID": "SKILL.html#工具依赖",
+    "href": "SKILL.html#工具依赖",
+    "title": "1 Blog Post Publisher Skill",
+    "section": "",
+    "text": "Quarto：博客静态站点生成器\nGit：版本控制\nGitHub：远程仓库"
+  },
+  {
+    "objectID": "SKILL.html#示例任务",
+    "href": "SKILL.html#示例任务",
+    "title": "1 Blog Post Publisher Skill",
+    "section": "",
+    "text": "用户输入： &gt; 写一个 post，把今天我们刚安装的”Ghostty、Yazi、Lazygit、Zoxide”工具，写一个新手教程指导\n执行步骤： 1. 收集工具信息（功能、配置、快捷键） 2. 按照格式撰写文章 3. 保存为 2026-3-14-modern-terminal-tools.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 记录一下今天解决的 Git 忽略.pyc 文件的问题\n执行步骤： 1. 回顾问题背景和解决方案 2. 按照格式撰写文章 3. 保存为 2026-3-4-git_ignore_pyc.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 写一篇前端后端服务器对比的文章\n执行步骤： 1. 收集对比信息（功能、性能、使用场景） 2. 用表格展示对比 3. 保存文章 4. Git 提交推送"
+  },
+  {
+    "objectID": "SKILL.html#注意事项",
+    "href": "SKILL.html#注意事项",
+    "title": "1 Blog Post Publisher Skill",
+    "section": "",
+    "text": "日期格式： 使用 2026-03-14（YYYY-MM-DD）\n文件名： 使用 2026-3-14-主题.qmd（短横线分隔）\n提交信息： 清晰说明变更（feat: 添加 XXX 教程）\n网络问题： 如果 push 失败，告知用户本地已提交\n文章质量： 确保代码示例可执行，步骤清晰"
+  },
+  {
+    "objectID": "SKILL.html#未来改进",
+    "href": "SKILL.html#未来改进",
+    "title": "1 Blog Post Publisher Skill",
+    "section": "",
+    "text": "自动构建并预览（quarto render）\n自动检查拼写错误\n自动生成摘要\n支持多语言文章\n自动添加标签和分类"
+  },
+  {
+    "objectID": "SKILL.html#版本历史",
+    "href": "SKILL.html#版本历史",
+    "title": "1 Blog Post Publisher Skill",
+    "section": "",
+    "text": "v2.0.0 (2026-03-15): 迁移到 workspace 目录，规范化管理\nv1.0.0 (2026-03-14): 初始版本\n\n\n创建时间：2026-03-14\n最后更新：2026-03-15"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "我是一名农业数据科学研究者，关注农业系统中的数据建模、遥感分析与智能决策。希望用更清晰的方法与流程，助力农业技术进步与可持续发展"
+  },
+  {
+    "objectID": "about.html#交流与合作",
+    "href": "about.html#交流与合作",
+    "title": "About",
+    "section": "交流与合作",
+    "text": "交流与合作\n\n\n\n\nEmail\nbinc041208@gmail.com\n\n\n\n\n\nGitHub\ngithub.com/chenbin98\n\n\n\n\n\nLinkedIn\nbin-chen-49292b312\n\n\n\n\n\nORCID\n0009-0000-8266-940X\n\n\n\n\n\nGoogle Scholar\nBin Chen\n\n\n\n\n“Looking for like-minded friends to do something different together.”"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html",
+    "href": "posts/2026-3-16-server-google-access-fix.html",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "",
+    "text": "在 阿里云中国大陆 ECS (Ubuntu 22.04) 上部署服务时，遇到服务器无法访问 Google API / Earth Engine (GEE) 的问题。\n服务器环境： - 云平台：阿里云 ECS - 地域：西南 1（成都） - 系统：Ubuntu 22.04 - 应用依赖：Google OAuth + Earth Engine API\n问题症状：\ncurl https://oauth2.googleapis.com/token\n# 返回 timeout / Connection reset"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#问题背景",
+    "href": "posts/2026-3-16-server-google-access-fix.html#问题背景",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "",
+    "text": "在 阿里云中国大陆 ECS (Ubuntu 22.04) 上部署服务时，遇到服务器无法访问 Google API / Earth Engine (GEE) 的问题。\n服务器环境： - 云平台：阿里云 ECS - 地域：西南 1（成都） - 系统：Ubuntu 22.04 - 应用依赖：Google OAuth + Earth Engine API\n问题症状：\ncurl https://oauth2.googleapis.com/token\n# 返回 timeout / Connection reset"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#问题排查",
+    "href": "posts/2026-3-16-server-google-access-fix.html#问题排查",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "2 问题排查",
+    "text": "2 问题排查\n\n2.1 测试 GitHub 访问\ncurl -I https://github.com\n结果：\nHTTP/2 200  ✅\n说明服务器可以访问部分国外网站。\n\n\n2.2 测试 Google 访问\ncurl -I https://google.com\n结果：\nConnection reset / timeout  ❌\n确认 中国大陆服务器无法直连 Google 服务。"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#解决思路",
+    "href": "posts/2026-3-16-server-google-access-fix.html#解决思路",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "3 解决思路",
+    "text": "3 解决思路\n整体思路：在服务器上部署代理客户端，使访问 Google API 的流量通过代理节点转发。\n服务器\n   ↓\n本地代理 (sing-box)\n   ↓\n机场节点 (hysteria2)\n   ↓\nGoogle API / GEE"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#解决方案",
+    "href": "posts/2026-3-16-server-google-access-fix.html#解决方案",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "4 解决方案",
+    "text": "4 解决方案\n\n4.1 1. 安装 sing-box\ncurl -fsSL https://sing-box.app/install.sh | bash\n\n\n4.2 2. 配置订阅\n编辑配置文件：\nnano /etc/sing-box/config.json\n添加机场订阅（hysteria2 协议）：\n{\n  \"outbounds\": [\n    {\n      \"type\": \"hysteria2\",\n      \"tag\": \"node1\",\n      \"server\": \"your.server.com\",\n      \"server_port\": 443,\n      \"password\": \"your_password\",\n      \"tls\": {\n        \"enabled\": true,\n        \"server_name\": \"your.server.com\"\n      }\n    }\n  ]\n}\n\n⚠️ 安全提示：如果曾公开分享过机场订阅 token，建议登录机场后台重新生成，防止他人盗用流量。\n\n\n\n4.3 3. 启动服务\n# 设置开机自启\nsudo systemctl enable sing-box\n\n# 启动服务\nsudo systemctl start sing-box\n\n# 查看状态\nsudo systemctl status sing-box\n\n\n4.4 4. 设置系统代理\n# 添加代理环境变量\necho 'export HTTP_PROXY=http://127.0.0.1:7890' &gt;&gt; ~/.bashrc\necho 'export HTTPS_PROXY=http://127.0.0.1:7890' &gt;&gt; ~/.bashrc\n\n# 立即生效\nsource ~/.bashrc\n\n\n4.5 5. 验证访问\ncurl -I https://google.com\n成功结果：\nHTTP/2 200  ✅\n或\nHTTP/2 404  ✅ (404 不是错误，只是 API 根路径没有资源)\n\n\n4.6 6. 测试 GEE\n重新运行 GEE 相关程序：\npython gee_test.py\n如果不再出现以下错误： - connection timeout - connection reset - token refresh failed\n说明 问题已解决 ✅"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#最终架构",
+    "href": "posts/2026-3-16-server-google-access-fix.html#最终架构",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "5 最终架构",
+    "text": "5 最终架构\n服务器网络结构：\nApplication (Python/GEE)\n     ↓\nHTTP_PROXY (127.0.0.1:7890)\n     ↓\nsing-box 代理\n     ↓\nHysteria2 节点\n     ↓\nGoogle OAuth / Earth Engine API"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#关键组件说明",
+    "href": "posts/2026-3-16-server-google-access-fix.html#关键组件说明",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "6 关键组件说明",
+    "text": "6 关键组件说明\n\n\n\n组件\n作用\n端口\n\n\n\n\nsing-box\n代理客户端\n7890\n\n\nhysteria2\n代理协议\n443\n\n\nHTTP_PROXY\n系统代理环境变量\n-"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#常见问题",
+    "href": "posts/2026-3-16-server-google-access-fix.html#常见问题",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "7 常见问题",
+    "text": "7 常见问题\n\n7.1 Q1: sing-box 启动失败？\n检查配置文件语法：\nsing-box check -c /etc/sing-box/config.json\n查看日志：\nsudo journalctl -u sing-box -f\n\n\n7.2 Q2: 代理速度慢？\n\n检查机场节点负载\n尝试切换其他节点\n检查服务器带宽限制\n\n\n\n7.3 Q3: Python 程序仍然无法访问？\n确认环境变量已生效：\necho $HTTP_PROXY\necho $HTTPS_PROXY\n或在 Python 代码中显式设置：\nimport os\nos.environ['HTTP_PROXY'] = 'http://127.0.0.1:7890'\nos.environ['HTTPS_PROXY'] = 'http://127.0.0.1:7890'\n\n\n7.4 Q4: Docker 容器内无法访问？\n方案 1： 在容器内设置代理\nENV HTTP_PROXY=http://127.0.0.1:7890\nENV HTTPS_PROXY=http://127.0.0.1:7890\n方案 2： 使用 host 网络模式\ndocker run --network host your_image"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#总结",
+    "href": "posts/2026-3-16-server-google-access-fix.html#总结",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "8 总结",
+    "text": "8 总结\n问题本质：\n中国大陆服务器无法直接访问 Google API\n解决方案：\n服务器部署代理客户端\n→ 使用机场节点转发流量\n→ 成功访问 Google / GEE\n核心优势： - ✅ 稳定可靠（sing-box 性能优秀） - ✅ 配置简单（只需 3 步） - ✅ 系统级代理（所有应用受益） - ✅ SSH 友好（命令行操作）"
+  },
+  {
+    "objectID": "posts/2026-3-16-server-google-access-fix.html#参考链接",
+    "href": "posts/2026-3-16-server-google-access-fix.html#参考链接",
+    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
+    "section": "9 参考链接",
+    "text": "9 参考链接\n\nsing-box 官方文档\nHysteria2 协议文档\nGoogle Earth Engine Python API\n阿里云 ECS 网络配置\n\n\n本文可作为 中国大陆服务器访问 GEE 的通用解决方案参考。"
   },
   {
     "objectID": "posts/2025-9-27-scientific_paper_abbreviations.html",
@@ -126,179 +637,11 @@
     "text": "首次出现是否“全称（缩写）”并后续一致？\n标题与摘要中的缩写是否必要且已定义？\n图表与附注是否给出缩写释义或“缩写表”？\n单位、数值与符号是否符合 SI 与期刊风格？\n统计量（P 值、区间、效应量）是否书写一致？\n参考文献与文内引文缩写是否统一格式？\n\n\n如需，我可以按您的研究方向（如遥感、生态、医学等）扩充专用缩写清单或将本页适配目标期刊格式。"
   },
   {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html",
-    "href": "posts/2026-3-4-git_ignore_pyc.html",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
+    "objectID": "posts/index.html",
+    "href": "posts/index.html",
+    "title": "技术文档",
     "section": "",
-    "text": "在 Git 仓库中执行 git status 时，大量 Python 编译生成的 .pyc 文件、__pycache__ 目录被标记为「修改未暂存」或「未跟踪文件」，干扰版本管理，需通过 .gitignore 规则永久忽略这类文件。"
-  },
-  {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html#问题背景",
-    "href": "posts/2026-3-4-git_ignore_pyc.html#问题背景",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
-    "section": "",
-    "text": "在 Git 仓库中执行 git status 时，大量 Python 编译生成的 .pyc 文件、__pycache__ 目录被标记为「修改未暂存」或「未跟踪文件」，干扰版本管理，需通过 .gitignore 规则永久忽略这类文件。"
-  },
-  {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html#适用环境",
-    "href": "posts/2026-3-4-git_ignore_pyc.html#适用环境",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
-    "section": "0.2 适用环境",
-    "text": "0.2 适用环境\n\n操作系统：Windows（PowerShell）/ Linux / macOS\nGit 版本：&gt;= 2.0\n项目类型：Python 项目"
-  },
-  {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html#解决方案步骤",
-    "href": "posts/2026-3-4-git_ignore_pyc.html#解决方案步骤",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
-    "section": "0.3 解决方案步骤",
-    "text": "0.3 解决方案步骤\n\n0.3.1 定位仓库根目录\n打开终端/命令行，切换到 Git 仓库根目录（以示例路径为例）：\n```bash # Windows PowerShell cd F:_planthoppers_shift"
-  },
-  {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html#创建-编辑-.gitignore-文件",
-    "href": "posts/2026-3-4-git_ignore_pyc.html#创建-编辑-.gitignore-文件",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
-    "section": "1.1 创建 / 编辑 .gitignore 文件",
-    "text": "1.1 创建 / 编辑 .gitignore 文件\n\n1.1.1 新建或打开 .gitignore"
-  },
-  {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html#windows-powershell用记事本打开",
-    "href": "posts/2026-3-4-git_ignore_pyc.html#windows-powershell用记事本打开",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
-    "section": "1.2 Windows PowerShell（用记事本打开）",
-    "text": "1.2 Windows PowerShell（用记事本打开）\nnotepad .gitignore"
-  },
-  {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html#linuxmacos用vim打开",
-    "href": "posts/2026-3-4-git_ignore_pyc.html#linuxmacos用vim打开",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
-    "section": "1.3 Linux/macOS（用vim打开）",
-    "text": "1.3 Linux/macOS（用vim打开）\nvim .gitignore"
-  },
-  {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html#添加忽略规则",
-    "href": "posts/2026-3-4-git_ignore_pyc.html#添加忽略规则",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
-    "section": "1.4 添加忽略规则",
-    "text": "1.4 添加忽略规则\n在 .gitignore 文件中写入以下规则（覆盖 Python 编译文件核心忽略项 + 通用推荐项）："
-  },
-  {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html#处理已被-git-跟踪的-.pyc-文件",
-    "href": "posts/2026-3-4-git_ignore_pyc.html#处理已被-git-跟踪的-.pyc-文件",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
-    "section": "9.1 处理已被 Git 跟踪的 .pyc 文件",
-    "text": "9.1 处理已被 Git 跟踪的 .pyc 文件\n若 .pyc 文件 /pycache 目录已被 Git 提交过（即历史记录中有该文件），需先移除 Git 跟踪（仅移除索引，不删除本地文件）： # 递归移除所有已跟踪的 .pyc 文件 git rm –cached **/*.pyc # 移除已跟踪的 pycache 目录（若有） git rm –cached -r **/pycache"
-  },
-  {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html#提交-.gitignore-规则",
-    "href": "posts/2026-3-4-git_ignore_pyc.html#提交-.gitignore-规则",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
-    "section": "9.2 提交 .gitignore 规则",
-    "text": "9.2 提交 .gitignore 规则\n将 .gitignore 文件加入版本控制并提交，使规则生效： # 暂存 .gitignore 文件 git add .gitignore # 提交修改（备注清晰说明变更） git commit -m “feat: 添加.gitignore规则，忽略Python .pyc编译文件和__pycache__目录” # 推送到远程仓库（可选，同步到团队仓库） git push origin main"
-  },
-  {
-    "objectID": "posts/2026-3-4-git_ignore_pyc.html#验证效果",
-    "href": "posts/2026-3-4-git_ignore_pyc.html#验证效果",
-    "title": "Git 忽略 Python .pyc 编译文件解决方案",
-    "section": "9.3 验证效果",
-    "text": "9.3 验证效果\n执行以下命令验证忽略规则是否生效： git status 预期结果：终端输出中不再出现 .pyc 文件、pycache 目录的「modified」或「Untracked files」提示。"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html",
-    "href": "posts/2026-3-17-github-connection-fix.html",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "",
-    "text": "今天在执行 git push 推送代码到 GitHub 时，遇到了连接超时错误：\nfatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': \nFailed to connect to github.com port 443 after 75003 ms: Couldn't connect to server\n等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#问题背景",
-    "href": "posts/2026-3-17-github-connection-fix.html#问题背景",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "",
-    "text": "今天在执行 git push 推送代码到 GitHub 时，遇到了连接超时错误：\nfatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': \nFailed to connect to github.com port 443 after 75003 ms: Couldn't connect to server\n等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#问题诊断过程",
-    "href": "posts/2026-3-17-github-connection-fix.html#问题诊断过程",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "2 问题诊断过程",
-    "text": "2 问题诊断过程\n\n2.1 1. 检查基础网络连接\n首先确认网络本身是否正常：\n# 测试 GitHub 是否可达\ncurl -I https://github.com\n\n# 检查 DNS 解析\nping -c 2 github.com\n结果：网络本身是通的，DNS 解析正常，说明不是基础网络问题。\n\n\n\n2.2 2. 检查 Git 配置\n检查是否有代理设置或其他配置问题：\n# 检查代理设置\ngit config --global --get http.proxy\ngit config --global --get https.proxy\n\n# 检查 SSL 验证设置\ngit config --global --get http.sslVerify\n结果：无代理设置，SSL 验证默认开启。\n\n\n\n2.3 3. 详细诊断 Git 连接\n使用详细日志模式诊断具体错误：\nGIT_CURL_VERBOSE=1 git ls-remote origin 2&gt;&1 | tail -30\n关键发现： - ✅ SSL 证书验证通过 - ❌ 连接能建立，但请求发送后超时 - ❌ 错误信息：Error in the HTTP/2 framing layer\n结论：问题出在 HTTP/2 协议层，GitHub 的 HTTP/2 连接在某些网络环境下不稳定。"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#解决方案",
-    "href": "posts/2026-3-17-github-connection-fix.html#解决方案",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "3 解决方案",
-    "text": "3 解决方案\n\n3.1 方案一：禁用 HTTP/2，使用 HTTP/1.1（推荐，本次生效）\nGit 默认使用 HTTP/2 协议，但在国内网络环境下可能不稳定。强制使用 HTTP/1.1 可以提高兼容性。\n# 1. 全局设置 Git 使用 HTTP/1.1\ngit config --global http.version HTTP/1.1\n\n# 2. 增加缓冲区大小，避免大文件推送失败\ngit config --global http.postBuffer 524288000\n\n# 3. 禁用低速限制（避免慢速连接被中断）\ngit config --global http.lowSpeedLimit 0\ngit config --global http.lowSpeedTime 9999\n\n# 4. 重新推送\ngit push --set-upstream origin main\n原理： - http.version HTTP/1.1：强制使用 HTTP/1.1 协议，避免 HTTP/2 兼容性问题 - http.postBuffer 524288000：设置 500MB 缓冲区，适合大文件推送 - http.lowSpeedLimit 0：禁用低速限制，避免慢速连接被中断\n效果：✅ 本次问题已解决，推送成功。\n\n\n\n3.2 方案二：配置代理（如果方案一无效）\n如果你使用代理软件（Clash、Surge、Shadowsocks 等），可以配置 Git 通过代理连接：\n# 查找代理端口（常见端口：7890, 1087, 6153 等）\n# Clash 默认端口通常是 7890\n\n# 设置 Git 代理\ngit config --global http.proxy http://127.0.0.1:7890\ngit config --global https.proxy http://127.0.0.1:7890\n\n# 推送\ngit push --set-upstream origin main\n\n# 取消代理（如果需要）\ngit config --global --unset http.proxy\ngit config --global --unset https.proxy\n\n\n\n3.3 方案三：改用 SSH 协议（长期推荐）\nSSH 协议比 HTTPS 更稳定，且不需要每次输入密码。\n# 1. 查看现有 SSH 公钥\ncat ~/.ssh/id_ed25519.pub\n\n# 2. 如果没有密钥，生成新的\nssh-keygen -t ed25519 -C \"your_email@example.com\"\n\n# 3. 将公钥添加到 GitHub\n# 访问：https://github.com/settings/keys\n# 点击 \"New SSH key\"，粘贴公钥内容\n\n# 4. 测试 SSH 连接\nssh -T git@github.com\n# 成功输出：Hi chenbin98! You've successfully authenticated...\n\n# 5. 切换 remote 为 SSH\ngit remote set-url origin git@github.com:chenbin98/meteo_data_download.git\n\n# 6. 推送\ngit push --set-upstream origin main\n优势： - ✅ 不需要每次输入密码 - ✅ 连接更稳定 - ✅ 不受 HTTPS 代理问题影响"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#常用-git-远程操作命令",
-    "href": "posts/2026-3-17-github-connection-fix.html#常用-git-远程操作命令",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "4 常用 Git 远程操作命令",
-    "text": "4 常用 Git 远程操作命令\n# 查看远程仓库\ngit remote -v\n\n# 设置 upstream 并推送\ngit push --set-upstream origin main\n\n# 后续推送（已设置 upstream 后）\ngit push\n\n# 拉取远程更新\ngit pull\n\n# 查看当前分支跟踪情况\ngit branch -vv"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#故障排查流程图",
-    "href": "posts/2026-3-17-github-connection-fix.html#故障排查流程图",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "5 故障排查流程图",
-    "text": "5 故障排查流程图\ngit push 失败\n    │\n    ▼\n检查网络：curl/ping github.com\n    │\n    ├── 不通 → 检查网络/代理\n    │\n    ▼ 通\n检查 Git 配置：git config --get http.proxy\n    │\n    ├── 有代理 → 确认代理是否正确\n    │\n    ▼ 无代理\n详细诊断：GIT_CURL_VERBOSE=1 git ls-remote origin\n    │\n    ├── SSL 失败 → 检查证书/时间设置\n    ├── HTTP/2 错误 → 改用 HTTP/1.1 ✓\n    └── 认证失败 → 检查凭证/SSH 密钥"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#方案对比",
-    "href": "posts/2026-3-17-github-connection-fix.html#方案对比",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "6 方案对比",
-    "text": "6 方案对比\n\n\n\n\n\n\n\n\n\n方案\n优点\n缺点\n适用场景\n\n\n\n\nHTTP/1.1\n配置简单，立竿见影\n每次推送可能仍需输入密码\n临时解决/快速修复\n\n\n代理\n可访问被墙资源\n依赖代理软件稳定性\n代理环境用户\n\n\nSSH\n最稳定，无需密码\n需要配置 SSH 密钥\n长期使用推荐"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#总结",
-    "href": "posts/2026-3-17-github-connection-fix.html#总结",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "7 总结",
-    "text": "7 总结\n本次解决的关键命令：\n# 1. 禁用 HTTP/2\ngit config --global http.version HTTP/1.1\n\n# 2. 增加缓冲区\ngit config --global http.postBuffer 524288000\n\n# 3. 禁用低速限制\ngit config --global http.lowSpeedLimit 0\ngit config --global http.lowSpeedTime 9999\n\n# 4. 推送\ngit push --set-upstream origin main\n长期建议：配置 SSH 密钥，切换到 SSH 协议，获得更稳定的连接体验。"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#参考链接",
-    "href": "posts/2026-3-17-github-connection-fix.html#参考链接",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "8 参考链接",
-    "text": "8 参考链接\n\nGit 配置文档\nGitHub SSH 连接指南\nGit 代理设置\n\n\n文档生成时间：2026-03-17\n问题状态：✅ 已解决"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
-  },
-  {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "title": "机器学习与传统作物模型的未来展望",
-    "section": "",
-    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化\n\n\n介绍如何通过 Docker 本地部署气象数据服务，结合 OpenAPI 规范和 AI 代码生成，实现标准化的气象数据自动化下载流程\n\n\n\n\n\nApr 1, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\nBinchen Chen\n\n\n\n\n\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html",
@@ -364,151 +707,116 @@
     "text": "8 参考资料\n\nCodex 官方文档\nCodex 配置指南"
   },
   {
-    "objectID": "posts/index.html",
-    "href": "posts/index.html",
-    "title": "技术文档",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\nBinchen Chen\n\n\n\n\n\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Binchen’s Tech Blog",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法\n\n浏览全部文章 → 关于我 →"
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
   },
   {
-    "objectID": "index.html#最新文章",
-    "href": "index.html#最新文章",
-    "title": "Binchen’s Tech Blog",
-    "section": "最新文章",
-    "text": "最新文章\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "posts/2025-9-1-geedownloadimages.html",
-    "href": "posts/2025-9-1-geedownloadimages.html",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的完整工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。\n该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。\n\n\n\n\n\n确保安装以下工具和库：\n\n\n\n工具/库\n用途\n安装命令\n\n\n\n\nPython\n核心编程环境\n从 python.org 下载\n\n\ngeemap\nGEE 可视化和数据下载\npip install geemap\n\n\nearthengine-api (ee)\nGEE Python API\npip install earthengine-api\n\n\ngeopandas\n读取矢量网格数据（用于分段）\npip install geopandas\n\n\nrasterio\n图像镶嵌和栅格处理\npip install rasterio\n\n\nGDAL\n栅格操作后端（多线程）\n随 rasterio 包含\n\n\n\n\n注意: 安装 earthengine-api 后，需要通过 earthengine authenticate 进行身份验证。\n\n\n\n\n\nGEE 栅格数据集 ID: 在 GEE 中识别目标数据集 ID\n\n示例：NPP 数据 MODIS/061/MOD17A3HGF\n示例：Landsat 8 数据 LANDSAT/LC08/C02/T1_L2\n\n全球矢量网格: 准备预分割的矢量网格（GeoPackage .gpkg 格式）\n\n将全球研究区域分割为较小的、可下载的块\n示例：WorldFishnet.gpkg（可根据数据分辨率自定义网格大小）\n\n\n\n\n\n\n\n\nimport ee\nimport geemap\nimport os\nimport geopandas as gpd\n\n\n\n# 身份验证 GEE（运行一次；如果已经身份验证则跳过）\n# ee.Authenticate()\n\n# 初始化 GEE API\nee.Initialize()\n\n\n\n\n\n# 为您的目标数据集自定义这些参数\nGEE_DATA_ID = \"MODIS/061/MOD17A3HGF\"  # 示例：MODIS NPP 数据集\nBAND_NAME = \"Npp\"                       # 目标波段名称\nTIME_RANGE = [\"2001-01-01\", \"2025-01-01\"]  # 时间范围（开始，结束）\nSCALING_FACTOR = 0.0001                 # 缩放因子，将 GEE 数据转换为实际值\n\n# 可视化参数\nVIS_PARAMS = {\n    \"min\": 0,\n    \"max\": 3,\n    \"palette\": [\n        \"ffffff\", \"ce7e45\", \"df923d\", \"f1b555\", \"fcd163\", \n        \"99b718\", \"74a901\", \"66a000\", \"529400\", \"3e8601\", \n        \"207401\", \"056201\", \"004c00\", \"023b01\", \"012e01\", \n        \"011d01\", \"011301\"\n    ]  # 根据数据集范围调整\n}\n\n\n\n# 加载 GEE 图像集合\nimage_collection = ee.ImageCollection(GEE_DATA_ID)\\\n    .filterDate(TIME_RANGE[0], TIME_RANGE[1])\\\n    .select(BAND_NAME)\n\n# 定义应用缩放因子的函数\ndef apply_scaling(image):\n    return image.multiply(SCALING_FACTOR)\n\n# 将缩放应用到集合\nscaled_collection = image_collection.map(apply_scaling)\n\n\n\n\n# 初始化 geemap 界面\nMap = geemap.Map(center=(40, 100), zoom=4)  # 以欧亚大陆为中心\n\n# 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）\npreview_image = scaled_collection.median()\n\n# 将图像添加到地图\nMap.addLayer(preview_image, VIS_PARAMS, f\"{GEE_DATA_ID.split('/')[-1]}_Preview\")\n\n# 添加颜色条图例\nMap.add_colorbar_branca(\n    colors=VIS_PARAMS[\"palette\"],\n    vmin=VIS_PARAMS[\"min\"],\n    vmax=VIS_PARAMS[\"max\"],\n    label=BAND_NAME,\n    position=\"bottomright\"\n)\n\n# 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）\nMap\n\n\n\n\n直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。\n\n\n# 文件路径（自定义这些）\nGRID_PATH = \"I:/geemap/roi/WorldFishnet.gpkg\"  # 矢量网格路径\nGRID_LAYER = \"WorldFish30\"                       # GeoPackage 中的图层名称\nOUTPUT_DIR = \"I:/geemap/GEE_Global_Data/\"        # 保存分段文件的目录\nRESOLUTION = 500                                  # 数据集分辨率（米）\nBATCH_SIZE = 5                                    # 每批处理的网格块数量\nSTART_YEAR = 2001                                 # 从此年开始恢复（如果下载被中断）\nSTART_GRID_INDEX = 0                             # 从此网格索引恢复（如果下载被中断）\nCRS = \"EPSG:4326\"                                # 目标坐标系（WGS84）\n\n\n\n# 使用 geopandas 加载矢量网格\ngrid_gdf = gpd.read_file(GRID_PATH, layer=GRID_LAYER)\n\n# 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection\ngrid_ee = geemap.gdf_to_ee(grid_gdf)\n\n# 创建输出目录（如果不存在）\nos.makedirs(OUTPUT_DIR, exist_ok=True)\n\n\n\n# 从时间范围获取年份列表\nyears = range(int(TIME_RANGE[0].split(\"-\")[0]), int(TIME_RANGE[1].split(\"-\")[0]))\n\n# 遍历每一年\nfor year in years:\n    # 跳过恢复开始年份之前的年份\n    if year &lt; START_YEAR:\n        continue\n    print(f\"🔄 正在处理 {year} 年的数据...\")\n\n    # 提取年度数据\n    annual_image = scaled_collection\\\n        .filter(ee.Filter.calendarRange(year, year, \"year\"))\\\n        .median()\n\n    # 获取网格块总数\n    total_grids = grid_ee.size().getInfo()\n\n    # 计算批次数\n    num_batches = (total_grids - START_GRID_INDEX + BATCH_SIZE - 1) // BATCH_SIZE\n\n    # 处理每批\n    for batch in range(num_batches):\n        batch_start = START_GRID_INDEX + batch * BATCH_SIZE\n        batch_end = min(batch_start + BATCH_SIZE, total_grids)\n        current_batch = grid_ee.toList(BATCH_SIZE, batch_start)\n\n        # 处理批次中的每个网格块\n        for i in range(batch_end - batch_start):\n            # 获取当前网格要素和几何形状\n            grid_feature = ee.Feature(current_batch.get(i))\n            grid_geom = grid_feature.geometry()\n\n            # 生成唯一文件名\n            grid_index = batch_start + i + 1\n            filename = f\"{BAND_NAME}_{year}_grid_{grid_index:04d}.tif\"\n            file_path = os.path.join(OUTPUT_DIR, filename)\n\n            # 如果文件已存在则跳过（断点续传功能）\n            if os.path.exists(file_path):\n                print(f\"⏭️  跳过现有文件: {filename}\")\n                continue\n\n            # 下载裁剪后的图像\n            try:\n                # 将年度图像裁剪到当前网格\n                clipped_image = annual_image.clip(grid_geom)\n\n                # 使用 geemap 下载\n                geemap.download_ee_image(\n                    image=clipped_image,\n                    filename=file_path,\n                    scale=RESOLUTION,\n                    region=grid_geom,\n                    crs=CRS,\n                    max_tile_size=1024  # 根据内存调整\n                )\n                print(f\"✅ 成功下载: {filename}\")\n\n            except Exception as e:\n                print(f\"❌ 下载 {filename} 失败: {str(e)}\")\n                continue\n\n    # 为下一年重置网格索引\n    START_GRID_INDEX = 0\n\nprint(\"🎉 所有下载任务完成！\")\n\n\n\n\n使用 rasterio 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。\n\n\n# 文件路径（自定义这些）\nINPUT_DIR = OUTPUT_DIR                    # 与下载输出目录相同\nMOSAIC_OUTPUT_DIR = \"I:/geemap/GEE_Global_Data/Mosaicked/\"  # 镶嵌文件的目录\nCOMPRESSION = \"LZW\"                       # 压缩方法（减少文件大小）\n\n\n\n# 启用 GDAL 多线程以加速镶嵌\nos.environ[\"GDAL_NUM_THREADS\"] = \"ALL_CPUS\"  # 使用所有可用 CPU\n\n\n\nimport re\nfrom rasterio.merge import merge\nfrom rasterio.enums import Resampling\n\n# 为镶嵌文件创建输出目录\nos.makedirs(MOSAIC_OUTPUT_DIR, exist_ok=True)\n\n# 按年份分组分段文件\nfile_pattern = re.compile(rf\"{BAND_NAME}_(\\d{{4}})_grid_\\d{{4}}\\.tif$\")\nyearly_files = {}\n\nfor filename in os.listdir(INPUT_DIR):\n    match = file_pattern.match(filename)\n    if match:\n        year = match.group(1)\n        file_path = os.path.join(INPUT_DIR, filename)\n        yearly_files.setdefault(year, []).append(file_path)\n\n# 镶嵌每年的文件\nfor year, file_list in yearly_files.items():\n    print(f\"🔗 正在镶嵌 {year} 年的 {len(file_list)} 个文件...\")\n    datasets = []\n\n    try:\n        # 打开所有分段文件\n        for file_path in file_list:\n            src = rasterio.open(file_path)\n            datasets.append(src)\n\n        # 执行镶嵌\n        mosaic_array, out_transform = merge(\n            datasets,\n            resampling=Resampling.nearest  # 对离散数据使用最近邻重采样\n        )\n\n        # 更新镶嵌文件的元数据\n        out_meta = datasets[0].meta.copy()\n        out_meta.update({\n            \"driver\": \"GTiff\",\n            \"height\": mosaic_array.shape[1],\n            \"width\": mosaic_array.shape[2],\n            \"transform\": out_transform,\n            \"compress\": COMPRESSION,\n            \"bigtiff\": \"YES\"  # 对大文件启用（&gt;4GB）\n        })\n\n        # 保存镶嵌文件\n        output_path = os.path.join(MOSAIC_OUTPUT_DIR, f\"{BAND_NAME}_{year}_Global.tif\")\n        with rasterio.open(output_path, \"w\", **out_meta) as dest:\n            dest.write(mosaic_array)\n\n        print(f\"✅ 成功镶嵌: {output_path}\")\n\n    except Exception as e:\n        print(f\"❌ 镶嵌 {year} 年数据失败: {str(e)}\")\n        continue\n\n    finally:\n        # 关闭所有打开的栅格数据集以释放内存\n        for ds in datasets:\n            ds.close()\n\nprint(\"🎉 所有镶嵌任务完成！\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n问题\n解决方案\n\n\n\n\nGEE 身份验证错误\n重新运行 ee.Authenticate() 并按照浏览器提示重新进行身份验证\n\n\n下载中断\n工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复\n\n\n内存过载\n减少 BATCH_SIZE（如从 5 到 3）或 max_tile_size（如从 1024 到 512）\n\n\n镶嵌失败\n确保所有分段文件具有相同的 CRS 和分辨率\n\n\n\n\n\n\n\n非年度数据: 对于月度/季节性数据，修改时间过滤器\n# 示例：夏季数据\nee.Filter.calendarRange(year, year, \"year\")\\\n  .filter(ee.Filter.calendarRange(6, 8, \"month\"))\n不同数据集: 更新 GEE_DATA_ID、BAND_NAME、SCALING_FACTOR 和 VIS_PARAMS\n网格调整: 根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）\n\n\n\n\n\n\ngeemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
+    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
   },
   {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#概述",
-    "href": "posts/2025-9-1-geedownloadimages.html#概述",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模（如全球）栅格数据的完整工作流程。它解决了 GEE 直接下载像素数量限制和下载中断等常见挑战，并包括下载后的图像镶嵌以生成完整数据集。\n该工作流程适用于大多数 GEE 栅格数据集（如 MODIS、Landsat），可通过调整数据 ID、分辨率和时间范围等参数进行适配。"
+    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
   },
   {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#前置要求",
-    "href": "posts/2025-9-1-geedownloadimages.html#前置要求",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "确保安装以下工具和库：\n\n\n\n工具/库\n用途\n安装命令\n\n\n\n\nPython\n核心编程环境\n从 python.org 下载\n\n\ngeemap\nGEE 可视化和数据下载\npip install geemap\n\n\nearthengine-api (ee)\nGEE Python API\npip install earthengine-api\n\n\ngeopandas\n读取矢量网格数据（用于分段）\npip install geopandas\n\n\nrasterio\n图像镶嵌和栅格处理\npip install rasterio\n\n\nGDAL\n栅格操作后端（多线程）\n随 rasterio 包含\n\n\n\n\n注意: 安装 earthengine-api 后，需要通过 earthengine authenticate 进行身份验证。\n\n\n\n\n\nGEE 栅格数据集 ID: 在 GEE 中识别目标数据集 ID\n\n示例：NPP 数据 MODIS/061/MOD17A3HGF\n示例：Landsat 8 数据 LANDSAT/LC08/C02/T1_L2\n\n全球矢量网格: 准备预分割的矢量网格（GeoPackage .gpkg 格式）\n\n将全球研究区域分割为较小的、可下载的块\n示例：WorldFishnet.gpkg（可根据数据分辨率自定义网格大小）"
+    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
   },
   {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-1初始化环境和预览数据",
-    "href": "posts/2025-9-1-geedownloadimages.html#步骤-1初始化环境和预览数据",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html",
+    "href": "posts/2026-4-1-meteo-data-workflow.html",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
     "section": "",
-    "text": "import ee\nimport geemap\nimport os\nimport geopandas as gpd\n\n\n\n# 身份验证 GEE（运行一次；如果已经身份验证则跳过）\n# ee.Authenticate()\n\n# 初始化 GEE API\nee.Initialize()\n\n\n\n\n\n# 为您的目标数据集自定义这些参数\nGEE_DATA_ID = \"MODIS/061/MOD17A3HGF\"  # 示例：MODIS NPP 数据集\nBAND_NAME = \"Npp\"                       # 目标波段名称\nTIME_RANGE = [\"2001-01-01\", \"2025-01-01\"]  # 时间范围（开始，结束）\nSCALING_FACTOR = 0.0001                 # 缩放因子，将 GEE 数据转换为实际值\n\n# 可视化参数\nVIS_PARAMS = {\n    \"min\": 0,\n    \"max\": 3,\n    \"palette\": [\n        \"ffffff\", \"ce7e45\", \"df923d\", \"f1b555\", \"fcd163\", \n        \"99b718\", \"74a901\", \"66a000\", \"529400\", \"3e8601\", \n        \"207401\", \"056201\", \"004c00\", \"023b01\", \"012e01\", \n        \"011d01\", \"011301\"\n    ]  # 根据数据集范围调整\n}\n\n\n\n# 加载 GEE 图像集合\nimage_collection = ee.ImageCollection(GEE_DATA_ID)\\\n    .filterDate(TIME_RANGE[0], TIME_RANGE[1])\\\n    .select(BAND_NAME)\n\n# 定义应用缩放因子的函数\ndef apply_scaling(image):\n    return image.multiply(SCALING_FACTOR)\n\n# 将缩放应用到集合\nscaled_collection = image_collection.map(apply_scaling)\n\n\n\n\n# 初始化 geemap 界面\nMap = geemap.Map(center=(40, 100), zoom=4)  # 以欧亚大陆为中心\n\n# 将集合镶嵌为单个图像进行预览（对时间序列使用中位数/平均值）\npreview_image = scaled_collection.median()\n\n# 将图像添加到地图\nMap.addLayer(preview_image, VIS_PARAMS, f\"{GEE_DATA_ID.split('/')[-1]}_Preview\")\n\n# 添加颜色条图例\nMap.add_colorbar_branca(\n    colors=VIS_PARAMS[\"palette\"],\n    vmin=VIS_PARAMS[\"min\"],\n    vmax=VIS_PARAMS[\"max\"],\n    label=BAND_NAME,\n    position=\"bottomright\"\n)\n\n# 显示地图（在 Jupyter Notebook/Lab 中运行以获得交互式视图）\nMap"
+    "text": "在科研和数据分析项目中，获取气象数据是一个常见需求。但每次手动查文档、写代码、调试接口，效率极低。\n本文介绍一套标准化的气象数据服务工作流程：通过 Docker 本地部署服务，使用 OpenAPI 规范自动获取接口定义，再借助 AI 生成调用代码。整个过程无需记忆 API，每个新项目都能快速复用。"
   },
   {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-2支持断点续传的分段下载",
-    "href": "posts/2025-9-1-geedownloadimages.html#步骤-2支持断点续传的分段下载",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#引言",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#引言",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
     "section": "",
-    "text": "直接下载全球高分辨率数据（如 500 米）会超过 GEE 的像素限制。使用矢量网格将数据分割为可下载的块，并具有跳过现有文件的断点续传功能。\n\n\n# 文件路径（自定义这些）\nGRID_PATH = \"I:/geemap/roi/WorldFishnet.gpkg\"  # 矢量网格路径\nGRID_LAYER = \"WorldFish30\"                       # GeoPackage 中的图层名称\nOUTPUT_DIR = \"I:/geemap/GEE_Global_Data/\"        # 保存分段文件的目录\nRESOLUTION = 500                                  # 数据集分辨率（米）\nBATCH_SIZE = 5                                    # 每批处理的网格块数量\nSTART_YEAR = 2001                                 # 从此年开始恢复（如果下载被中断）\nSTART_GRID_INDEX = 0                             # 从此网格索引恢复（如果下载被中断）\nCRS = \"EPSG:4326\"                                # 目标坐标系（WGS84）\n\n\n\n# 使用 geopandas 加载矢量网格\ngrid_gdf = gpd.read_file(GRID_PATH, layer=GRID_LAYER)\n\n# 将 geopandas GeoDataFrame 转换为 GEE FeatureCollection\ngrid_ee = geemap.gdf_to_ee(grid_gdf)\n\n# 创建输出目录（如果不存在）\nos.makedirs(OUTPUT_DIR, exist_ok=True)\n\n\n\n# 从时间范围获取年份列表\nyears = range(int(TIME_RANGE[0].split(\"-\")[0]), int(TIME_RANGE[1].split(\"-\")[0]))\n\n# 遍历每一年\nfor year in years:\n    # 跳过恢复开始年份之前的年份\n    if year &lt; START_YEAR:\n        continue\n    print(f\"🔄 正在处理 {year} 年的数据...\")\n\n    # 提取年度数据\n    annual_image = scaled_collection\\\n        .filter(ee.Filter.calendarRange(year, year, \"year\"))\\\n        .median()\n\n    # 获取网格块总数\n    total_grids = grid_ee.size().getInfo()\n\n    # 计算批次数\n    num_batches = (total_grids - START_GRID_INDEX + BATCH_SIZE - 1) // BATCH_SIZE\n\n    # 处理每批\n    for batch in range(num_batches):\n        batch_start = START_GRID_INDEX + batch * BATCH_SIZE\n        batch_end = min(batch_start + BATCH_SIZE, total_grids)\n        current_batch = grid_ee.toList(BATCH_SIZE, batch_start)\n\n        # 处理批次中的每个网格块\n        for i in range(batch_end - batch_start):\n            # 获取当前网格要素和几何形状\n            grid_feature = ee.Feature(current_batch.get(i))\n            grid_geom = grid_feature.geometry()\n\n            # 生成唯一文件名\n            grid_index = batch_start + i + 1\n            filename = f\"{BAND_NAME}_{year}_grid_{grid_index:04d}.tif\"\n            file_path = os.path.join(OUTPUT_DIR, filename)\n\n            # 如果文件已存在则跳过（断点续传功能）\n            if os.path.exists(file_path):\n                print(f\"⏭️  跳过现有文件: {filename}\")\n                continue\n\n            # 下载裁剪后的图像\n            try:\n                # 将年度图像裁剪到当前网格\n                clipped_image = annual_image.clip(grid_geom)\n\n                # 使用 geemap 下载\n                geemap.download_ee_image(\n                    image=clipped_image,\n                    filename=file_path,\n                    scale=RESOLUTION,\n                    region=grid_geom,\n                    crs=CRS,\n                    max_tile_size=1024  # 根据内存调整\n                )\n                print(f\"✅ 成功下载: {filename}\")\n\n            except Exception as e:\n                print(f\"❌ 下载 {filename} 失败: {str(e)}\")\n                continue\n\n    # 为下一年重置网格索引\n    START_GRID_INDEX = 0\n\nprint(\"🎉 所有下载任务完成！\")"
+    "text": "在科研和数据分析项目中，获取气象数据是一个常见需求。但每次手动查文档、写代码、调试接口，效率极低。\n本文介绍一套标准化的气象数据服务工作流程：通过 Docker 本地部署服务，使用 OpenAPI 规范自动获取接口定义，再借助 AI 生成调用代码。整个过程无需记忆 API，每个新项目都能快速复用。"
   },
   {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#步骤-3镶嵌分段文件",
-    "href": "posts/2025-9-1-geedownloadimages.html#步骤-3镶嵌分段文件",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "使用 rasterio 和 GDAL 多线程将分段文件镶嵌为每年的单个完整栅格。\n\n\n# 文件路径（自定义这些）\nINPUT_DIR = OUTPUT_DIR                    # 与下载输出目录相同\nMOSAIC_OUTPUT_DIR = \"I:/geemap/GEE_Global_Data/Mosaicked/\"  # 镶嵌文件的目录\nCOMPRESSION = \"LZW\"                       # 压缩方法（减少文件大小）\n\n\n\n# 启用 GDAL 多线程以加速镶嵌\nos.environ[\"GDAL_NUM_THREADS\"] = \"ALL_CPUS\"  # 使用所有可用 CPU\n\n\n\nimport re\nfrom rasterio.merge import merge\nfrom rasterio.enums import Resampling\n\n# 为镶嵌文件创建输出目录\nos.makedirs(MOSAIC_OUTPUT_DIR, exist_ok=True)\n\n# 按年份分组分段文件\nfile_pattern = re.compile(rf\"{BAND_NAME}_(\\d{{4}})_grid_\\d{{4}}\\.tif$\")\nyearly_files = {}\n\nfor filename in os.listdir(INPUT_DIR):\n    match = file_pattern.match(filename)\n    if match:\n        year = match.group(1)\n        file_path = os.path.join(INPUT_DIR, filename)\n        yearly_files.setdefault(year, []).append(file_path)\n\n# 镶嵌每年的文件\nfor year, file_list in yearly_files.items():\n    print(f\"🔗 正在镶嵌 {year} 年的 {len(file_list)} 个文件...\")\n    datasets = []\n\n    try:\n        # 打开所有分段文件\n        for file_path in file_list:\n            src = rasterio.open(file_path)\n            datasets.append(src)\n\n        # 执行镶嵌\n        mosaic_array, out_transform = merge(\n            datasets,\n            resampling=Resampling.nearest  # 对离散数据使用最近邻重采样\n        )\n\n        # 更新镶嵌文件的元数据\n        out_meta = datasets[0].meta.copy()\n        out_meta.update({\n            \"driver\": \"GTiff\",\n            \"height\": mosaic_array.shape[1],\n            \"width\": mosaic_array.shape[2],\n            \"transform\": out_transform,\n            \"compress\": COMPRESSION,\n            \"bigtiff\": \"YES\"  # 对大文件启用（&gt;4GB）\n        })\n\n        # 保存镶嵌文件\n        output_path = os.path.join(MOSAIC_OUTPUT_DIR, f\"{BAND_NAME}_{year}_Global.tif\")\n        with rasterio.open(output_path, \"w\", **out_meta) as dest:\n            dest.write(mosaic_array)\n\n        print(f\"✅ 成功镶嵌: {output_path}\")\n\n    except Exception as e:\n        print(f\"❌ 镶嵌 {year} 年数据失败: {str(e)}\")\n        continue\n\n    finally:\n        # 关闭所有打开的栅格数据集以释放内存\n        for ds in datasets:\n            ds.close()\n\nprint(\"🎉 所有镶嵌任务完成！\")"
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#核心架构",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#核心架构",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "2 核心架构",
+    "text": "2 核心架构\n┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐\n│   Docker 容器    │────▶│  OpenAPI 规范    │────▶│  AI 代码生成     │\n│ meteo-data-     │     │  openapi.json    │     │  Python 脚本     │\n│ download:8000   │     │  (机器可读)      │     │  (自动编写)      │\n└─────────────────┘     └──────────────────┘     └─────────────────┘\n关键原则：\n\n❌ 不依赖 /docs（给人看的页面，不适合自动化）\n✅ 必须使用 openapi.json（机器可读标准）\n✅ 每个新项目重复标准流程\n✅ 不需要记忆 API，只需要标准流程"
   },
   {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#注意事项和故障排除",
-    "href": "posts/2025-9-1-geedownloadimages.html#注意事项和故障排除",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "问题\n解决方案\n\n\n\n\nGEE 身份验证错误\n重新运行 ee.Authenticate() 并按照浏览器提示重新进行身份验证\n\n\n下载中断\n工作流程会跳过现有文件，因此只需重新运行下载脚本即可恢复\n\n\n内存过载\n减少 BATCH_SIZE（如从 5 到 3）或 max_tile_size（如从 1024 到 512）\n\n\n镶嵌失败\n确保所有分段文件具有相同的 CRS 和分辨率\n\n\n\n\n\n\n\n非年度数据: 对于月度/季节性数据，修改时间过滤器\n# 示例：夏季数据\nee.Filter.calendarRange(year, year, \"year\")\\\n  .filter(ee.Filter.calendarRange(6, 8, \"month\"))\n不同数据集: 更新 GEE_DATA_ID、BAND_NAME、SCALING_FACTOR 和 VIS_PARAMS\n网格调整: 根据数据分辨率使用更粗/更细的网格（如 10°x10° 或 5°x5°）"
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#前提条件",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#前提条件",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "3 前提条件",
+    "text": "3 前提条件\n\n3.1 环境要求\n\nDocker 已安装并运行\nPython 3.8+\ncurl 或 wget\n任意 AI 助手（如 OpenClaw、Claude Code 等）\n\n\n\n3.2 服务地址\n\n\n\n项目\n值\n\n\n\n\n本地服务地址\nhttp://127.0.0.1:8000\n\n\nOpenAPI 定义\nhttp://127.0.0.1:8000/openapi.json\n\n\n文档页面\nhttp://127.0.0.1:8000/docs（仅供参考）"
   },
   {
-    "objectID": "posts/2025-9-1-geedownloadimages.html#参考资料",
-    "href": "posts/2025-9-1-geedownloadimages.html#参考资料",
-    "title": "使用 Geemap 从 GEE 下载全球栅格数据",
-    "section": "",
-    "text": "geemap 文档: geemap.org\nGEE Python API 文档: developers.google.com/earth-engine\nrasterio 镶嵌指南: rasterio.readthedocs.io\nMODIS MOD17A3HGF 数据集: GEE MOD17A3HGF 文档\n\n\n💡 提示：本工作流程适用于大多数 GEE 栅格数据集，可根据具体需求进行调整和优化。"
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#标准使用流程",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#标准使用流程",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "4 标准使用流程",
+    "text": "4 标准使用流程\n\n4.1 Step 1：检查 Docker 服务是否启动\ndocker ps | grep meteo-data-download\n如果已启动 → 继续下一步\n如果未启动 → 启动服务：\n# 已有容器\ndocker start meteo-data-download\n\n# 或首次运行\ndocker run -d -p 8000:8000 --name meteo-data-download your-image\n\n\n\n4.2 Step 2：获取 API 接口定义\n在每个新项目中，先创建 api 目录并下载 OpenAPI 规范：\nmkdir -p api && curl -s http://127.0.0.1:8000/openapi.json -o ./api/openapi.json\n为什么需要这一步？\n\nOpenAPI 规范包含所有接口的完整定义\nAI 可以基于此自动生成准确的调用代码\n避免手动查文档导致的错误\n\n\n\n\n4.3 Step 3：让 AI 基于接口定义编写代码\n向 AI 提供以下信息：\n\n本地服务地址：http://127.0.0.1:8000\n接口定义文件：./api/openapi.json\n用户需求（例如：下载某区域、某时间段气象数据）\n\n标准提示模板：\n本项目需要调用本地气象服务。\n\n服务地址：\nhttp://127.0.0.1:8000\n\n接口定义文件：\n./api/openapi.json\n\n请完成以下任务：\n1. 先阅读 ./api/openapi.json，识别可用接口、参数和返回结构\n2. 基于真实接口，编写代码实现气象数据下载\n\n要求：\n- 必须严格依据 openapi.json 中的接口，不得假设\n- 使用 Python 实现\n- 封装为可复用函数或类\n- 所有注释使用 English\n- 包含错误处理和超时控制\n- 提供最小可运行示例\n\n\n\n4.4 Step 4：执行 AI 生成的代码\nAI 会生成类似以下的代码：\nimport requests\nimport json\nfrom typing import Dict, Any\n\nclass MeteoDataClient:\n    \"\"\"Client for downloading meteorological data from local Docker service.\"\"\"\n    \n    def __init__(self, base_url: str = \"http://127.0.0.1:8000\", timeout: int = 30):\n        self.base_url = base_url\n        self.timeout = timeout\n        self.session = requests.Session()\n    \n    def download_weather_data(\n        self,\n        latitude: float,\n        longitude: float,\n        start_date: str,\n        end_date: str,\n        variables: list[str]\n    ) -&gt; Dict[str, Any]:\n        \"\"\"\n        Download weather data for specified location and time range.\n        \n        Args:\n            latitude: Latitude coordinate\n            longitude: Longitude coordinate\n            start_date: Start date in YYYY-MM-DD format\n            end_date: End date in YYYY-MM-DD format\n            variables: List of weather variables to download\n        \n        Returns:\n            Dictionary containing weather data\n        \n        Raises:\n            requests.exceptions.RequestException: If API call fails\n        \"\"\"\n        endpoint = f\"{self.base_url}/api/download\"\n        payload = {\n            \"latitude\": latitude,\n            \"longitude\": longitude,\n            \"start_date\": start_date,\n            \"end_date\": end_date,\n            \"variables\": variables\n        }\n        \n        response = self.session.post(\n            endpoint,\n            json=payload,\n            timeout=self.timeout\n        )\n        response.raise_for_status()\n        return response.json()\n\n\n# 使用示例\nif __name__ == \"__main__\":\n    client = MeteoDataClient()\n    \n    try:\n        data = client.download_weather_data(\n            latitude=39.9042,\n            longitude=116.4074,\n            start_date=\"2026-01-01\",\n            end_date=\"2026-01-31\",\n            variables=[\"temperature\", \"humidity\", \"precipitation\"]\n        )\n        \n        # 保存为 JSON\n        with open(\"weather_data.json\", \"w\") as f:\n            json.dump(data, f, indent=2)\n        \n        print(f\"✅ Downloaded {len(data.get('results', []))} records\")\n        \n    except requests.exceptions.RequestException as e:\n        print(f\"❌ Error: {e}\")\n执行代码，获取气象数据：\n\n可保存为 CSV / JSON 等格式\n可扩展为批量下载\n可集成到现有数据处理流程"
   },
   {
-    "objectID": "posts/2026-3-16-server-google-access-fix.html",
-    "href": "posts/2026-3-16-server-google-access-fix.html",
-    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
-    "section": "",
-    "text": "在 阿里云中国大陆 ECS (Ubuntu 22.04) 上部署服务时，遇到服务器无法访问 Google API / Earth Engine (GEE) 的问题。\n服务器环境： - 云平台：阿里云 ECS - 地域：西南 1（成都） - 系统：Ubuntu 22.04 - 应用依赖：Google OAuth + Earth Engine API\n问题症状：\ncurl https://oauth2.googleapis.com/token\n# 返回 timeout / Connection reset"
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#项目结构示例",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#项目结构示例",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "5 项目结构示例",
+    "text": "5 项目结构示例\nmy-research-project/\n├── api/\n│   └── openapi.json          # 从本地服务获取\n├── scripts/\n│   └── download_weather.py   # AI 生成的下载脚本\n├── data/\n│   └── weather_data.json     # 下载的气象数据\n└── README.md"
   },
   {
-    "objectID": "posts/2026-3-16-server-google-access-fix.html#问题背景",
-    "href": "posts/2026-3-16-server-google-access-fix.html#问题背景",
-    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
-    "section": "",
-    "text": "在 阿里云中国大陆 ECS (Ubuntu 22.04) 上部署服务时，遇到服务器无法访问 Google API / Earth Engine (GEE) 的问题。\n服务器环境： - 云平台：阿里云 ECS - 地域：西南 1（成都） - 系统：Ubuntu 22.04 - 应用依赖：Google OAuth + Earth Engine API\n问题症状：\ncurl https://oauth2.googleapis.com/token\n# 返回 timeout / Connection reset"
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#常见问题",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#常见问题",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "6 常见问题",
+    "text": "6 常见问题\n\n6.1 Q1: 服务无法启动怎么办？\n检查 Docker 日志：\ndocker logs meteo-data-download\n常见原因：\n\n端口 8000 被占用 → 修改端口映射：-p 8001:8000\n镜像不存在 → 先拉取或构建镜像\n内存不足 → 检查系统资源\n\n\n\n\n6.2 Q2: OpenAPI 规范获取失败？\n手动检查服务是否可用：\ncurl http://127.0.0.1:8000/openapi.json\n如果返回 JSON → 服务正常，检查网络或防火墙\n如果无法连接 → 服务未启动或端口错误\n\n\n\n6.3 Q3: AI 生成的代码无法运行？\n检查点：\n\n确认 openapi.json 是最新的（服务可能更新）\n重新运行 Step 2 获取最新接口定义\n检查 AI 是否严格依据接口定义（不要假设）\n查看错误信息，调整提示词重新生成\n\n\n\n\n6.4 Q4: 如何批量下载多个地点的数据？\n扩展 AI 生成的代码：\nlocations = [\n    {\"name\": \"Beijing\", \"lat\": 39.9042, \"lon\": 116.4074},\n    {\"name\": \"Shanghai\", \"lat\": 31.2304, \"lon\": 121.4737},\n    {\"name\": \"Guangzhou\", \"lat\": 23.1291, \"lon\": 113.2644},\n]\n\nfor loc in locations:\n    data = client.download_weather_data(\n        latitude=loc[\"lat\"],\n        longitude=loc[\"lon\"],\n        start_date=\"2026-01-01\",\n        end_date=\"2026-01-31\",\n        variables=[\"temperature\", \"humidity\"]\n    )\n    \n    with open(f\"data/{loc['name']}_weather.json\", \"w\") as f:\n        json.dump(data, f, indent=2)\n    \n    print(f\"✅ {loc['name']} downloaded\")"
   },
   {
-    "objectID": "posts/2026-3-16-server-google-access-fix.html#问题排查",
-    "href": "posts/2026-3-16-server-google-access-fix.html#问题排查",
-    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
-    "section": "2 问题排查",
-    "text": "2 问题排查\n\n2.1 测试 GitHub 访问\ncurl -I https://github.com\n结果：\nHTTP/2 200  ✅\n说明服务器可以访问部分国外网站。\n\n\n2.2 测试 Google 访问\ncurl -I https://google.com\n结果：\nConnection reset / timeout  ❌\n确认 中国大陆服务器无法直连 Google 服务。"
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#优势总结",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#优势总结",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "7 优势总结",
+    "text": "7 优势总结\n\n\n\n传统方式\n标准流程\n\n\n\n\n手动查文档，容易出错\nAI 基于 OpenAPI 自动生成\n\n\n每个项目重复写代码\n标准化流程，快速复用\n\n\nAPI 变更需要手动更新\n重新获取 openapi.json 即可\n\n\n需要记忆接口参数\n无需记忆，流程驱动\n\n\n调试时间长\nAI 生成 + 自动错误处理"
   },
   {
-    "objectID": "posts/2026-3-16-server-google-access-fix.html#解决思路",
-    "href": "posts/2026-3-16-server-google-access-fix.html#解决思路",
-    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
-    "section": "3 解决思路",
-    "text": "3 解决思路\n整体思路：在服务器上部署代理客户端，使访问 Google API 的流量通过代理节点转发。\n服务器\n   ↓\n本地代理 (sing-box)\n   ↓\n机场节点 (hysteria2)\n   ↓\nGoogle API / GEE"
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#扩展应用",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#扩展应用",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "8 扩展应用",
+    "text": "8 扩展应用\n这套流程不仅适用于气象数据，还可用于：\n\n其他本地 API 服务（数据库、文件处理、AI 模型等）\n团队标准化：所有成员使用相同流程\nCI/CD 集成：自动化数据获取流程\n科研可复现性：标准化的数据获取脚本"
   },
   {
-    "objectID": "posts/2026-3-16-server-google-access-fix.html#解决方案",
-    "href": "posts/2026-3-16-server-google-access-fix.html#解决方案",
-    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
-    "section": "4 解决方案",
-    "text": "4 解决方案\n\n4.1 1. 安装 sing-box\ncurl -fsSL https://sing-box.app/install.sh | bash\n\n\n4.2 2. 配置订阅\n编辑配置文件：\nnano /etc/sing-box/config.json\n添加机场订阅（hysteria2 协议）：\n{\n  \"outbounds\": [\n    {\n      \"type\": \"hysteria2\",\n      \"tag\": \"node1\",\n      \"server\": \"your.server.com\",\n      \"server_port\": 443,\n      \"password\": \"your_password\",\n      \"tls\": {\n        \"enabled\": true,\n        \"server_name\": \"your.server.com\"\n      }\n    }\n  ]\n}\n\n⚠️ 安全提示：如果曾公开分享过机场订阅 token，建议登录机场后台重新生成，防止他人盗用流量。\n\n\n\n4.3 3. 启动服务\n# 设置开机自启\nsudo systemctl enable sing-box\n\n# 启动服务\nsudo systemctl start sing-box\n\n# 查看状态\nsudo systemctl status sing-box\n\n\n4.4 4. 设置系统代理\n# 添加代理环境变量\necho 'export HTTP_PROXY=http://127.0.0.1:7890' &gt;&gt; ~/.bashrc\necho 'export HTTPS_PROXY=http://127.0.0.1:7890' &gt;&gt; ~/.bashrc\n\n# 立即生效\nsource ~/.bashrc\n\n\n4.5 5. 验证访问\ncurl -I https://google.com\n成功结果：\nHTTP/2 200  ✅\n或\nHTTP/2 404  ✅ (404 不是错误，只是 API 根路径没有资源)\n\n\n4.6 6. 测试 GEE\n重新运行 GEE 相关程序：\npython gee_test.py\n如果不再出现以下错误： - connection timeout - connection reset - token refresh failed\n说明 问题已解决 ✅"
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#总结",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#总结",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "9 总结",
+    "text": "9 总结\n通过 Docker 本地服务 + OpenAPI 规范 + AI 代码生成 的组合，我们实现了一套标准化的气象数据服务工作流程：\n\n✅ 无需记忆 API 细节\n✅ 每个项目快速复用\n✅ 代码准确可靠\n✅ 易于维护和扩展\n\n核心理念： 把重复的工作标准化，把标准化的工作自动化，让 AI 处理繁琐的细节，人类专注于更高层次的决策。"
   },
   {
-    "objectID": "posts/2026-3-16-server-google-access-fix.html#最终架构",
-    "href": "posts/2026-3-16-server-google-access-fix.html#最终架构",
-    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
-    "section": "5 最终架构",
-    "text": "5 最终架构\n服务器网络结构：\nApplication (Python/GEE)\n     ↓\nHTTP_PROXY (127.0.0.1:7890)\n     ↓\nsing-box 代理\n     ↓\nHysteria2 节点\n     ↓\nGoogle OAuth / Earth Engine API"
-  },
-  {
-    "objectID": "posts/2026-3-16-server-google-access-fix.html#关键组件说明",
-    "href": "posts/2026-3-16-server-google-access-fix.html#关键组件说明",
-    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
-    "section": "6 关键组件说明",
-    "text": "6 关键组件说明\n\n\n\n组件\n作用\n端口\n\n\n\n\nsing-box\n代理客户端\n7890\n\n\nhysteria2\n代理协议\n443\n\n\nHTTP_PROXY\n系统代理环境变量\n-"
-  },
-  {
-    "objectID": "posts/2026-3-16-server-google-access-fix.html#常见问题",
-    "href": "posts/2026-3-16-server-google-access-fix.html#常见问题",
-    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
-    "section": "7 常见问题",
-    "text": "7 常见问题\n\n7.1 Q1: sing-box 启动失败？\n检查配置文件语法：\nsing-box check -c /etc/sing-box/config.json\n查看日志：\nsudo journalctl -u sing-box -f\n\n\n7.2 Q2: 代理速度慢？\n\n检查机场节点负载\n尝试切换其他节点\n检查服务器带宽限制\n\n\n\n7.3 Q3: Python 程序仍然无法访问？\n确认环境变量已生效：\necho $HTTP_PROXY\necho $HTTPS_PROXY\n或在 Python 代码中显式设置：\nimport os\nos.environ['HTTP_PROXY'] = 'http://127.0.0.1:7890'\nos.environ['HTTPS_PROXY'] = 'http://127.0.0.1:7890'\n\n\n7.4 Q4: Docker 容器内无法访问？\n方案 1： 在容器内设置代理\nENV HTTP_PROXY=http://127.0.0.1:7890\nENV HTTPS_PROXY=http://127.0.0.1:7890\n方案 2： 使用 host 网络模式\ndocker run --network host your_image"
-  },
-  {
-    "objectID": "posts/2026-3-16-server-google-access-fix.html#总结",
-    "href": "posts/2026-3-16-server-google-access-fix.html#总结",
-    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
-    "section": "8 总结",
-    "text": "8 总结\n问题本质：\n中国大陆服务器无法直接访问 Google API\n解决方案：\n服务器部署代理客户端\n→ 使用机场节点转发流量\n→ 成功访问 Google / GEE\n核心优势： - ✅ 稳定可靠（sing-box 性能优秀） - ✅ 配置简单（只需 3 步） - ✅ 系统级代理（所有应用受益） - ✅ SSH 友好（命令行操作）"
-  },
-  {
-    "objectID": "posts/2026-3-16-server-google-access-fix.html#参考链接",
-    "href": "posts/2026-3-16-server-google-access-fix.html#参考链接",
-    "title": "中国大陆服务器访问 Google API / Earth Engine 完整解决方案",
-    "section": "9 参考链接",
-    "text": "9 参考链接\n\nsing-box 官方文档\nHysteria2 协议文档\nGoogle Earth Engine Python API\n阿里云 ECS 网络配置\n\n\n本文可作为 中国大陆服务器访问 GEE 的通用解决方案参考。"
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#参考链接",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#参考链接",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "10 参考链接",
+    "text": "10 参考链接\n\nOpenAPI Specification\nDocker Documentation\nRequests Library\nAI for Code Generation Best Practices\n\n\n本文示例代码和完整项目结构可在作者 GitHub 获取。"
   },
   {
     "objectID": "posts/2025-6-8-local_package_install.html",
@@ -544,236 +852,5 @@
     "title": "Python 本地包安装与更新指南",
     "section": "",
     "text": "如果遇到安装问题，可以尝试：\n\n清理构建文件：\n\nrm -rf build/ dist/ *.egg-info/\n\n重新构建并安装：\n\npython setup.py clean --all\npython setup.py sdist bdist_wheel\npip install -e ."
-  },
-  {
-    "objectID": "posts/2026-3-14-modern-terminal-tools.html",
-    "href": "posts/2026-3-14-modern-terminal-tools.html",
-    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
-    "section": "",
-    "text": "传统终端命令（cd, ls, git status）功能强大但体验原始。今天介绍的四个工具能让终端拥有GUI 般的易用性，同时保持SSH 友好和低资源占用。\n核心优势： - ⚡ 性能更快（Rust/Zig/Go 编写，GPU 加速） - 🎨 美观现代（主题、透明度、连字字体） - ⌨️ 键盘优先（手不离开键盘完成所有操作） - 🔧 可组合性（管道、脚本、自动化）"
-  },
-  {
-    "objectID": "posts/2026-3-14-modern-terminal-tools.html#为什么需要这些工具",
-    "href": "posts/2026-3-14-modern-terminal-tools.html#为什么需要这些工具",
-    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
-    "section": "",
-    "text": "传统终端命令（cd, ls, git status）功能强大但体验原始。今天介绍的四个工具能让终端拥有GUI 般的易用性，同时保持SSH 友好和低资源占用。\n核心优势： - ⚡ 性能更快（Rust/Zig/Go 编写，GPU 加速） - 🎨 美观现代（主题、透明度、连字字体） - ⌨️ 键盘优先（手不离开键盘完成所有操作） - 🔧 可组合性（管道、脚本、自动化）"
-  },
-  {
-    "objectID": "posts/2026-3-14-modern-terminal-tools.html#工具清单",
-    "href": "posts/2026-3-14-modern-terminal-tools.html#工具清单",
-    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
-    "section": "2 工具清单",
-    "text": "2 工具清单\n\n\n\n工具\n类别\n作用\n替代\n\n\n\n\nGhostty\n终端模拟器\n提供终端窗口\niTerm2, Terminal.app\n\n\nYazi\n文件管理器\n浏览/管理文件\nls+cd+cat\n\n\nLazygit\nGit 界面\n可视化 Git 操作\ngit status/diff/add\n\n\nZoxide\n目录跳转\n智能目录导航\ncd"
-  },
-  {
-    "objectID": "posts/2026-3-14-modern-terminal-tools.html#安装macos",
-    "href": "posts/2026-3-14-modern-terminal-tools.html#安装macos",
-    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
-    "section": "3 安装（macOS）",
-    "text": "3 安装（macOS）\n\n3.1 1. 安装 Homebrew（如果没有）\n/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\n\n\n3.2 2. 安装所有工具\n# 终端模拟器\nbrew install --cask ghostty\n\n# 终端工具\nbrew install zoxide lazygit yazi\n\n# 字体（支持图标显示）\nbrew install --cask jetbrains-mono-nerd-font\n\n\n3.3 3. 初始化配置\n# 创建配置目录\nmkdir -p ~/.config/ghostty ~/.config/yazi ~/.config/lazygit"
-  },
-  {
-    "objectID": "posts/2026-3-14-modern-terminal-tools.html#配置详解",
-    "href": "posts/2026-3-14-modern-terminal-tools.html#配置详解",
-    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
-    "section": "4 配置详解",
-    "text": "4 配置详解\n\n4.1 Ghostty 配置\n编辑 ~/.config/ghostty/config：\n# 字体配置\nfont-family = \"JetBrainsMono Nerd Font\"\nfont-size = 13\n\n# 主题（Catppuccin Mocha - 深色护眼）\ntheme = \"catppuccin-mocha\"\nbackground = \"#1e1e2e\"\nforeground = \"#cdd6f4\"\n\n# 窗口设置\ninitial-window-size = \"1200x800\"\nwindow-padding-x = 12\nwindow-padding-y = 12\nbackground-opacity = 0.92\n\n# 快捷键\nkeybind = \"cmd+t=new_tab\"\nkeybind = \"cmd+w=close\"\nkeybind = \"cmd+d=split:right\"\nkeybind = \"cmd+shift+d=split:down\"\nkeybind = \"cmd+f=show_search\"\nkeybind = \"cmd+c=copy_to_clipboard\"\nkeybind = \"cmd+v=paste_from_clipboard\"\n核心快捷键：\n\n\n\n快捷键\n功能\n\n\n\n\nCmd+T\n新建标签页\n\n\nCmd+D\n右分屏\n\n\nCmd+Shift+D\n下分屏\n\n\nCmd+W\n关闭标签页\n\n\nCmd+Enter\n全屏切换\n\n\nCmd+F\n搜索\n\n\nCmd+Plus/Minus\n字体缩放\n\n\n\n\n\n\n4.2 Zoxide 配置\n编辑 ~/.zshrc（或 ~/.bashrc）：\n# 初始化 zoxide\neval \"$(zoxide init zsh)\"\n\n# 快捷别名\nalias z=\"z\"\nalias zi=\"z -i\"  # 交互式选择\n基本用法：\n# 跳转到包含关键词的目录\nz projects          # 跳转到 ~/projects 或 /work/projects\nz ai                # 跳转到包含\"ai\"的目录\n\n# 模糊匹配（超好用！）\nz proj/ai           # 匹配 ~/projects/ai-tool\n\n# 列出所有记录\nz\n\n# 交互式选择（推荐）\nzi\n\n# 跳转并列出文件\nz projects -\n智能学习： Zoxide 会记录你常去的目录，去得越多的地方优先级越高。\n\n\n\n4.3 Yazi 配置\n编辑 ~/.config/yazi/yazi.toml：\n[manager]\nshow_hidden = true\nsort_by = \"alphabetical\"\nsort_dir_first = true\n\n[preview]\ncode_syntax_highlight = true\ncode_max_lines = 1000\nimage_quality = 75\n\n[opener]\nedit = [\n  { run = '${EDITOR:-vi} \"$@\"', block = true, for = \"unix\" },\n]\nopen = [\n  { run = 'open \"$1\"', for = \"macos\" },\n]\n基本用法：\n# 启动 yazi\ny\nya\n\n# 从指定目录启动\ny ~/projects\n核心快捷键：\n\n\n\n按键\n功能\n\n\n\n\nj/k\n上/下移动\n\n\nl\n进入目录/打开文件\n\n\nh\n返回上级目录\n\n\nTab\n切换预览面板\n\n\n/\n搜索文件\n\n\na\n新建文件/目录\n\n\nr\n重命名\n\n\nd\n删除（到回收站）\n\n\nc\n复制\n\n\nx\n剪切\n\n\np\n粘贴\n\n\n.\n显示/隐藏文件\n\n\nq\n退出\n\n\n\n预览功能： - 代码文件：语法高亮 - 图片：缩略图预览 - PDF：第一页预览 - 视频：封面预览\n\n\n\n4.4 Lazygit 配置\n编辑 ~/.config/lazygit/config.yml：\ngui:\n  theme:\n    activeBorderColor:\n      - \"#89b4fa\"\n      - \"bold\"\n    selectedLineBgColor:\n      - \"#313244\"\n  \n  mouseEvents: true\n  showFileTree: true\n  \ngit:\n  autoRefresh: true\n  autoRefreshPeriod: 5\n基本用法：\n# 在项目目录中启动\ncd ~/your-project\nlg\nlazygit\n界面布局：\n┌─ Files ─────────────┬─ Diff ──────────────┐\n│ M src/main.rs       │ @@ -12,7 +12,9 @@   │\n│ M Cargo.toml        │  fn main() {        │\n│ ? README.md         │ +   // new code     │\n│                     │      old code       │\n└─────────────────────┴─────────────────────┘\n┌─ Branches ──────────┬─ Commits ───────────┐\n│ * feature/auth      │ abc123 Add login    │\n│   main              │ def456 Fix bug      │\n│   develop           │ 789xyz Update deps  │\n└─────────────────────┴─────────────────────┘\n核心快捷键：\n\n\n\n按键\n功能\n\n\n\n\nj/k\n上/下移动\n\n\nSpace\n选择/取消选择文件\n\n\na\n添加文件到暂存区\n\n\nc\n提交（Commit）\n\n\np\n推送（Push）\n\n\nP\n拉取（Pull）\n\n\nb\n切换分支\n\n\nB\n创建分支\n\n\nm\n合并分支\n\n\nr\n刷新\n\n\nq\n退出\n\n\n?\n查看完整快捷键列表\n\n\n\n高级功能： - 部分提交：选中部分代码行提交 - 交互式 Rebase：可视化调整提交历史 - 冲突解决：分屏对比，点击选择保留哪边 - 暂存区管理：分开查看暂存和未暂存的变更"
-  },
-  {
-    "objectID": "posts/2026-3-14-modern-terminal-tools.html#完整工作流示例",
-    "href": "posts/2026-3-14-modern-terminal-tools.html#完整工作流示例",
-    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
-    "section": "5 完整工作流示例",
-    "text": "5 完整工作流示例\n\n5.1 场景：开发新功能并提交\n# 1. 用 zoxide 快速跳转项目\nz ai-project\n\n# 2. 用 yazi 浏览文件结构\ny\n\n# 3. 编辑代码（用你喜欢的编辑器）\ncode .\n\n# 4. 用 lazygit 查看变更并提交\nlg\n# → Space 选择文件\n# → c 输入提交信息\n# → p 推送到远程\n\n# 5. 分屏查看日志（Ghostty 原生支持）\nCmd+D  # 右分屏\ntail -f logs/app.log\n\n\n5.2 场景：多项目并行开发\n# Ghostty 分屏工作流\n\n# 左侧：项目 A\nz project-a\nlg\n\n# 右侧：项目 B（Cmd+D 分屏）\nz project-b\ny\n\n# 下方：系统监控（Cmd+Shift+D 分屏）\nhtop"
-  },
-  {
-    "objectID": "posts/2026-3-14-modern-terminal-tools.html#常见问题",
-    "href": "posts/2026-3-14-modern-terminal-tools.html#常见问题",
-    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
-    "section": "6 常见问题",
-    "text": "6 常见问题\n\n6.1 Q1: 字体显示异常？\nA: 确保安装了 Nerd Font 并在配置中指定：\nfont-family = \"JetBrainsMono Nerd Font\"\n\n\n6.2 Q2: Yazi 预览乱码？\nA: 安装 bat 和 ffmpegthumbnailer：\nbrew install bat ffmpeg\n\n\n6.3 Q3: Lazygit 中文乱码？\nA: 确保终端支持 UTF-8（Ghostty 默认支持）。\n\n\n6.4 Q4: Zoxide 找不到目录？\nA: 需要先用 cd 去几次，Zoxide 会学习你的习惯。"
-  },
-  {
-    "objectID": "posts/2026-3-14-modern-terminal-tools.html#进阶技巧",
-    "href": "posts/2026-3-14-modern-terminal-tools.html#进阶技巧",
-    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
-    "section": "7 进阶技巧",
-    "text": "7 进阶技巧\n\n7.1 Zoxide 高级用法\n# 删除记录\nzoxide remove ~/old-project\n\n# 导出记录\nzoxide query --list &gt; directories.txt\n\n# 在 Yazi 中集成\n# ~/.config/yazi/keymap.toml\n[[manager.prepend_keymap]]\non   = [ \"c\", \"z\" ]\nrun  = \"plugin zoxide\"\ndesc = \"Jump to a directory using zoxide\"\n\n\n7.2 Yazi 插件推荐\n# 安装插件管理器\ngit clone https://github.com/yazi-rs/plugins.git ~/.config/yazi/plugins\n\n# 推荐插件\n# - zoxide.yazi: 目录跳转\n# - git.yazi: Git 状态显示\n# - full-border.yazi: 美化边框\n\n\n7.3 Lazygit 自定义命令\n# ~/.config/lazygit/config.yml\ncustomCommands:\n  - key: \"&lt;c-r&gt;\"\n    command: \"git reset --hard HEAD~1\"\n    description: \"回滚上一个提交\"\n    context: \"commits\"\n    prompts:\n      - type: \"confirm\"\n        title: \"确认回滚\"\n        body: \"确定要删除上一个提交吗？\""
-  },
-  {
-    "objectID": "posts/2026-3-14-modern-terminal-tools.html#总结",
-    "href": "posts/2026-3-14-modern-terminal-tools.html#总结",
-    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
-    "section": "8 总结",
-    "text": "8 总结\n这套工具组合能显著提升终端开发体验：\n\n\n\n工具\n学习成本\n效率提升\n推荐指数\n\n\n\n\nGhostty\n⭐\n⭐⭐⭐\n⭐⭐⭐⭐⭐\n\n\nZoxide\n⭐\n⭐⭐⭐\n⭐⭐⭐⭐⭐\n\n\nLazygit\n⭐⭐\n⭐⭐⭐⭐⭐\n⭐⭐⭐⭐⭐\n\n\nYazi\n⭐⭐\n⭐⭐⭐⭐\n⭐⭐⭐⭐\n\n\n\n建议学习路径： 1. 第 1 周：Ghostty + Zoxide（最低学习成本） 2. 第 2 周：Lazygit（Git 复杂操作救星） 3. 第 3 周：Yazi（文件管理进阶）\n最终目标： 手不离开键盘，完成所有开发工作！"
-  },
-  {
-    "objectID": "posts/2026-3-14-modern-terminal-tools.html#参考链接",
-    "href": "posts/2026-3-14-modern-terminal-tools.html#参考链接",
-    "title": "现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程",
-    "section": "9 参考链接",
-    "text": "9 参考链接\n\nGhostty 官网\nZoxide GitHub\nYazi 官网\nLazygit GitHub\nCatppuccin 主题\n\n\n最后更新：2026-03-14 | 测试环境：macOS 26.3.1 (arm64)"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html",
-    "href": "posts/2025-6-10-paper_fig_size.html",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。\n\n\n\n\n\n用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图\n\n\n\n\n\n\n\n\nimport matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})\n\n\n\n\n\n分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt\n\n\n\n\n\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)\n\n\n\n\n图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
-    "href": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
-    "href": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "import matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
-    "href": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#代码示例",
-    "href": "posts/2025-6-10-paper_fig_size.html#代码示例",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)"
-  },
-  {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#常见问题",
-    "href": "posts/2025-6-10-paper_fig_size.html#常见问题",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html",
-    "href": "posts/2026-1-4-front_and_backend_server.html",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。\n\n\nsudo apt-get update\nsudo apt-get install -y python3-venv python3-pip\n\n\n\ncd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env\n\n\n\n\n\nsudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target\n\n\n\n\nsudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f\n\n\n\n\n\nsudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}\n\n\n\n\n\n重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
-    "href": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "sudo apt-get update\nsudo apt-get install -y python3-venv python3-pip"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
-    "href": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "cd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
-    "href": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "sudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#启动服务",
-    "href": "posts/2026-1-4-front_and_backend_server.html#启动服务",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "sudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
-    "href": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "sudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}"
-  },
-  {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
-    "href": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
-    "title": "后端服务部署：systemd + venv + Nginx",
-    "section": "",
-    "text": "重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
-  },
-  {
-    "objectID": "SKILL.html",
-    "href": "SKILL.html",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "自动将用户的技术分享需求转化为博客文章，并提交到本地 tech-blog 仓库。\n\n\n\n\nname: blog-post-publisher\nversion: 2.0.0\ndescription: 技术博客文章生成与发布工具\nauthor: bin\nlocation: ~/.openclaw/workspace/skills/blog-post-publisher\n\n\n\n\n\n\n\n用户提供一个主题或想法\n自动生成结构完整的技术文章\n遵循 Quarto Markdown 格式规范\n\n\n\n\n\n统一的文件命名（YYYY-M-D-主题.qmd）\n标准化的 Frontmatter（标题、日期、分类、标签）\n一致的写作风格和质量\n\n\n\n\n\n自动添加到 Git 仓库\n提交信息规范化\n可选推送到远程仓库\n\n\n\n\n\n\n重要： 本技能已集成到 OpenClaw workspace，博客项目也在同一位置。\n\n技能目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n博客根目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n文章目录： ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n配置文件： ~/.openclaw/workspace/skills/blog-post-publisher/_quarto.yml\n样式文件： ~/.openclaw/workspace/skills/blog-post-publisher/styles.css\n\n\n\n\n\n\n\n用户会给你一个主题，例如： - “写一个 post，介绍今天安装的终端工具” - “写一篇关于 Python 虚拟环境的教程” - “记录一下今天解决的那个 Git 问题”\n\n\n\n# 查看博客项目结构\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n\n# 查看现有文章格式（学习写作风格）\ncat ~/.openclaw/workspace/skills/blog-post-publisher/posts/最新文章.qmd\n\n\n\n文章格式（Quarto Markdown）：\n---\ntitle: \"文章标题\"\ndate: \"2026-XX-XX\"\ncategories: [分类 1, 分类 2]\ntags: [标签 1, 标签 2]\ndescription: \"一句话描述\"\n---\n\n## 问题背景/引言\n说明为什么写这篇文章，解决什么问题\n\n## 适用环境\n- 操作系统\n- 软件版本\n- 项目类型\n\n## 解决方案/教程内容\n分步骤说明，包含代码示例\n\n## 常见问题\nQ&A 格式\n\n## 总结\n表格对比、建议等\n\n## 参考链接\n相关文档、GitHub 仓库等\n写作要点： - ✅ 标题清晰，包含关键词 - ✅ 代码块标注语言（bash,python 等） - ✅ 使用表格对比 - ✅ 提供可执行的命令 - ✅ 包含常见问题解答\n\n\n\n# 文件命名格式：YYYY-M-D-主题.qmd\n# 例如：2026-3-14-modern-terminal-tools.qmd\n\ncat &gt; ~/.openclaw/workspace/skills/blog-post-publisher/posts/2026-3-14-主题.qmd &lt;&lt; 'EOF'\n[文章内容]\nEOF\n\n\n\ncd ~/.openclaw/workspace/skills/blog-post-publisher\n\n# 查看状态\ngit status\n\n# 添加新文章\ngit add posts/2026-3-14-主题.qmd\n\n# 提交（清晰说明变更）\ngit commit -m \"feat: 添加 [主题] 教程\"\n\n# 推送\ngit push origin main\n\n\n\n告诉用户： - ✅ 文章已发布 - 📝 文章标题和位置 - 🔗 GitHub 仓库链接（如果可以访问）\n\n\n\n\n\n\nQuarto：博客静态站点生成器\nGit：版本控制\nGitHub：远程仓库\n\n\n\n\n\n\n\n用户输入： &gt; 写一个 post，把今天我们刚安装的”Ghostty、Yazi、Lazygit、Zoxide”工具，写一个新手教程指导\n执行步骤： 1. 收集工具信息（功能、配置、快捷键） 2. 按照格式撰写文章 3. 保存为 2026-3-14-modern-terminal-tools.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 记录一下今天解决的 Git 忽略.pyc 文件的问题\n执行步骤： 1. 回顾问题背景和解决方案 2. 按照格式撰写文章 3. 保存为 2026-3-4-git_ignore_pyc.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 写一篇前端后端服务器对比的文章\n执行步骤： 1. 收集对比信息（功能、性能、使用场景） 2. 用表格展示对比 3. 保存文章 4. Git 提交推送\n\n\n\n\n\n\n日期格式： 使用 2026-03-14（YYYY-MM-DD）\n文件名： 使用 2026-3-14-主题.qmd（短横线分隔）\n提交信息： 清晰说明变更（feat: 添加 XXX 教程）\n网络问题： 如果 push 失败，告知用户本地已提交\n文章质量： 确保代码示例可执行，步骤清晰\n\n\n\n\n\n\n自动构建并预览（quarto render）\n自动检查拼写错误\n自动生成摘要\n支持多语言文章\n自动添加标签和分类\n\n\n\n\n\n\nv2.0.0 (2026-03-15): 迁移到 workspace 目录，规范化管理\nv1.0.0 (2026-03-14): 初始版本\n\n\n创建时间：2026-03-14\n最后更新：2026-03-15"
-  },
-  {
-    "objectID": "SKILL.html#技能信息",
-    "href": "SKILL.html#技能信息",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "name: blog-post-publisher\nversion: 2.0.0\ndescription: 技术博客文章生成与发布工具\nauthor: bin\nlocation: ~/.openclaw/workspace/skills/blog-post-publisher"
-  },
-  {
-    "objectID": "SKILL.html#核心功能",
-    "href": "SKILL.html#核心功能",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "用户提供一个主题或想法\n自动生成结构完整的技术文章\n遵循 Quarto Markdown 格式规范\n\n\n\n\n\n统一的文件命名（YYYY-M-D-主题.qmd）\n标准化的 Frontmatter（标题、日期、分类、标签）\n一致的写作风格和质量\n\n\n\n\n\n自动添加到 Git 仓库\n提交信息规范化\n可选推送到远程仓库"
-  },
-  {
-    "objectID": "SKILL.html#项目路径",
-    "href": "SKILL.html#项目路径",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "重要： 本技能已集成到 OpenClaw workspace，博客项目也在同一位置。\n\n技能目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n博客根目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n文章目录： ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n配置文件： ~/.openclaw/workspace/skills/blog-post-publisher/_quarto.yml\n样式文件： ~/.openclaw/workspace/skills/blog-post-publisher/styles.css"
-  },
-  {
-    "objectID": "SKILL.html#工作流程",
-    "href": "SKILL.html#工作流程",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "用户会给你一个主题，例如： - “写一个 post，介绍今天安装的终端工具” - “写一篇关于 Python 虚拟环境的教程” - “记录一下今天解决的那个 Git 问题”\n\n\n\n# 查看博客项目结构\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n\n# 查看现有文章格式（学习写作风格）\ncat ~/.openclaw/workspace/skills/blog-post-publisher/posts/最新文章.qmd\n\n\n\n文章格式（Quarto Markdown）：\n---\ntitle: \"文章标题\"\ndate: \"2026-XX-XX\"\ncategories: [分类 1, 分类 2]\ntags: [标签 1, 标签 2]\ndescription: \"一句话描述\"\n---\n\n## 问题背景/引言\n说明为什么写这篇文章，解决什么问题\n\n## 适用环境\n- 操作系统\n- 软件版本\n- 项目类型\n\n## 解决方案/教程内容\n分步骤说明，包含代码示例\n\n## 常见问题\nQ&A 格式\n\n## 总结\n表格对比、建议等\n\n## 参考链接\n相关文档、GitHub 仓库等\n写作要点： - ✅ 标题清晰，包含关键词 - ✅ 代码块标注语言（bash,python 等） - ✅ 使用表格对比 - ✅ 提供可执行的命令 - ✅ 包含常见问题解答\n\n\n\n# 文件命名格式：YYYY-M-D-主题.qmd\n# 例如：2026-3-14-modern-terminal-tools.qmd\n\ncat &gt; ~/.openclaw/workspace/skills/blog-post-publisher/posts/2026-3-14-主题.qmd &lt;&lt; 'EOF'\n[文章内容]\nEOF\n\n\n\ncd ~/.openclaw/workspace/skills/blog-post-publisher\n\n# 查看状态\ngit status\n\n# 添加新文章\ngit add posts/2026-3-14-主题.qmd\n\n# 提交（清晰说明变更）\ngit commit -m \"feat: 添加 [主题] 教程\"\n\n# 推送\ngit push origin main\n\n\n\n告诉用户： - ✅ 文章已发布 - 📝 文章标题和位置 - 🔗 GitHub 仓库链接（如果可以访问）"
-  },
-  {
-    "objectID": "SKILL.html#工具依赖",
-    "href": "SKILL.html#工具依赖",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "Quarto：博客静态站点生成器\nGit：版本控制\nGitHub：远程仓库"
-  },
-  {
-    "objectID": "SKILL.html#示例任务",
-    "href": "SKILL.html#示例任务",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "用户输入： &gt; 写一个 post，把今天我们刚安装的”Ghostty、Yazi、Lazygit、Zoxide”工具，写一个新手教程指导\n执行步骤： 1. 收集工具信息（功能、配置、快捷键） 2. 按照格式撰写文章 3. 保存为 2026-3-14-modern-terminal-tools.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 记录一下今天解决的 Git 忽略.pyc 文件的问题\n执行步骤： 1. 回顾问题背景和解决方案 2. 按照格式撰写文章 3. 保存为 2026-3-4-git_ignore_pyc.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 写一篇前端后端服务器对比的文章\n执行步骤： 1. 收集对比信息（功能、性能、使用场景） 2. 用表格展示对比 3. 保存文章 4. Git 提交推送"
-  },
-  {
-    "objectID": "SKILL.html#注意事项",
-    "href": "SKILL.html#注意事项",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "日期格式： 使用 2026-03-14（YYYY-MM-DD）\n文件名： 使用 2026-3-14-主题.qmd（短横线分隔）\n提交信息： 清晰说明变更（feat: 添加 XXX 教程）\n网络问题： 如果 push 失败，告知用户本地已提交\n文章质量： 确保代码示例可执行，步骤清晰"
-  },
-  {
-    "objectID": "SKILL.html#未来改进",
-    "href": "SKILL.html#未来改进",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "自动构建并预览（quarto render）\n自动检查拼写错误\n自动生成摘要\n支持多语言文章\n自动添加标签和分类"
-  },
-  {
-    "objectID": "SKILL.html#版本历史",
-    "href": "SKILL.html#版本历史",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "v2.0.0 (2026-03-15): 迁移到 workspace 目录，规范化管理\nv1.0.0 (2026-03-14): 初始版本\n\n\n创建时间：2026-03-14\n最后更新：2026-03-15"
   }
 ]
