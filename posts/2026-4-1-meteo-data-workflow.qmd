@@ -1,0 +1,348 @@
+---
+title: "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化"
+date: "2026-04-01"
+categories: [DevOps, AI Workflow, Data Engineering]
+tags: [Docker, OpenAPI, AI, 气象数据，自动化，Python]
+description: "介绍如何通过 Docker 本地部署气象数据服务，结合 OpenAPI 规范和 AI 代码生成，实现标准化的气象数据自动化下载流程"
+---
+
+## 引言
+
+在科研和数据分析项目中，获取气象数据是一个常见需求。但每次手动查文档、写代码、调试接口，效率极低。
+
+本文介绍一套**标准化的气象数据服务工作流程**：通过 Docker 本地部署服务，使用 OpenAPI 规范自动获取接口定义，再借助 AI 生成调用代码。整个过程无需记忆 API，每个新项目都能快速复用。
+
+---
+
+## 核心架构
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│   Docker 容器    │────▶│  OpenAPI 规范    │────▶│  AI 代码生成     │
+│ meteo-data-     │     │  openapi.json    │     │  Python 脚本     │
+│ download:8000   │     │  (机器可读)      │     │  (自动编写)      │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
+```
+
+**关键原则：**
+
+- ❌ 不依赖 `/docs`（给人看的页面，不适合自动化）
+- ✅ 必须使用 `openapi.json`（机器可读标准）
+- ✅ 每个新项目重复标准流程
+- ✅ 不需要记忆 API，只需要标准流程
+
+---
+
+## 前提条件
+
+### 环境要求
+
+- Docker 已安装并运行
+- Python 3.8+
+- curl 或 wget
+- 任意 AI 助手（如 OpenClaw、Claude Code 等）
+
+### 服务地址
+
+| 项目 | 值 |
+|------|-----|
+| 本地服务地址 | `http://127.0.0.1:8000` |
+| OpenAPI 定义 | `http://127.0.0.1:8000/openapi.json` |
+| 文档页面 | `http://127.0.0.1:8000/docs`（仅供参考） |
+
+---
+
+## 标准使用流程
+
+### Step 1：检查 Docker 服务是否启动
+
+```bash
+docker ps | grep meteo-data-download
+```
+
+**如果已启动** → 继续下一步
+
+**如果未启动** → 启动服务：
+
+```bash
+# 已有容器
+docker start meteo-data-download
+
+# 或首次运行
+docker run -d -p 8000:8000 --name meteo-data-download your-image
+```
+
+---
+
+### Step 2：获取 API 接口定义
+
+在每个新项目中，先创建 `api` 目录并下载 OpenAPI 规范：
+
+```bash
+mkdir -p api && curl -s http://127.0.0.1:8000/openapi.json -o ./api/openapi.json
+```
+
+**为什么需要这一步？**
+
+- OpenAPI 规范包含所有接口的完整定义
+- AI 可以基于此自动生成准确的调用代码
+- 避免手动查文档导致的错误
+
+---
+
+### Step 3：让 AI 基于接口定义编写代码
+
+向 AI 提供以下信息：
+
+1. 本地服务地址：`http://127.0.0.1:8000`
+2. 接口定义文件：`./api/openapi.json`
+3. 用户需求（例如：下载某区域、某时间段气象数据）
+
+**标准提示模板：**
+
+```
+本项目需要调用本地气象服务。
+
+服务地址：
+http://127.0.0.1:8000
+
+接口定义文件：
+./api/openapi.json
+
+请完成以下任务：
+1. 先阅读 ./api/openapi.json，识别可用接口、参数和返回结构
+2. 基于真实接口，编写代码实现气象数据下载
+
+要求：
+- 必须严格依据 openapi.json 中的接口，不得假设
+- 使用 Python 实现
+- 封装为可复用函数或类
+- 所有注释使用 English
+- 包含错误处理和超时控制
+- 提供最小可运行示例
+```
+
+---
+
+### Step 4：执行 AI 生成的代码
+
+AI 会生成类似以下的代码：
+
+```python
+import requests
+import json
+from typing import Dict, Any
+
+class MeteoDataClient:
+    """Client for downloading meteorological data from local Docker service."""
+    
+    def __init__(self, base_url: str = "http://127.0.0.1:8000", timeout: int = 30):
+        self.base_url = base_url
+        self.timeout = timeout
+        self.session = requests.Session()
+    
+    def download_weather_data(
+        self,
+        latitude: float,
+        longitude: float,
+        start_date: str,
+        end_date: str,
+        variables: list[str]
+    ) -> Dict[str, Any]:
+        """
+        Download weather data for specified location and time range.
+        
+        Args:
+            latitude: Latitude coordinate
+            longitude: Longitude coordinate
+            start_date: Start date in YYYY-MM-DD format
+            end_date: End date in YYYY-MM-DD format
+            variables: List of weather variables to download
+        
+        Returns:
+            Dictionary containing weather data
+        
+        Raises:
+            requests.exceptions.RequestException: If API call fails
+        """
+        endpoint = f"{self.base_url}/api/download"
+        payload = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "start_date": start_date,
+            "end_date": end_date,
+            "variables": variables
+        }
+        
+        response = self.session.post(
+            endpoint,
+            json=payload,
+            timeout=self.timeout
+        )
+        response.raise_for_status()
+        return response.json()
+
+
+# 使用示例
+if __name__ == "__main__":
+    client = MeteoDataClient()
+    
+    try:
+        data = client.download_weather_data(
+            latitude=39.9042,
+            longitude=116.4074,
+            start_date="2026-01-01",
+            end_date="2026-01-31",
+            variables=["temperature", "humidity", "precipitation"]
+        )
+        
+        # 保存为 JSON
+        with open("weather_data.json", "w") as f:
+            json.dump(data, f, indent=2)
+        
+        print(f"✅ Downloaded {len(data.get('results', []))} records")
+        
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Error: {e}")
+```
+
+执行代码，获取气象数据：
+
+- 可保存为 CSV / JSON 等格式
+- 可扩展为批量下载
+- 可集成到现有数据处理流程
+
+---
+
+## 项目结构示例
+
+```
+my-research-project/
+├── api/
+│   └── openapi.json          # 从本地服务获取
+├── scripts/
+│   └── download_weather.py   # AI 生成的下载脚本
+├── data/
+│   └── weather_data.json     # 下载的气象数据
+└── README.md
+```
+
+---
+
+## 常见问题
+
+### Q1: 服务无法启动怎么办？
+
+**检查 Docker 日志：**
+
+```bash
+docker logs meteo-data-download
+```
+
+**常见原因：**
+
+- 端口 8000 被占用 → 修改端口映射：`-p 8001:8000`
+- 镜像不存在 → 先拉取或构建镜像
+- 内存不足 → 检查系统资源
+
+---
+
+### Q2: OpenAPI 规范获取失败？
+
+**手动检查服务是否可用：**
+
+```bash
+curl http://127.0.0.1:8000/openapi.json
+```
+
+如果返回 JSON → 服务正常，检查网络或防火墙
+
+如果无法连接 → 服务未启动或端口错误
+
+---
+
+### Q3: AI 生成的代码无法运行？
+
+**检查点：**
+
+1. 确认 `openapi.json` 是最新的（服务可能更新）
+2. 重新运行 Step 2 获取最新接口定义
+3. 检查 AI 是否严格依据接口定义（不要假设）
+4. 查看错误信息，调整提示词重新生成
+
+---
+
+### Q4: 如何批量下载多个地点的数据？
+
+扩展 AI 生成的代码：
+
+```python
+locations = [
+    {"name": "Beijing", "lat": 39.9042, "lon": 116.4074},
+    {"name": "Shanghai", "lat": 31.2304, "lon": 121.4737},
+    {"name": "Guangzhou", "lat": 23.1291, "lon": 113.2644},
+]
+
+for loc in locations:
+    data = client.download_weather_data(
+        latitude=loc["lat"],
+        longitude=loc["lon"],
+        start_date="2026-01-01",
+        end_date="2026-01-31",
+        variables=["temperature", "humidity"]
+    )
+    
+    with open(f"data/{loc['name']}_weather.json", "w") as f:
+        json.dump(data, f, indent=2)
+    
+    print(f"✅ {loc['name']} downloaded")
+```
+
+---
+
+## 优势总结
+
+| 传统方式 | 标准流程 |
+|---------|---------|
+| 手动查文档，容易出错 | AI 基于 OpenAPI 自动生成 |
+| 每个项目重复写代码 | 标准化流程，快速复用 |
+| API 变更需要手动更新 | 重新获取 openapi.json 即可 |
+| 需要记忆接口参数 | 无需记忆，流程驱动 |
+| 调试时间长 | AI 生成 + 自动错误处理 |
+
+---
+
+## 扩展应用
+
+这套流程不仅适用于气象数据，还可用于：
+
+- **其他本地 API 服务**（数据库、文件处理、AI 模型等）
+- **团队标准化**：所有成员使用相同流程
+- **CI/CD 集成**：自动化数据获取流程
+- **科研可复现性**：标准化的数据获取脚本
+
+---
+
+## 总结
+
+通过 **Docker 本地服务 + OpenAPI 规范 + AI 代码生成** 的组合，我们实现了一套标准化的气象数据服务工作流程：
+
+1. ✅ 无需记忆 API 细节
+2. ✅ 每个项目快速复用
+3. ✅ 代码准确可靠
+4. ✅ 易于维护和扩展
+
+**核心理念：** 把重复的工作标准化，把标准化的工作自动化，让 AI 处理繁琐的细节，人类专注于更高层次的决策。
+
+---
+
+## 参考链接
+
+- [OpenAPI Specification](https://swagger.io/specification/)
+- [Docker Documentation](https://docs.docker.com/)
+- [Requests Library](https://docs.python-requests.org/)
+- [AI for Code Generation Best Practices](https://github.com/luongnv89/claude-howto)
+
+---
+
+*本文示例代码和完整项目结构可在作者 GitHub 获取。*
