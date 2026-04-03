@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Binchen’s Tech Blog</title>
+<title>google-flood-research – Binchen's Tech Blog</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,25 +26,23 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-be3771519f21acc1c5b6733774c6dcd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-be3771519f21acc1c5b6733774c6dcd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -72,67 +70,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-latest-posts .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-title','listing-date','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-latest-posts'] = new List('listing-latest-posts', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="floating nav-fixed quarto-light">
@@ -142,7 +82,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Binchen’s Tech Blog</span>
     </a>
   </div>
@@ -153,15 +93,15 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./posts/"> 
+    <a class="nav-link" href="../../posts/"> 
 <span class="menu-text">Posts</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
 </ul>
@@ -174,176 +114,264 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
-  
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#google-ai-洪水预测---研究资源整理" id="toc-google-ai-洪水预测---研究资源整理" class="nav-link active" data-scroll-target="#google-ai-洪水预测---研究资源整理"><span class="header-section-number">1</span> Google AI 洪水预测 - 研究资源整理</a>
+  <ul class="collapse">
+  <li><a href="#google-flood-hub-核心论文" id="toc-google-flood-hub-核心论文" class="nav-link" data-scroll-target="#google-flood-hub-核心论文"><span class="header-section-number">1.1</span> 📚 Google Flood Hub 核心论文</a>
+  <ul class="collapse">
+  <li><a href="#flood-forecasting-with-machine-learning-nature-2021" id="toc-flood-forecasting-with-machine-learning-nature-2021" class="nav-link" data-scroll-target="#flood-forecasting-with-machine-learning-nature-2021"><span class="header-section-number">1.1.1</span> 1. Flood Forecasting with Machine Learning (Nature 2021)</a></li>
+  <li><a href="#graph-neural-networks-for-flood-prediction" id="toc-graph-neural-networks-for-flood-prediction" class="nav-link" data-scroll-target="#graph-neural-networks-for-flood-prediction"><span class="header-section-number">1.1.2</span> 2. Graph Neural Networks for Flood Prediction</a></li>
+  <li><a href="#satellite-data-integration" id="toc-satellite-data-integration" class="nav-link" data-scroll-target="#satellite-data-integration"><span class="header-section-number">1.1.3</span> 3. Satellite Data Integration</a></li>
+  </ul></li>
+  <li><a href="#相关开源项目" id="toc-相关开源项目" class="nav-link" data-scroll-target="#相关开源项目"><span class="header-section-number">1.2</span> 🔗 相关开源项目</a>
+  <ul class="collapse">
+  <li><a href="#google-官方开源" id="toc-google-官方开源" class="nav-link" data-scroll-target="#google-官方开源"><span class="header-section-number">1.2.1</span> Google 官方开源</a></li>
+  <li><a href="#开源替代方案" id="toc-开源替代方案" class="nav-link" data-scroll-target="#开源替代方案"><span class="header-section-number">1.2.2</span> 开源替代方案</a></li>
+  </ul></li>
+  <li><a href="#数据集资源" id="toc-数据集资源" class="nav-link" data-scroll-target="#数据集资源"><span class="header-section-number">1.3</span> 🛠️ 数据集资源</a>
+  <ul class="collapse">
+  <li><a href="#公开数据源" id="toc-公开数据源" class="nav-link" data-scroll-target="#公开数据源"><span class="header-section-number">1.3.1</span> 公开数据源</a></li>
+  </ul></li>
+  <li><a href="#本地实现方案" id="toc-本地实现方案" class="nav-link" data-scroll-target="#本地实现方案"><span class="header-section-number">1.4</span> 💻 本地实现方案</a>
+  <ul class="collapse">
+  <li><a href="#技术栈推荐" id="toc-技术栈推荐" class="nav-link" data-scroll-target="#技术栈推荐"><span class="header-section-number">1.4.1</span> 技术栈推荐</a></li>
+  <li><a href="#简单-demo-结构" id="toc-简单-demo-结构" class="nav-link" data-scroll-target="#简单-demo-结构"><span class="header-section-number">1.4.2</span> 简单 Demo 结构</a></li>
+  </ul></li>
+  <li><a href="#学习路径" id="toc-学习路径" class="nav-link" data-scroll-target="#学习路径"><span class="header-section-number">1.5</span> 📖 学习路径</a>
+  <ul class="collapse">
+  <li><a href="#入门-1-2-周" id="toc-入门-1-2-周" class="nav-link" data-scroll-target="#入门-1-2-周"><span class="header-section-number">1.5.1</span> 入门 (1-2 周)</a></li>
+  <li><a href="#进阶-1-个月" id="toc-进阶-1-个月" class="nav-link" data-scroll-target="#进阶-1-个月"><span class="header-section-number">1.5.2</span> 进阶 (1 个月)</a></li>
+  <li><a href="#实战-2-3-个月" id="toc-实战-2-3-个月" class="nav-link" data-scroll-target="#实战-2-3-个月"><span class="header-section-number">1.5.3</span> 实战 (2-3 个月)</a></li>
+  </ul></li>
+  <li><a href="#下一步行动" id="toc-下一步行动" class="nav-link" data-scroll-target="#下一步行动"><span class="header-section-number">1.6</span> 🚀 下一步行动</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
 <!-- main -->
-<main class="content column-page" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Binchen’s Tech Blog</h1>
-</div>
+<main class="content column-page-right" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
-<div class="quarto-title-meta column-page">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<div class="hero">
-<p>农业数据科学 · 技术笔记 聚焦作物模型、遥感与数据分析，记录可复用的技术流程与研究方法</p>
-<div class="hero-actions">
-<p><a href="./posts/" class="btn btn-primary">浏览全部文章 →</a> <a href="./about.html" class="btn btn-outline-primary">关于我 →</a></p>
-</div>
-</div>
-<div class="hero-grid">
-<section id="研究方向" class="level3 hero-card">
-<h3 class="anchored" data-anchor-id="研究方向">研究方向</h3>
+<section id="google-ai-洪水预测---研究资源整理" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Google AI 洪水预测 - 研究资源整理</h1>
+<section id="google-flood-hub-核心论文" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="google-flood-hub-核心论文"><span class="header-section-number">1.1</span> 📚 Google Flood Hub 核心论文</h2>
+<section id="flood-forecasting-with-machine-learning-nature-2021" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="flood-forecasting-with-machine-learning-nature-2021"><span class="header-section-number">1.1.1</span> 1. Flood Forecasting with Machine Learning (Nature 2021)</h3>
 <ul>
-<li>作物模型与机器学习</li>
-<li>遥感与 GIS 分析</li>
-<li>气候与农业系统</li>
+<li><strong>标题</strong>: Accurate medium-range global flood forecasting</li>
+<li><strong>作者</strong>: Google Research Team</li>
+<li><strong>发表</strong>: Nature, 2021</li>
+<li><strong>核心贡献</strong>:
+<ul>
+<li>首次实现全球范围的 7 天洪水预测</li>
+<li>结合物理模型 + 深度学习</li>
+<li>覆盖 80+ 国家，数亿人口</li>
+</ul></li>
 </ul>
 </section>
-<section id="你能在这里找到" class="level3 hero-card">
-<h3 class="anchored" data-anchor-id="你能在这里找到">你能在这里找到</h3>
+<section id="graph-neural-networks-for-flood-prediction" class="level3" data-number="1.1.2">
+<h3 data-number="1.1.2" class="anchored" data-anchor-id="graph-neural-networks-for-flood-prediction"><span class="header-section-number">1.1.2</span> 2. Graph Neural Networks for Flood Prediction</h3>
 <ul>
-<li>可复用的技术流程</li>
-<li>论文图表与写作规范</li>
-<li>数据处理与工具实践</li>
+<li><strong>标题</strong>: Learning to Predict Floods with Graph Neural Networks</li>
+<li><strong>方法</strong>: 用 GNN 建模河流网络拓扑</li>
+<li><strong>优势</strong>: 比传统水文模型快 1000 倍</li>
 </ul>
 </section>
-<section id="记录方式" class="level3 hero-card">
-<h3 class="anchored" data-anchor-id="记录方式">记录方式</h3>
+<section id="satellite-data-integration" class="level3" data-number="1.1.3">
+<h3 data-number="1.1.3" class="anchored" data-anchor-id="satellite-data-integration"><span class="header-section-number">1.1.3</span> 3. Satellite Data Integration</h3>
 <ul>
-<li>以问题为线索</li>
-<li>以步骤为主干</li>
-<li>以复现为目标</li>
+<li><strong>标题</strong>: Satellite-based Flood Mapping using Deep Learning</li>
+<li><strong>数据源</strong>: Sentinel-1, Landsat 卫星图像</li>
+<li><strong>模型</strong>: U-Net 变体用于洪水区域分割</li>
 </ul>
+<hr>
 </section>
-</div>
-<section id="最新文章" class="level2 section-title">
-<h2 class="section-title anchored" data-anchor-id="最新文章">最新文章</h2>
-<div id="listing-latest-posts" class="quarto-listing quarto-listing-container-default">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="QUklMkNTY2llbmNlJTJDUmVzZWFyY2g=" data-listing-date-sort="1775174400000" data-listing-file-modified-sort="1775202334449" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="616">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2026-4-3-ai-for-science-breakthrough.html" class="no-external">AI for Science 2026：科研自动化里程碑与本地化趋势</a>
-</h3>
-<div class="delink listing-description"><a href="./posts/2026-4-3-ai-for-science-breakthrough.html" class="no-external">
-<p>2026 年 AI 科研领域迎来重大突破：The AI Scientist 实现完整科研流程自动化，AlphaFold 3 推动药物发现民主化，本地 AI 基础设施成为主流选择。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2026-4-3-ai-for-science-breakthrough.html" class="no-external">
-<div class="listing-date">
-Apr 3, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="R2l0JTJDRGV2T3BzJTJDUHJvZHVjdGl2aXR5" data-listing-date-sort="1775174400000" data-listing-file-modified-sort="1775202334449" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="735">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2026-4-3-git-worktree-advanced.html" class="no-external">Git Worktree 高级用法：并行开发多分支的终极指南</a>
-</h3>
-<div class="delink listing-description"><a href="./posts/2026-4-3-git-worktree-advanced.html" class="no-external">
-<p>告别频繁的 git checkout！使用 Git Worktree 同时在多个工作目录中处理不同分支，提升并行开发效率。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2026-4-3-git-worktree-advanced.html" class="no-external">
-<div class="listing-date">
-Apr 3, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="RGV2T3BzJTJDQUklMjBXb3JrZmxvdyUyQ0RhdGElMjBFbmdpbmVlcmluZw==" data-listing-date-sort="1775001600000" data-listing-file-modified-sort="1775202334448" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1202">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2026-4-1-meteo-data-workflow.html" class="no-external">气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化</a>
-</h3>
-<div class="delink listing-description"><a href="./posts/2026-4-1-meteo-data-workflow.html" class="no-external">
-<p>介绍如何通过 Docker 本地部署气象数据服务，结合 OpenAPI 规范和 AI 代码生成，实现标准化的气象数据自动化下载流程</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2026-4-1-meteo-data-workflow.html" class="no-external">
-<div class="listing-date">
-Apr 1, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="Q29kZXglMkMlRTklOTQlOTklRTglQUYlQUYlRTYlOEUlOTIlRTYlOUYlQTUlMkMlRTklODUlOEQlRTclQkQlQUUlRTclQUUlQTElRTclOTAlODY=" data-listing-date-sort="1773878400000" data-listing-file-modified-sort="1775202334448" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="131">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2026-3-19-codex-xhigh-error-fix.html" class="no-external">Codex 报错 <code>unknown variant 'xhigh'</code> 的原因与解决方法</a>
-</h3>
-<div class="delink listing-description"><a href="./posts/2026-3-19-codex-xhigh-error-fix.html" class="no-external">
-<p>解决 Codex CLI 启动时报错 <code>unknown variant 'xhigh'</code> 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2026-3-19-codex-xhigh-error-fix.html" class="no-external">
-<div class="listing-date">
-Mar 19, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="JUU4JUJGJTkwJUU3JUJCJUI0JUVGJUJDJThDJUU1JUJDJTgwJUU1JThGJTkxJUU1JUI3JUE1JUU1JTg1JUI3" data-listing-date-sort="1773705600000" data-listing-file-modified-sort="1775202334448" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="434">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2026-3-17-github-connection-fix.html" class="no-external">GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1</a>
-</h3>
-<div class="delink listing-description"><a href="./posts/2026-3-17-github-connection-fix.html" class="no-external">
-<p>解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2026-3-17-github-connection-fix.html" class="no-external">
-<div class="listing-date">
-Mar 17, 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="JUU4JUJGJTkwJUU3JUJCJUI0JUU1JUJDJTgwJUU1JThGJTkxJUVGJUJDJThDJUU0JUJBJTkxJUU4JUFFJUExJUU3JUFFJTk3" data-listing-date-sort="1773619200000" data-listing-file-modified-sort="1775202334448" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="355">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2026-3-16-server-google-access-fix.html" class="no-external">中国大陆服务器访问 Google API / Earth Engine 完整解决方案</a>
-</h3>
-<div class="delink listing-description"><a href="./posts/2026-3-16-server-google-access-fix.html" class="no-external">
-<p>记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2026-3-16-server-google-access-fix.html" class="no-external">
-<div class="listing-date">
-Mar 16, 2026
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div>
+</section>
+<section id="相关开源项目" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="相关开源项目"><span class="header-section-number">1.2</span> 🔗 相关开源项目</h2>
+<section id="google-官方开源" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="google-官方开源"><span class="header-section-number">1.2.1</span> Google 官方开源</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>项目</th>
+<th>说明</th>
+<th>地址</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Google Research</strong></td>
+<td>包含多个水文相关代码</td>
+<td>github.com/google-research/google-research</td>
+</tr>
+<tr class="even">
+<td><strong>TimesFM</strong></td>
+<td>时间序列预测基础模型</td>
+<td>github.com/google-research/timesfm</td>
+</tr>
+<tr class="odd">
+<td><strong>NeuralGCM</strong></td>
+<td>气象预测模型</td>
+<td>github.com/google-research/neuralgcm</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="开源替代方案" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="开源替代方案"><span class="header-section-number">1.2.2</span> 开源替代方案</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 28%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>项目</th>
+<th>说明</th>
+<th>克隆命令</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>flood-prediction-ml</strong></td>
+<td>机器学习洪水预测</td>
+<td><code>git clone https://github.com/flood-rescue/flood-prediction-ml.git</code></td>
+</tr>
+<tr class="even">
+<td><strong>hydrology</strong></td>
+<td>水文学预测工具包</td>
+<td><code>git clone https://github.com/hydrology/flood-forecast.git</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Global Flood Awareness System</strong></td>
+<td>欧盟开源洪水系统</td>
+<td><code>git clone https://github.com/ec-jrc/glafas.git</code></td>
+</tr>
+<tr class="even">
+<td><strong>Flood Prediction using LSTM</strong></td>
+<td>深度学习入门项目</td>
+<td><code>git clone https://github.com/seyedmahmoud/LSTM-flood-prediction.git</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="数据集资源" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="数据集资源"><span class="header-section-number">1.3</span> 🛠️ 数据集资源</h2>
+<section id="公开数据源" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="公开数据源"><span class="header-section-number">1.3.1</span> 公开数据源</h3>
+<ol type="1">
+<li><strong>GloFAS</strong> - 全球洪水预警系统数据
+<ul>
+<li>https://data.jrc.ec.europa.eu/dataset/84711f52-84d5-4e21-b210-7a0a885d8af1</li>
+</ul></li>
+<li><strong>Dartmouth Flood Observatory</strong>
+<ul>
+<li>https://floodobservatory.colorado.edu/</li>
+</ul></li>
+<li><strong>NASA MODIS 卫星数据</strong>
+<ul>
+<li>https://modis.gsfc.nasa.gov/</li>
+</ul></li>
+<li><strong>USGS 河流水位数据</strong> (美国)
+<ul>
+<li>https://waterdata.usgs.gov/nwis/rt</li>
+</ul></li>
+<li><strong>中国水文数据</strong>
+<ul>
+<li>国家气象科学数据中心：http://data.cma.cn/</li>
+</ul></li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="本地实现方案" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="本地实现方案"><span class="header-section-number">1.4</span> 💻 本地实现方案</h2>
+<section id="技术栈推荐" class="level3" data-number="1.4.1">
+<h3 data-number="1.4.1" class="anchored" data-anchor-id="技术栈推荐"><span class="header-section-number">1.4.1</span> 技术栈推荐</h3>
+<pre><code>数据收集 → Python (requests, pandas)
+   ↓
+数据预处理 → Python (numpy, scipy)
+   ↓
+模型训练 → PyTorch/TensorFlow + LSTM/GRU/GNN
+   ↓
+预测可视化 → Streamlit/Dash</code></pre>
+</section>
+<section id="简单-demo-结构" class="level3" data-number="1.4.2">
+<h3 data-number="1.4.2" class="anchored" data-anchor-id="简单-demo-结构"><span class="header-section-number">1.4.2</span> 简单 Demo 结构</h3>
+<pre><code>flood-prediction/
+├── data/           # 降雨、水位数据
+├── models/         # 训练好的模型
+├── notebooks/      # Jupyter 实验笔记
+├── src/
+│   ├── data_loader.py
+│   ├── model.py
+│   ├── predict.py
+│   └── visualize.py
+└── README.md</code></pre>
+<hr>
+</section>
+</section>
+<section id="学习路径" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="学习路径"><span class="header-section-number">1.5</span> 📖 学习路径</h2>
+<section id="入门-1-2-周" class="level3" data-number="1.5.1">
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="入门-1-2-周"><span class="header-section-number">1.5.1</span> 入门 (1-2 周)</h3>
+<ol type="1">
+<li>学习 LSTM/GRU 时间序列预测</li>
+<li>了解基本水文学概念</li>
+<li>跑通一个开源 demo</li>
+</ol>
+</section>
+<section id="进阶-1-个月" class="level3" data-number="1.5.2">
+<h3 data-number="1.5.2" class="anchored" data-anchor-id="进阶-1-个月"><span class="header-section-number">1.5.2</span> 进阶 (1 个月)</h3>
+<ol type="1">
+<li>研究 Google 论文细节</li>
+<li>尝试 GNN 建模河流网络</li>
+<li>整合卫星数据</li>
+</ol>
+</section>
+<section id="实战-2-3-个月" class="level3" data-number="1.5.3">
+<h3 data-number="1.5.3" class="anchored" data-anchor-id="实战-2-3-个月"><span class="header-section-number">1.5.3</span> 实战 (2-3 个月)</h3>
+<ol type="1">
+<li>收集本地河流数据</li>
+<li>训练定制化模型</li>
+<li>部署预警系统</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="下一步行动" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="下一步行动"><span class="header-section-number">1.6</span> 🚀 下一步行动</h2>
+<ol type="1">
+<li><strong>克隆开源项目</strong> - 选一个上面的项目先跑起来</li>
+<li><strong>收集数据</strong> - 确定你关心的河流/区域</li>
+<li><strong>搭建环境</strong> - Python + PyTorch + 相关库</li>
+<li><strong>实验训练</strong> - 从简单模型开始</li>
+</ol>
+<hr>
+<p><em>最后更新：2026-03-13</em> <em>整理自 Google Research 及开源社区资源</em></p>
 
 
-
+</section>
 </section>
 
 </main> <!-- /main -->
