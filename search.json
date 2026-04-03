@@ -126,186 +126,284 @@
     "text": "9 参考链接\n\nGhostty 官网\nZoxide GitHub\nYazi 官网\nLazygit GitHub\nCatppuccin 主题\n\n\n最后更新：2026-03-14 | 测试环境：macOS 26.3.1 (arm64)"
   },
   {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html",
-    "href": "posts/2026-1-4-front_and_backend_server.html",
-    "title": "后端服务部署：systemd + venv + Nginx",
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html",
+    "href": "posts/2026-4-1-meteo-data-workflow.html",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
     "section": "",
-    "text": "以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。\n\n\nsudo apt-get update\nsudo apt-get install -y python3-venv python3-pip\n\n\n\ncd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env\n\n\n\n\n\nsudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target\n\n\n\n\nsudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f\n\n\n\n\n\nsudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}\n\n\n\n\n\n重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
+    "text": "在科研和数据分析项目中，获取气象数据是一个常见需求。但每次手动查文档、写代码、调试接口，效率极低。\n本文介绍一套标准化的气象数据服务工作流程：通过 Docker 本地部署服务，使用 OpenAPI 规范自动获取接口定义，再借助 AI 生成调用代码。整个过程无需记忆 API，每个新项目都能快速复用。"
   },
   {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
-    "href": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
-    "title": "后端服务部署：systemd + venv + Nginx",
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#引言",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#引言",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
     "section": "",
-    "text": "sudo apt-get update\nsudo apt-get install -y python3-venv python3-pip"
+    "text": "在科研和数据分析项目中，获取气象数据是一个常见需求。但每次手动查文档、写代码、调试接口，效率极低。\n本文介绍一套标准化的气象数据服务工作流程：通过 Docker 本地部署服务，使用 OpenAPI 规范自动获取接口定义，再借助 AI 生成调用代码。整个过程无需记忆 API，每个新项目都能快速复用。"
   },
   {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
-    "href": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
-    "title": "后端服务部署：systemd + venv + Nginx",
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#核心架构",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#核心架构",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "2 核心架构",
+    "text": "2 核心架构\n┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐\n│   Docker 容器    │────▶│  OpenAPI 规范    │────▶│  AI 代码生成     │\n│ meteo-data-     │     │  openapi.json    │     │  Python 脚本     │\n│ download:8000   │     │  (机器可读)      │     │  (自动编写)      │\n└─────────────────┘     └──────────────────┘     └─────────────────┘\n关键原则：\n\n❌ 不依赖 /docs（给人看的页面，不适合自动化）\n✅ 必须使用 openapi.json（机器可读标准）\n✅ 每个新项目重复标准流程\n✅ 不需要记忆 API，只需要标准流程"
+  },
+  {
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#前提条件",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#前提条件",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "3 前提条件",
+    "text": "3 前提条件\n\n3.1 环境要求\n\nDocker 已安装并运行\nPython 3.8+\ncurl 或 wget\n任意 AI 助手（如 OpenClaw、Claude Code 等）\n\n\n\n3.2 服务地址\n\n\n\n项目\n值\n\n\n\n\n本地服务地址\nhttp://127.0.0.1:8000\n\n\nOpenAPI 定义\nhttp://127.0.0.1:8000/openapi.json\n\n\n文档页面\nhttp://127.0.0.1:8000/docs（仅供参考）"
+  },
+  {
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#标准使用流程",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#标准使用流程",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "4 标准使用流程",
+    "text": "4 标准使用流程\n\n4.1 Step 1：检查 Docker 服务是否启动\ndocker ps | grep meteo-data-download\n如果已启动 → 继续下一步\n如果未启动 → 启动服务：\n# 已有容器\ndocker start meteo-data-download\n\n# 或首次运行\ndocker run -d -p 8000:8000 --name meteo-data-download your-image\n\n\n\n4.2 Step 2：获取 API 接口定义\n在每个新项目中，先创建 api 目录并下载 OpenAPI 规范：\nmkdir -p api && curl -s http://127.0.0.1:8000/openapi.json -o ./api/openapi.json\n为什么需要这一步？\n\nOpenAPI 规范包含所有接口的完整定义\nAI 可以基于此自动生成准确的调用代码\n避免手动查文档导致的错误\n\n\n\n\n4.3 Step 3：让 AI 基于接口定义编写代码\n向 AI 提供以下信息：\n\n本地服务地址：http://127.0.0.1:8000\n接口定义文件：./api/openapi.json\n用户需求（例如：下载某区域、某时间段气象数据）\n\n标准提示模板：\n本项目需要调用本地气象服务。\n\n服务地址：\nhttp://127.0.0.1:8000\n\n接口定义文件：\n./api/openapi.json\n\n请完成以下任务：\n1. 先阅读 ./api/openapi.json，识别可用接口、参数和返回结构\n2. 基于真实接口，编写代码实现气象数据下载\n\n要求：\n- 必须严格依据 openapi.json 中的接口，不得假设\n- 使用 Python 实现\n- 封装为可复用函数或类\n- 所有注释使用 English\n- 包含错误处理和超时控制\n- 提供最小可运行示例\n\n\n\n4.4 Step 4：执行 AI 生成的代码\nAI 会生成类似以下的代码：\nimport requests\nimport json\nfrom typing import Dict, Any\n\nclass MeteoDataClient:\n    \"\"\"Client for downloading meteorological data from local Docker service.\"\"\"\n    \n    def __init__(self, base_url: str = \"http://127.0.0.1:8000\", timeout: int = 30):\n        self.base_url = base_url\n        self.timeout = timeout\n        self.session = requests.Session()\n    \n    def download_weather_data(\n        self,\n        latitude: float,\n        longitude: float,\n        start_date: str,\n        end_date: str,\n        variables: list[str]\n    ) -&gt; Dict[str, Any]:\n        \"\"\"\n        Download weather data for specified location and time range.\n        \n        Args:\n            latitude: Latitude coordinate\n            longitude: Longitude coordinate\n            start_date: Start date in YYYY-MM-DD format\n            end_date: End date in YYYY-MM-DD format\n            variables: List of weather variables to download\n        \n        Returns:\n            Dictionary containing weather data\n        \n        Raises:\n            requests.exceptions.RequestException: If API call fails\n        \"\"\"\n        endpoint = f\"{self.base_url}/api/download\"\n        payload = {\n            \"latitude\": latitude,\n            \"longitude\": longitude,\n            \"start_date\": start_date,\n            \"end_date\": end_date,\n            \"variables\": variables\n        }\n        \n        response = self.session.post(\n            endpoint,\n            json=payload,\n            timeout=self.timeout\n        )\n        response.raise_for_status()\n        return response.json()\n\n\n# 使用示例\nif __name__ == \"__main__\":\n    client = MeteoDataClient()\n    \n    try:\n        data = client.download_weather_data(\n            latitude=39.9042,\n            longitude=116.4074,\n            start_date=\"2026-01-01\",\n            end_date=\"2026-01-31\",\n            variables=[\"temperature\", \"humidity\", \"precipitation\"]\n        )\n        \n        # 保存为 JSON\n        with open(\"weather_data.json\", \"w\") as f:\n            json.dump(data, f, indent=2)\n        \n        print(f\"✅ Downloaded {len(data.get('results', []))} records\")\n        \n    except requests.exceptions.RequestException as e:\n        print(f\"❌ Error: {e}\")\n执行代码，获取气象数据：\n\n可保存为 CSV / JSON 等格式\n可扩展为批量下载\n可集成到现有数据处理流程"
+  },
+  {
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#项目结构示例",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#项目结构示例",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "5 项目结构示例",
+    "text": "5 项目结构示例\nmy-research-project/\n├── api/\n│   └── openapi.json          # 从本地服务获取\n├── scripts/\n│   └── download_weather.py   # AI 生成的下载脚本\n├── data/\n│   └── weather_data.json     # 下载的气象数据\n└── README.md"
+  },
+  {
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#常见问题",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#常见问题",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "6 常见问题",
+    "text": "6 常见问题\n\n6.1 Q1: 服务无法启动怎么办？\n检查 Docker 日志：\ndocker logs meteo-data-download\n常见原因：\n\n端口 8000 被占用 → 修改端口映射：-p 8001:8000\n镜像不存在 → 先拉取或构建镜像\n内存不足 → 检查系统资源\n\n\n\n\n6.2 Q2: OpenAPI 规范获取失败？\n手动检查服务是否可用：\ncurl http://127.0.0.1:8000/openapi.json\n如果返回 JSON → 服务正常，检查网络或防火墙\n如果无法连接 → 服务未启动或端口错误\n\n\n\n6.3 Q3: AI 生成的代码无法运行？\n检查点：\n\n确认 openapi.json 是最新的（服务可能更新）\n重新运行 Step 2 获取最新接口定义\n检查 AI 是否严格依据接口定义（不要假设）\n查看错误信息，调整提示词重新生成\n\n\n\n\n6.4 Q4: 如何批量下载多个地点的数据？\n扩展 AI 生成的代码：\nlocations = [\n    {\"name\": \"Beijing\", \"lat\": 39.9042, \"lon\": 116.4074},\n    {\"name\": \"Shanghai\", \"lat\": 31.2304, \"lon\": 121.4737},\n    {\"name\": \"Guangzhou\", \"lat\": 23.1291, \"lon\": 113.2644},\n]\n\nfor loc in locations:\n    data = client.download_weather_data(\n        latitude=loc[\"lat\"],\n        longitude=loc[\"lon\"],\n        start_date=\"2026-01-01\",\n        end_date=\"2026-01-31\",\n        variables=[\"temperature\", \"humidity\"]\n    )\n    \n    with open(f\"data/{loc['name']}_weather.json\", \"w\") as f:\n        json.dump(data, f, indent=2)\n    \n    print(f\"✅ {loc['name']} downloaded\")"
+  },
+  {
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#优势总结",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#优势总结",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "7 优势总结",
+    "text": "7 优势总结\n\n\n\n传统方式\n标准流程\n\n\n\n\n手动查文档，容易出错\nAI 基于 OpenAPI 自动生成\n\n\n每个项目重复写代码\n标准化流程，快速复用\n\n\nAPI 变更需要手动更新\n重新获取 openapi.json 即可\n\n\n需要记忆接口参数\n无需记忆，流程驱动\n\n\n调试时间长\nAI 生成 + 自动错误处理"
+  },
+  {
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#扩展应用",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#扩展应用",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "8 扩展应用",
+    "text": "8 扩展应用\n这套流程不仅适用于气象数据，还可用于：\n\n其他本地 API 服务（数据库、文件处理、AI 模型等）\n团队标准化：所有成员使用相同流程\nCI/CD 集成：自动化数据获取流程\n科研可复现性：标准化的数据获取脚本"
+  },
+  {
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#总结",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#总结",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "9 总结",
+    "text": "9 总结\n通过 Docker 本地服务 + OpenAPI 规范 + AI 代码生成 的组合，我们实现了一套标准化的气象数据服务工作流程：\n\n✅ 无需记忆 API 细节\n✅ 每个项目快速复用\n✅ 代码准确可靠\n✅ 易于维护和扩展\n\n核心理念： 把重复的工作标准化，把标准化的工作自动化，让 AI 处理繁琐的细节，人类专注于更高层次的决策。"
+  },
+  {
+    "objectID": "posts/2026-4-1-meteo-data-workflow.html#参考链接",
+    "href": "posts/2026-4-1-meteo-data-workflow.html#参考链接",
+    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "section": "10 参考链接",
+    "text": "10 参考链接\n\nOpenAPI Specification\nDocker Documentation\nRequests Library\nAI for Code Generation Best Practices\n\n\n本文示例代码和完整项目结构可在作者 GitHub 获取。"
+  },
+  {
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "cd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env"
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
   },
   {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
-    "href": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
-    "title": "后端服务部署：systemd + venv + Nginx",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "sudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target"
+    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
   },
   {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#启动服务",
-    "href": "posts/2026-1-4-front_and_backend_server.html#启动服务",
-    "title": "后端服务部署：systemd + venv + Nginx",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "sudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f"
+    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
   },
   {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
-    "href": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
-    "title": "后端服务部署：systemd + venv + Nginx",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "sudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}"
+    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
   },
   {
-    "objectID": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
-    "href": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
-    "title": "后端服务部署：systemd + venv + Nginx",
+    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
+    "title": "机器学习与传统作物模型的未来展望",
     "section": "",
-    "text": "重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
+    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
   },
   {
-    "objectID": "posts/2025-6-10-paper_fig_size.html",
-    "href": "posts/2025-6-10-paper_fig_size.html",
-    "title": "Python 论文图片尺寸规范指南",
+    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html",
+    "href": "posts/2026-3-19-codex-xhigh-error-fix.html",
+    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
     "section": "",
-    "text": "在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。\n\n\n\n\n\n用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图\n\n\n\n\n\n\n\n\nimport matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})\n\n\n\n\n\n分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt\n\n\n\n\n\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)\n\n\n\n\n图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
+    "text": "在终端运行 codex 时，出现如下报错：\nError loading configuration: unknown variant `xhigh`, expected one of `minimal`, `low`, `medium`, `high`\nin `model_reasoning_effort`\n这说明 Codex 在读取配置文件时，发现 model_reasoning_effort 被设置成了当前版本不支持的值 xhigh。"
   },
   {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
-    "href": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
-    "title": "Python 论文图片尺寸规范指南",
+    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#问题现象",
+    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#问题现象",
+    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
     "section": "",
-    "text": "用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图"
+    "text": "在终端运行 codex 时，出现如下报错：\nError loading configuration: unknown variant `xhigh`, expected one of `minimal`, `low`, `medium`, `high`\nin `model_reasoning_effort`\n这说明 Codex 在读取配置文件时，发现 model_reasoning_effort 被设置成了当前版本不支持的值 xhigh。"
   },
   {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
-    "href": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "import matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})"
+    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#报错原因",
+    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#报错原因",
+    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "section": "2 报错原因",
+    "text": "2 报错原因\n根本原因是：\n\n本地 Codex 配置文件中存在如下配置：\n\nmodel_reasoning_effort = \"xhigh\"\n\n但当前 CLI 版本只支持以下四个取值：\n\nminimal\nlow\nmedium\nhigh\n也就是说，当前环境下 xhigh 这个枚举值无法被解析，因此启动失败。\n\n2.1 常见触发场景\n\n之前在某些图形界面、IDE 插件或其他环境中，把 reasoning effort 设成了更高档位；\n该设置被写入 ~/.codex/config.toml；\n但当前终端里的 codex CLI 版本并不支持 xhigh；\n于是每次启动都会报错。"
   },
   {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
-    "href": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt"
+    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#解决思路",
+    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#解决思路",
+    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "section": "3 解决思路",
+    "text": "3 解决思路\n处理方法很直接：\n\n先备份原始配置文件；\n把配置文件里的所有 \"xhigh\" 替换成 \"high\"；\n重新运行 codex。"
   },
   {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#代码示例",
-    "href": "posts/2025-6-10-paper_fig_size.html#代码示例",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)"
+    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#解决方法",
+    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#解决方法",
+    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "section": "4 解决方法",
+    "text": "4 解决方法\n\n4.1 一键修复命令\n# 1. 备份配置文件\ncp ~/.codex/config.toml ~/.codex/config.toml.bak\n\n# 2. 批量替换配置值\nperl -0pi -e 's/\"xhigh\"/\"high\"/g' ~/.codex/config.toml\n\n# 3. 重新运行 Codex\ncodex\n\n\n4.2 命令说明\n\n4.2.1 备份配置文件\ncp ~/.codex/config.toml ~/.codex/config.toml.bak\n作用：\n\n将当前配置文件复制一份作为备份；\n如果后续修改有问题，可以随时恢复。\n\n\n\n4.2.2 批量替换配置值\nperl -0pi -e 's/\"xhigh\"/\"high\"/g' ~/.codex/config.toml\n作用：\n\n直接原地修改 ~/.codex/config.toml；\n将文件中所有 \"xhigh\" 全部替换成 \"high\"；\n不需要手动打开编辑器逐行查找。"
   },
   {
-    "objectID": "posts/2025-6-10-paper_fig_size.html#常见问题",
-    "href": "posts/2025-6-10-paper_fig_size.html#常见问题",
-    "title": "Python 论文图片尺寸规范指南",
-    "section": "",
-    "text": "图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
+    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#手动检查与编辑",
+    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#手动检查与编辑",
+    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "section": "5 手动检查与编辑",
+    "text": "5 手动检查与编辑\n如果想手动检查配置中是否仍然包含 xhigh：\ngrep -n \"xhigh\" ~/.codex/config.toml\n也可以直接打开文件手动编辑：\ncode ~/.codex/config.toml\n把类似下面的内容：\nmodel_reasoning_effort = \"xhigh\"\nplan_mode_reasoning_effort = \"xhigh\"\n改成：\nmodel_reasoning_effort = \"high\"\nplan_mode_reasoning_effort = \"high\""
   },
   {
-    "objectID": "posts/2026-3-17-github-connection-fix.html",
-    "href": "posts/2026-3-17-github-connection-fix.html",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "",
-    "text": "今天在执行 git push 推送代码到 GitHub 时，遇到了连接超时错误：\nfatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': \nFailed to connect to github.com port 443 after 75003 ms: Couldn't connect to server\n等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。"
+    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#如果问题再次出现",
+    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#如果问题再次出现",
+    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "section": "6 如果问题再次出现",
+    "text": "6 如果问题再次出现\n如果已经修改了 ~/.codex/config.toml，但还是报同样错误，可能还有其他位置也存在配置文件，例如项目目录下的：\n./.codex/config.toml\n可以用下面命令全局搜索：\ngrep -Rn 'xhigh' ~/.codex ./.codex 2&gt;/dev/null\n如果项目配置里也有 xhigh，同样需要改掉。"
   },
   {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#问题背景",
-    "href": "posts/2026-3-17-github-connection-fix.html#问题背景",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "",
-    "text": "今天在执行 git push 推送代码到 GitHub 时，遇到了连接超时错误：\nfatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': \nFailed to connect to github.com port 443 after 75003 ms: Couldn't connect to server\n等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#问题诊断过程",
-    "href": "posts/2026-3-17-github-connection-fix.html#问题诊断过程",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "2 问题诊断过程",
-    "text": "2 问题诊断过程\n\n2.1 1. 检查基础网络连接\n首先确认网络本身是否正常：\n# 测试 GitHub 是否可达\ncurl -I https://github.com\n\n# 检查 DNS 解析\nping -c 2 github.com\n结果：网络本身是通的，DNS 解析正常，说明不是基础网络问题。\n\n\n\n2.2 2. 检查 Git 配置\n检查是否有代理设置或其他配置问题：\n# 检查代理设置\ngit config --global --get http.proxy\ngit config --global --get https.proxy\n\n# 检查 SSL 验证设置\ngit config --global --get http.sslVerify\n结果：无代理设置，SSL 验证默认开启。\n\n\n\n2.3 3. 详细诊断 Git 连接\n使用详细日志模式诊断具体错误：\nGIT_CURL_VERBOSE=1 git ls-remote origin 2&gt;&1 | tail -30\n关键发现： - ✅ SSL 证书验证通过 - ❌ 连接能建立，但请求发送后超时 - ❌ 错误信息：Error in the HTTP/2 framing layer\n结论：问题出在 HTTP/2 协议层，GitHub 的 HTTP/2 连接在某些网络环境下不稳定。"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#解决方案",
-    "href": "posts/2026-3-17-github-connection-fix.html#解决方案",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "3 解决方案",
-    "text": "3 解决方案\n\n3.1 方案一：禁用 HTTP/2，使用 HTTP/1.1（推荐，本次生效）\nGit 默认使用 HTTP/2 协议，但在国内网络环境下可能不稳定。强制使用 HTTP/1.1 可以提高兼容性。\n# 1. 全局设置 Git 使用 HTTP/1.1\ngit config --global http.version HTTP/1.1\n\n# 2. 增加缓冲区大小，避免大文件推送失败\ngit config --global http.postBuffer 524288000\n\n# 3. 禁用低速限制（避免慢速连接被中断）\ngit config --global http.lowSpeedLimit 0\ngit config --global http.lowSpeedTime 9999\n\n# 4. 重新推送\ngit push --set-upstream origin main\n原理： - http.version HTTP/1.1：强制使用 HTTP/1.1 协议，避免 HTTP/2 兼容性问题 - http.postBuffer 524288000：设置 500MB 缓冲区，适合大文件推送 - http.lowSpeedLimit 0：禁用低速限制，避免慢速连接被中断\n效果：✅ 本次问题已解决，推送成功。\n\n\n\n3.2 方案二：配置代理（如果方案一无效）\n如果你使用代理软件（Clash、Surge、Shadowsocks 等），可以配置 Git 通过代理连接：\n# 查找代理端口（常见端口：7890, 1087, 6153 等）\n# Clash 默认端口通常是 7890\n\n# 设置 Git 代理\ngit config --global http.proxy http://127.0.0.1:7890\ngit config --global https.proxy http://127.0.0.1:7890\n\n# 推送\ngit push --set-upstream origin main\n\n# 取消代理（如果需要）\ngit config --global --unset http.proxy\ngit config --global --unset https.proxy\n\n\n\n3.3 方案三：改用 SSH 协议（长期推荐）\nSSH 协议比 HTTPS 更稳定，且不需要每次输入密码。\n# 1. 查看现有 SSH 公钥\ncat ~/.ssh/id_ed25519.pub\n\n# 2. 如果没有密钥，生成新的\nssh-keygen -t ed25519 -C \"your_email@example.com\"\n\n# 3. 将公钥添加到 GitHub\n# 访问：https://github.com/settings/keys\n# 点击 \"New SSH key\"，粘贴公钥内容\n\n# 4. 测试 SSH 连接\nssh -T git@github.com\n# 成功输出：Hi chenbin98! You've successfully authenticated...\n\n# 5. 切换 remote 为 SSH\ngit remote set-url origin git@github.com:chenbin98/meteo_data_download.git\n\n# 6. 推送\ngit push --set-upstream origin main\n优势： - ✅ 不需要每次输入密码 - ✅ 连接更稳定 - ✅ 不受 HTTPS 代理问题影响"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#常用-git-远程操作命令",
-    "href": "posts/2026-3-17-github-connection-fix.html#常用-git-远程操作命令",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "4 常用 Git 远程操作命令",
-    "text": "4 常用 Git 远程操作命令\n# 查看远程仓库\ngit remote -v\n\n# 设置 upstream 并推送\ngit push --set-upstream origin main\n\n# 后续推送（已设置 upstream 后）\ngit push\n\n# 拉取远程更新\ngit pull\n\n# 查看当前分支跟踪情况\ngit branch -vv"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#故障排查流程图",
-    "href": "posts/2026-3-17-github-connection-fix.html#故障排查流程图",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "5 故障排查流程图",
-    "text": "5 故障排查流程图\ngit push 失败\n    │\n    ▼\n检查网络：curl/ping github.com\n    │\n    ├── 不通 → 检查网络/代理\n    │\n    ▼ 通\n检查 Git 配置：git config --get http.proxy\n    │\n    ├── 有代理 → 确认代理是否正确\n    │\n    ▼ 无代理\n详细诊断：GIT_CURL_VERBOSE=1 git ls-remote origin\n    │\n    ├── SSL 失败 → 检查证书/时间设置\n    ├── HTTP/2 错误 → 改用 HTTP/1.1 ✓\n    └── 认证失败 → 检查凭证/SSH 密钥"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#方案对比",
-    "href": "posts/2026-3-17-github-connection-fix.html#方案对比",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "6 方案对比",
-    "text": "6 方案对比\n\n\n\n\n\n\n\n\n\n方案\n优点\n缺点\n适用场景\n\n\n\n\nHTTP/1.1\n配置简单，立竿见影\n每次推送可能仍需输入密码\n临时解决/快速修复\n\n\n代理\n可访问被墙资源\n依赖代理软件稳定性\n代理环境用户\n\n\nSSH\n最稳定，无需密码\n需要配置 SSH 密钥\n长期使用推荐"
-  },
-  {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#总结",
-    "href": "posts/2026-3-17-github-connection-fix.html#总结",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#总结",
+    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#总结",
+    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
     "section": "7 总结",
-    "text": "7 总结\n本次解决的关键命令：\n# 1. 禁用 HTTP/2\ngit config --global http.version HTTP/1.1\n\n# 2. 增加缓冲区\ngit config --global http.postBuffer 524288000\n\n# 3. 禁用低速限制\ngit config --global http.lowSpeedLimit 0\ngit config --global http.lowSpeedTime 9999\n\n# 4. 推送\ngit push --set-upstream origin main\n长期建议：配置 SSH 密钥，切换到 SSH 协议，获得更稳定的连接体验。"
+    "text": "7 总结\n这个报错不是 codex 本身坏了，而是配置文件里写了当前 CLI 不支持的 model_reasoning_effort = \"xhigh\"。\n把它改成 high 即可恢复正常。\n\n7.1 推荐保留的最终修复命令\ncp ~/.codex/config.toml ~/.codex/config.toml.bak\nperl -0pi -e 's/\"xhigh\"/\"high\"/g' ~/.codex/config.toml\ncodex"
   },
   {
-    "objectID": "posts/2026-3-17-github-connection-fix.html#参考链接",
-    "href": "posts/2026-3-17-github-connection-fix.html#参考链接",
-    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
-    "section": "8 参考链接",
-    "text": "8 参考链接\n\nGit 配置文档\nGitHub SSH 连接指南\nGit 代理设置\n\n\n文档生成时间：2026-03-17\n问题状态：✅ 已解决"
+    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#参考资料",
+    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#参考资料",
+    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "section": "8 参考资料",
+    "text": "8 参考资料\n\nCodex 官方文档\nCodex 配置指南"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html",
-    "href": "posts/2025-6-13-geedownload.html",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/index.html",
+    "href": "posts/index.html",
+    "title": "技术文档",
     "section": "",
-    "text": "最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。\n\n\n\n\n首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。\n\n\n\n\n\n确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息\n\n\n\n\n如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
+    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nAI for Science 2026：科研自动化里程碑与本地化趋势\n\n\n2026 年 AI 科研领域迎来重大突破：The AI Scientist 实现完整科研流程自动化，AlphaFold 3 推动药物发现民主化，本地 AI 基础设施成为主流选择。\n\n\n\n\n\nApr 3, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit Worktree 高级用法：并行开发多分支的终极指南\n\n\n告别频繁的 git checkout！使用 Git Worktree 同时在多个工作目录中处理不同分支，提升并行开发效率。\n\n\n\n\n\nApr 3, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化\n\n\n介绍如何通过 Docker 本地部署气象数据服务，结合 OpenAPI 规范和 AI 代码生成，实现标准化的气象数据自动化下载流程\n\n\n\n\n\nApr 1, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\nBinchen Chen\n\n\n\n\n\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html#认证步骤",
-    "href": "posts/2025-6-13-geedownload.html#认证步骤",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
     "section": "",
-    "text": "首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。"
+    "text": "2026 年 4 月，AI for Science 领域迎来了一系列里程碑式的突破。从 AI 自主完成完整科研流程，到 AlphaFold 数据库开放数百万蛋白质结构预测，再到本地 AI 基础设施的崛起——我们正站在科研范式转移的临界点上。\n本文基于 2026 年 4 月 3 日的最新行业动态，梳理 AI for Science 的核心进展，并探讨这些变化对科研工作者的实际意义。"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html#注意事项",
-    "href": "posts/2025-6-13-geedownload.html#注意事项",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#引言",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#引言",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
     "section": "",
-    "text": "确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息"
+    "text": "2026 年 4 月，AI for Science 领域迎来了一系列里程碑式的突破。从 AI 自主完成完整科研流程，到 AlphaFold 数据库开放数百万蛋白质结构预测，再到本地 AI 基础设施的崛起——我们正站在科研范式转移的临界点上。\n本文基于 2026 年 4 月 3 日的最新行业动态，梳理 AI for Science 的核心进展，并探讨这些变化对科研工作者的实际意义。"
   },
   {
-    "objectID": "posts/2025-6-13-geedownload.html#常见问题",
-    "href": "posts/2025-6-13-geedownload.html#常见问题",
-    "title": "解决 Google Earth Engine 认证问题的最新方法",
-    "section": "",
-    "text": "如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#一ai-科研自动化从辅助工具到独立研究者",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#一ai-科研自动化从辅助工具到独立研究者",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "2 一、AI 科研自动化：从辅助工具到独立研究者",
+    "text": "2 一、AI 科研自动化：从辅助工具到独立研究者\n\n2.1 1.1 The AI Scientist 里程碑\nNature 2026 年 3 月发表的 “The AI Scientist: Towards Fully Automated AI Research” 标志着 AI 科研能力的质的飞跃：\n\n第一作者：UBC 教授 Jeff Clune 等\n核心能力：AI Agent 可独立执行机器学习研究全生命周期\n\n提出研究想法\n文献调研\n实验设计\n代码编写\n论文撰写\n\n\n意义：这是首次展示 AI 独立完成从创意到论文的完整科研流程，标志着 AI 从”辅助工具”向”独立研究者”的转变。\n\n\n2.2 1.2 Claude 的数学突破\n与此同时，Donald Knuth 在 2026 年 3 月初发布的 “Claude’s Cycles” 展示了另一项突破：\n\nClaude Opus 4.6 成功解决开放图论难题（3D 有向图中哈密顿回路构造）\nKnuth 评价为”自动演绎与创造性问题解决的戏剧性进展”"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#二结构生物学与药物发现的民主化",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#二结构生物学与药物发现的民主化",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "3 二、结构生物学与药物发现的民主化",
+    "text": "3 二、结构生物学与药物发现的民主化\n\n3.1 2.1 AlphaFold 3 生态进展\n\n\n\n时间\n里程碑\n\n\n\n\n2024 年 5 月\nAlphaFold 3 发布\n\n\n2024 年 11 月\n开源（非商业用途）\n\n\n2025 年 2 月\n公开访问\n\n\n2026 年 3 月\n数据库开放数百万预测结构\n\n\n\n关键升级（相比 AlphaFold 2）： - 可预测蛋白质-DNA/RNA/配体/离子复合物 - 准确率提升 ≥50% - DeepMind + EMBL-EBI + NVIDIA + 首尔大学合作维护\n\n\n3.2 2.2 新药设计工具涌现\nUVA Health 2026 年发布： - YuelDesign/YuelPocket/YuelBond：基于扩散模型，考虑蛋白质动态结合过程 - 支持从头药物设计和现有药物新用途评估\n其他工具： - Boltz-2（2025 年 6 月） - Genesis Molecular AI Pearl - RFdiffusion（2025 年 4 月/12 月迭代） - BoltzGen（2025 年 11 月）"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#三ai-天气预报进入业务化阶段",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#三ai-天气预报进入业务化阶段",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "4 三、AI 天气预报进入业务化阶段",
+    "text": "4 三、AI 天气预报进入业务化阶段\n\n4.1 3.1 主流 AI 气象模型\n\n\n\n模型\n机构\n状态\n\n\n\n\nGraphCast\nGoogle DeepMind\n业务化\n\n\n盘古气象\n华为\n业务化\n\n\nAIFS\nECMWF\n2024 年业务化\n\n\nAIGFS\nNOAA\n混合 AI 系统\n\n\n\n核心优势： - 运行速度提升数千倍 - 多数指标匹配或超越传统数值预报 - 支持次季节（2-6 周）和季节尺度预测\n\n\n4.2 3.2 地球系统建模突破\nAI 正在改进大气重力波等小尺度过程表征，打破”数十年网格僵局”，支持： - 气候变化模拟 - 粮食安全预测 - 资源管理优化"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#四材料发现从十年压缩到数周",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#四材料发现从十年压缩到数周",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "5 四、材料发现：从”十年”压缩到”数周”",
+    "text": "5 四、材料发现：从”十年”压缩到”数周”\n\n5.1 4.1 生成式设计范式\n\n\n\n工具\n机构\n核心能力\n\n\n\n\nMatterGen\nMicrosoft\n扩散模型生成稳定无机材料\n\n\nAtomGPT\n-\nTransformer 架构设计超导体\n\n\nGNoME\nDeepMind\n预测 240 万种稳定材料\n\n\n\n\n\n5.2 4.2 自主实验室闭环\nBerkeley A-Lab 代表了一个新品类： - AI 提出假设 → 自主实验验证 → 结果反馈优化 - 闭环系统合成验证 AI 设计材料 - 短时间成功合成高比例目标化合物\n\n\n5.3 4.3 应用方向\n\n能源存储：高性能电池材料、钠离子电池固态电解质\n催化：生成式语言模型设计高熵催化剂\n光伏：优化钙钛矿配方，2026 年预期商用\n轻量化合金：航空航天/汽车应用\n可持续材料：食品包装化学回收设计"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#五物理仿真基础模型崛起",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#五物理仿真基础模型崛起",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "6 五、物理仿真基础模型崛起",
+    "text": "6 五、物理仿真基础模型崛起\n\n6.1 5.1 神经算子架构创新（2026 年 3 月）\n\n\n\n模型\n特点\n性能提升\n\n\n\n\nLNF-NO\n线性 - 非线性融合神经算子\n训练速度提升 2.7 倍\n\n\nPILNO\n物理信息拉普拉斯神经算子\n增强数据效率和分布外鲁棒性\n\n\nNOQS\n神经算子量子态\n单次前向预测未见协议\n\n\n\n\n\n6.2 5.2 基础模型\n\nPhysiX：45 亿参数自回归生成模型，大规模物理仿真基础模型\nPolymathic AI：Walrus、AION-1 等模型，跨领域科学知识迁移\nNeuralOperator：2026 年 1 月正式纳入 PyTorch 生态系统"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#六本地-ai-基础设施隐私与效率的双重驱动",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#六本地-ai-基础设施隐私与效率的双重驱动",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "7 六、本地 AI 基础设施：隐私与效率的双重驱动",
+    "text": "7 六、本地 AI 基础设施：隐私与效率的双重驱动\n\n7.1 6.1 为什么本地化成为趋势？\n2026 年 GitHub Trending 数据显示，OpenClaw 以 210K+ stars 成为 breakout star，反映了三大驱动力：\n\n\n\n驱动因素\n说明\n\n\n\n\n隐私保护\n个人数据不用上传到第三方\n\n\n成本优化\n降低 API 调用成本，提升迭代速度\n\n\n延迟优化\n本地运行意味着更快的响应\n\n\n\n\n\n7.2 6.2 OpenClaw 生态\nOpenClaw 是跑在自己设备上的 AI 助手网关： - 50+ 集成（微信、Discord、日历、邮件等） - 隐私优先，本地运行 - 支持 50+ 技能扩展\nClawMetry：OpenClaw 生态的可观测性工具 - 实时监代理行为 - 解决”AI 在做什么”的透明度问题\n\n\n7.3 6.3 对科研场景的价值\n\n✅ 敏感数据处理：未发表研究、保密项目\n✅ 离线场景：野外调研、网络受限环境\n✅ 工作流整合：直接连接现有工具，不用切换平台"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#七ai-代理治理2026-年关键词",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#七ai-代理治理2026-年关键词",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "8 七、AI 代理治理：2026 年关键词",
+    "text": "8 七、AI 代理治理：2026 年关键词\n\n8.1 7.1 为什么治理成为刚需？\nAI 代理正从”回答问题”变成”执行任务”，错误成本大幅上升： - 一个乱发邮件的代理可能比胡说八道的聊天机器人危险 100 倍 - 科研机构可能需要 AI 使用合规官 - 企业会需要 AI 治理专家\n\n\n8.2 7.2 OpenBox：AI 代理行为治理平台\n核心功能： - 查看、验证、管理 AI 代理的每个行为 - 事前审批、事后审计 - 解决”黑箱”信任问题\n\n\n8.3 7.3 个人 AI 使用规范建议\n\n\n\n操作类型\n建议级别\n\n\n\n\n文献调研、代码生成\n全自动\n\n\n论文初稿撰写\n半自动（需审查）\n\n\n邮件发送、内容发布\n人工确认\n\n\n代码提交、数据发布\n人工确认"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#八生产力悖论ai-越多审查越慢",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#八生产力悖论ai-越多审查越慢",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "9 八、生产力悖论：AI 越多，审查越慢",
+    "text": "9 八、生产力悖论：AI 越多，审查越慢\nHacker News 2026 年讨论发现：\n\n高 AI 采用率的团队完成的任务更多、PR 合并更多，但PR 审查时间大幅增加。\n\n启示： - AI 把瓶颈从”生产”转移到了”审查” - 需要提升代码审查、架构设计、需求拆解能力 - 建立 AI 输出审查清单（代码/文本/数据的验证点）"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#九跨领域趋势总结",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#九跨领域趋势总结",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "10 九、跨领域趋势总结",
+    "text": "10 九、跨领域趋势总结\n\n\n\n\n\n\n\n\n趋势\n说明\n影响\n\n\n\n\n基础模型范式扩展\n从 NLP/CV 向科学领域延伸\n材料/物理/量子基础模型涌现\n\n\n自主科研闭环\nAI 提出假设→实验验证→反馈优化\n材料、药物、物理领域快速落地\n\n\n混合方法主流化\nAI + 物理约束 + 数值求解器\nPINN、混合 AI-物理模型\n\n\n开放科学加速\nAlphaFold 数据库开源、NeuralOperator 纳入 PyTorch\n降低科研门槛\n\n\n监管与临床进展\nFDA 发布 AI 监管指南\n首个 AI 发现药物预期 2026-2027 年获批"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#十对科研工作者的建议",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#十对科研工作者的建议",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "11 十、对科研工作者的建议",
+    "text": "11 十、对科研工作者的建议\n\n11.1 10.1 能力重构\n\n\n\n能力域\n过去重点\n2026 年重点\n\n\n\n\n科研\n写论文、做实验\n设计 AI 工作流、审查 AI 输出\n\n\n工程\n写代码\n架构设计、AI 代码审查、token 优化\n\n\n产品\n需求文档\nAI 代理行为设计、治理规则定义\n\n\n\n\n\n11.2 10.2 行动清单\n高优先级（本周）： - [ ] 浏览 OpenClaw GitHub，理解本地 AI 架构 - [ ] 列出个人”高风险 AI 操作清单” - [ ] 评估当前 workflow 中可自动化的环节\n中优先级（本月）： - [ ] 尝试本地部署 Ollama + 开源模型 - [ ] 建立 AI 输出审查清单 - [ ] 关注 AlphaFold 3 在研究方向的应用\n长期关注： - [ ] AI 代理可观测性与治理 - [ ] 本地 AI 基础设施（模型量化、本地 RAG） - [ ] 科学基础模型竞争格局"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#总结",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#总结",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "12 总结",
+    "text": "12 总结\n2026 年的 AI for Science 不再是”能不能用”，而是”怎么安全、可控、高效地用”。\n三个核心方向值得投入： 1. 本地化：隐私、成本、延迟三重驱动 2. 可观测性：AI 代理监控与审计 3. 治理：审批流程设计与风险评估\n一句话总结：本地化、可观测、治理——这是成熟技术的标志，也是科研工作者需要跟进的方向。"
+  },
+  {
+    "objectID": "posts/2026-4-3-ai-for-science-breakthrough.html#参考链接",
+    "href": "posts/2026-4-3-ai-for-science-breakthrough.html#参考链接",
+    "title": "AI for Science 2026：科研自动化里程碑与本地化趋势",
+    "section": "13 参考链接",
+    "text": "13 参考链接\n\nOpenClaw GitHub\nAlphaFold Database\nECMWF AIFS\nNeuralOperator PyTorch\nThe AI Scientist (Nature)\n\n\n本文基于 2026 年 4 月 3 日 AI 深度简报与 AI for Science 每日简报整理\n发布时间：2026 年 4 月 3 日"
   },
   {
     "objectID": "posts/2026-3-4-git_ignore_pyc.html",
@@ -396,7 +494,7 @@
     "href": "index.html#最新文章",
     "title": "Binchen’s Tech Blog",
     "section": "最新文章",
-    "text": "最新文章\n\n\n\n\n\n气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化\n\n\n介绍如何通过 Docker 本地部署气象数据服务，结合 OpenAPI 规范和 AI 代码生成，实现标准化的气象数据自动化下载流程\n\n\n\n\n\nApr 1, 2026\n\n\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\nNo matching items"
+    "text": "最新文章\n\n\n\n\n\nAI for Science 2026：科研自动化里程碑与本地化趋势\n\n\n2026 年 AI 科研领域迎来重大突破：The AI Scientist 实现完整科研流程自动化，AlphaFold 3 推动药物发现民主化，本地 AI 基础设施成为主流选择。\n\n\n\n\n\nApr 3, 2026\n\n\n\n\n\n\n\nGit Worktree 高级用法：并行开发多分支的终极指南\n\n\n告别频繁的 git checkout！使用 Git Worktree 同时在多个工作目录中处理不同分支，提升并行开发效率。\n\n\n\n\n\nApr 3, 2026\n\n\n\n\n\n\n\n气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化\n\n\n介绍如何通过 Docker 本地部署气象数据服务，结合 OpenAPI 规范和 AI 代码生成，实现标准化的气象数据自动化下载流程\n\n\n\n\n\nApr 1, 2026\n\n\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "SKILL.html",
@@ -637,186 +735,263 @@
     "text": "首次出现是否“全称（缩写）”并后续一致？\n标题与摘要中的缩写是否必要且已定义？\n图表与附注是否给出缩写释义或“缩写表”？\n单位、数值与符号是否符合 SI 与期刊风格？\n统计量（P 值、区间、效应量）是否书写一致？\n参考文献与文内引文缩写是否统一格式？\n\n\n如需，我可以按您的研究方向（如遥感、生态、医学等）扩充专用缩写清单或将本页适配目标期刊格式。"
   },
   {
-    "objectID": "posts/index.html",
-    "href": "posts/index.html",
-    "title": "技术文档",
+    "objectID": "posts/2025-6-13-geedownload.html",
+    "href": "posts/2025-6-13-geedownload.html",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
     "section": "",
-    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化\n\n\n介绍如何通过 Docker 本地部署气象数据服务，结合 OpenAPI 规范和 AI 代码生成，实现标准化的气象数据自动化下载流程\n\n\n\n\n\nApr 1, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\nBinchen Chen\n\n\n\n\n\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
+    "text": "最近 Google Earth Engine 的认证方式有所更新，本文将介绍最新的认证流程。\n\n\n\n\n首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。\n\n\n\n\n\n确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息\n\n\n\n\n如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
   },
   {
-    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html",
-    "href": "posts/2026-3-19-codex-xhigh-error-fix.html",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "objectID": "posts/2025-6-13-geedownload.html#认证步骤",
+    "href": "posts/2025-6-13-geedownload.html#认证步骤",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
     "section": "",
-    "text": "在终端运行 codex 时，出现如下报错：\nError loading configuration: unknown variant `xhigh`, expected one of `minimal`, `low`, `medium`, `high`\nin `model_reasoning_effort`\n这说明 Codex 在读取配置文件时，发现 model_reasoning_effort 被设置成了当前版本不支持的值 xhigh。"
+    "text": "首先需要安装 Google Cloud SDK，这是进行认证的必要工具。\n\n\n\n\n打开终端，运行以下命令登录：\n\ngcloud auth login\n\n设置项目：\n\ngcloud config set project [你的项目ID]\n\n\n\n运行以下命令启用 Earth Engine API 服务：\ngcloud services enable earthengine.googleapis.com\n\n\n\n最后，使用以下命令进行 Earth Engine 的重新认证：\nearthengine authenticate --force\n系统会自动使用 gcloud 的方式进行认证。"
   },
   {
-    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#问题现象",
-    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#问题现象",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "objectID": "posts/2025-6-13-geedownload.html#注意事项",
+    "href": "posts/2025-6-13-geedownload.html#注意事项",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
     "section": "",
-    "text": "在终端运行 codex 时，出现如下报错：\nError loading configuration: unknown variant `xhigh`, expected one of `minimal`, `low`, `medium`, `high`\nin `model_reasoning_effort`\n这说明 Codex 在读取配置文件时，发现 model_reasoning_effort 被设置成了当前版本不支持的值 xhigh。"
+    "text": "确保已经安装了最新版本的 Google Cloud SDK\n确保有正确的 Google Cloud 项目权限\n如果遇到问题，可以尝试先运行 gcloud auth revoke 清除旧的认证信息"
   },
   {
-    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#报错原因",
-    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#报错原因",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
-    "section": "2 报错原因",
-    "text": "2 报错原因\n根本原因是：\n\n本地 Codex 配置文件中存在如下配置：\n\nmodel_reasoning_effort = \"xhigh\"\n\n但当前 CLI 版本只支持以下四个取值：\n\nminimal\nlow\nmedium\nhigh\n也就是说，当前环境下 xhigh 这个枚举值无法被解析，因此启动失败。\n\n2.1 常见触发场景\n\n之前在某些图形界面、IDE 插件或其他环境中，把 reasoning effort 设成了更高档位；\n该设置被写入 ~/.codex/config.toml；\n但当前终端里的 codex CLI 版本并不支持 xhigh；\n于是每次启动都会报错。"
+    "objectID": "posts/2025-6-13-geedownload.html#常见问题",
+    "href": "posts/2025-6-13-geedownload.html#常见问题",
+    "title": "解决 Google Earth Engine 认证问题的最新方法",
+    "section": "",
+    "text": "如果认证过程中遇到问题，可以：\n\n检查 gcloud 是否正确安装：gcloud --version\n确认项目设置：gcloud config list\n验证 API 是否已启用：gcloud services list --enabled"
   },
   {
-    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#解决思路",
-    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#解决思路",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
-    "section": "3 解决思路",
-    "text": "3 解决思路\n处理方法很直接：\n\n先备份原始配置文件；\n把配置文件里的所有 \"xhigh\" 替换成 \"high\"；\n重新运行 codex。"
+    "objectID": "posts/2026-3-17-github-connection-fix.html",
+    "href": "posts/2026-3-17-github-connection-fix.html",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "",
+    "text": "今天在执行 git push 推送代码到 GitHub 时，遇到了连接超时错误：\nfatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': \nFailed to connect to github.com port 443 after 75003 ms: Couldn't connect to server\n等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。"
   },
   {
-    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#解决方法",
-    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#解决方法",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
-    "section": "4 解决方法",
-    "text": "4 解决方法\n\n4.1 一键修复命令\n# 1. 备份配置文件\ncp ~/.codex/config.toml ~/.codex/config.toml.bak\n\n# 2. 批量替换配置值\nperl -0pi -e 's/\"xhigh\"/\"high\"/g' ~/.codex/config.toml\n\n# 3. 重新运行 Codex\ncodex\n\n\n4.2 命令说明\n\n4.2.1 备份配置文件\ncp ~/.codex/config.toml ~/.codex/config.toml.bak\n作用：\n\n将当前配置文件复制一份作为备份；\n如果后续修改有问题，可以随时恢复。\n\n\n\n4.2.2 批量替换配置值\nperl -0pi -e 's/\"xhigh\"/\"high\"/g' ~/.codex/config.toml\n作用：\n\n直接原地修改 ~/.codex/config.toml；\n将文件中所有 \"xhigh\" 全部替换成 \"high\"；\n不需要手动打开编辑器逐行查找。"
+    "objectID": "posts/2026-3-17-github-connection-fix.html#问题背景",
+    "href": "posts/2026-3-17-github-connection-fix.html#问题背景",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "",
+    "text": "今天在执行 git push 推送代码到 GitHub 时，遇到了连接超时错误：\nfatal: unable to access 'https://github.com/chenbin98/meteo_data_download.git/': \nFailed to connect to github.com port 443 after 75003 ms: Couldn't connect to server\n等待了 75 秒后连接失败，无法推送代码。这个问题在国内网络环境下比较常见，尤其是使用 HTTPS 协议连接 GitHub 时。"
   },
   {
-    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#手动检查与编辑",
-    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#手动检查与编辑",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
-    "section": "5 手动检查与编辑",
-    "text": "5 手动检查与编辑\n如果想手动检查配置中是否仍然包含 xhigh：\ngrep -n \"xhigh\" ~/.codex/config.toml\n也可以直接打开文件手动编辑：\ncode ~/.codex/config.toml\n把类似下面的内容：\nmodel_reasoning_effort = \"xhigh\"\nplan_mode_reasoning_effort = \"xhigh\"\n改成：\nmodel_reasoning_effort = \"high\"\nplan_mode_reasoning_effort = \"high\""
+    "objectID": "posts/2026-3-17-github-connection-fix.html#问题诊断过程",
+    "href": "posts/2026-3-17-github-connection-fix.html#问题诊断过程",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "2 问题诊断过程",
+    "text": "2 问题诊断过程\n\n2.1 1. 检查基础网络连接\n首先确认网络本身是否正常：\n# 测试 GitHub 是否可达\ncurl -I https://github.com\n\n# 检查 DNS 解析\nping -c 2 github.com\n结果：网络本身是通的，DNS 解析正常，说明不是基础网络问题。\n\n\n\n2.2 2. 检查 Git 配置\n检查是否有代理设置或其他配置问题：\n# 检查代理设置\ngit config --global --get http.proxy\ngit config --global --get https.proxy\n\n# 检查 SSL 验证设置\ngit config --global --get http.sslVerify\n结果：无代理设置，SSL 验证默认开启。\n\n\n\n2.3 3. 详细诊断 Git 连接\n使用详细日志模式诊断具体错误：\nGIT_CURL_VERBOSE=1 git ls-remote origin 2&gt;&1 | tail -30\n关键发现： - ✅ SSL 证书验证通过 - ❌ 连接能建立，但请求发送后超时 - ❌ 错误信息：Error in the HTTP/2 framing layer\n结论：问题出在 HTTP/2 协议层，GitHub 的 HTTP/2 连接在某些网络环境下不稳定。"
   },
   {
-    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#如果问题再次出现",
-    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#如果问题再次出现",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
-    "section": "6 如果问题再次出现",
-    "text": "6 如果问题再次出现\n如果已经修改了 ~/.codex/config.toml，但还是报同样错误，可能还有其他位置也存在配置文件，例如项目目录下的：\n./.codex/config.toml\n可以用下面命令全局搜索：\ngrep -Rn 'xhigh' ~/.codex ./.codex 2&gt;/dev/null\n如果项目配置里也有 xhigh，同样需要改掉。"
+    "objectID": "posts/2026-3-17-github-connection-fix.html#解决方案",
+    "href": "posts/2026-3-17-github-connection-fix.html#解决方案",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "3 解决方案",
+    "text": "3 解决方案\n\n3.1 方案一：禁用 HTTP/2，使用 HTTP/1.1（推荐，本次生效）\nGit 默认使用 HTTP/2 协议，但在国内网络环境下可能不稳定。强制使用 HTTP/1.1 可以提高兼容性。\n# 1. 全局设置 Git 使用 HTTP/1.1\ngit config --global http.version HTTP/1.1\n\n# 2. 增加缓冲区大小，避免大文件推送失败\ngit config --global http.postBuffer 524288000\n\n# 3. 禁用低速限制（避免慢速连接被中断）\ngit config --global http.lowSpeedLimit 0\ngit config --global http.lowSpeedTime 9999\n\n# 4. 重新推送\ngit push --set-upstream origin main\n原理： - http.version HTTP/1.1：强制使用 HTTP/1.1 协议，避免 HTTP/2 兼容性问题 - http.postBuffer 524288000：设置 500MB 缓冲区，适合大文件推送 - http.lowSpeedLimit 0：禁用低速限制，避免慢速连接被中断\n效果：✅ 本次问题已解决，推送成功。\n\n\n\n3.2 方案二：配置代理（如果方案一无效）\n如果你使用代理软件（Clash、Surge、Shadowsocks 等），可以配置 Git 通过代理连接：\n# 查找代理端口（常见端口：7890, 1087, 6153 等）\n# Clash 默认端口通常是 7890\n\n# 设置 Git 代理\ngit config --global http.proxy http://127.0.0.1:7890\ngit config --global https.proxy http://127.0.0.1:7890\n\n# 推送\ngit push --set-upstream origin main\n\n# 取消代理（如果需要）\ngit config --global --unset http.proxy\ngit config --global --unset https.proxy\n\n\n\n3.3 方案三：改用 SSH 协议（长期推荐）\nSSH 协议比 HTTPS 更稳定，且不需要每次输入密码。\n# 1. 查看现有 SSH 公钥\ncat ~/.ssh/id_ed25519.pub\n\n# 2. 如果没有密钥，生成新的\nssh-keygen -t ed25519 -C \"your_email@example.com\"\n\n# 3. 将公钥添加到 GitHub\n# 访问：https://github.com/settings/keys\n# 点击 \"New SSH key\"，粘贴公钥内容\n\n# 4. 测试 SSH 连接\nssh -T git@github.com\n# 成功输出：Hi chenbin98! You've successfully authenticated...\n\n# 5. 切换 remote 为 SSH\ngit remote set-url origin git@github.com:chenbin98/meteo_data_download.git\n\n# 6. 推送\ngit push --set-upstream origin main\n优势： - ✅ 不需要每次输入密码 - ✅ 连接更稳定 - ✅ 不受 HTTPS 代理问题影响"
   },
   {
-    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#总结",
-    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#总结",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "objectID": "posts/2026-3-17-github-connection-fix.html#常用-git-远程操作命令",
+    "href": "posts/2026-3-17-github-connection-fix.html#常用-git-远程操作命令",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "4 常用 Git 远程操作命令",
+    "text": "4 常用 Git 远程操作命令\n# 查看远程仓库\ngit remote -v\n\n# 设置 upstream 并推送\ngit push --set-upstream origin main\n\n# 后续推送（已设置 upstream 后）\ngit push\n\n# 拉取远程更新\ngit pull\n\n# 查看当前分支跟踪情况\ngit branch -vv"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#故障排查流程图",
+    "href": "posts/2026-3-17-github-connection-fix.html#故障排查流程图",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "5 故障排查流程图",
+    "text": "5 故障排查流程图\ngit push 失败\n    │\n    ▼\n检查网络：curl/ping github.com\n    │\n    ├── 不通 → 检查网络/代理\n    │\n    ▼ 通\n检查 Git 配置：git config --get http.proxy\n    │\n    ├── 有代理 → 确认代理是否正确\n    │\n    ▼ 无代理\n详细诊断：GIT_CURL_VERBOSE=1 git ls-remote origin\n    │\n    ├── SSL 失败 → 检查证书/时间设置\n    ├── HTTP/2 错误 → 改用 HTTP/1.1 ✓\n    └── 认证失败 → 检查凭证/SSH 密钥"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#方案对比",
+    "href": "posts/2026-3-17-github-connection-fix.html#方案对比",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "6 方案对比",
+    "text": "6 方案对比\n\n\n\n\n\n\n\n\n\n方案\n优点\n缺点\n适用场景\n\n\n\n\nHTTP/1.1\n配置简单，立竿见影\n每次推送可能仍需输入密码\n临时解决/快速修复\n\n\n代理\n可访问被墙资源\n依赖代理软件稳定性\n代理环境用户\n\n\nSSH\n最稳定，无需密码\n需要配置 SSH 密钥\n长期使用推荐"
+  },
+  {
+    "objectID": "posts/2026-3-17-github-connection-fix.html#总结",
+    "href": "posts/2026-3-17-github-connection-fix.html#总结",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
     "section": "7 总结",
-    "text": "7 总结\n这个报错不是 codex 本身坏了，而是配置文件里写了当前 CLI 不支持的 model_reasoning_effort = \"xhigh\"。\n把它改成 high 即可恢复正常。\n\n7.1 推荐保留的最终修复命令\ncp ~/.codex/config.toml ~/.codex/config.toml.bak\nperl -0pi -e 's/\"xhigh\"/\"high\"/g' ~/.codex/config.toml\ncodex"
+    "text": "7 总结\n本次解决的关键命令：\n# 1. 禁用 HTTP/2\ngit config --global http.version HTTP/1.1\n\n# 2. 增加缓冲区\ngit config --global http.postBuffer 524288000\n\n# 3. 禁用低速限制\ngit config --global http.lowSpeedLimit 0\ngit config --global http.lowSpeedTime 9999\n\n# 4. 推送\ngit push --set-upstream origin main\n长期建议：配置 SSH 密钥，切换到 SSH 协议，获得更稳定的连接体验。"
   },
   {
-    "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#参考资料",
-    "href": "posts/2026-3-19-codex-xhigh-error-fix.html#参考资料",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
-    "section": "8 参考资料",
-    "text": "8 参考资料\n\nCodex 官方文档\nCodex 配置指南"
+    "objectID": "posts/2026-3-17-github-connection-fix.html#参考链接",
+    "href": "posts/2026-3-17-github-connection-fix.html#参考链接",
+    "title": "GitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1",
+    "section": "8 参考链接",
+    "text": "8 参考链接\n\nGit 配置文档\nGitHub SSH 连接指南\nGit 代理设置\n\n\n文档生成时间：2026-03-17\n问题状态：✅ 已解决"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-10-paper_fig_size.html",
+    "href": "posts/2025-6-10-paper_fig_size.html",
+    "title": "Python 论文图片尺寸规范指南",
     "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限\n\n\n\n\n在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标\n\n\n\n目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。\n\n\n\n未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+    "text": "在学术论文写作中，图片尺寸的规范对于论文的排版和出版至关重要。本文主要介绍 Elsevier（爱思唯尔）出版社的图片尺寸规范，以及如何在 Python 中设置这些尺寸。\n\n\n\n\n\n用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图\n\n\n\n\n\n\n\n\nimport matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})\n\n\n\n\n\n分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt\n\n\n\n\n\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)\n\n\n\n\n图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#传统作物模型的现状与挑战",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
+    "href": "posts/2025-6-10-paper_fig_size.html#elsevier-图片尺寸规范",
+    "title": "Python 论文图片尺寸规范指南",
     "section": "",
-    "text": "农业系统因其复杂性和多要素特性，往往难以全面把握。传统作物模型基于作物生理学原理，是老一辈农业学家通过大量实践经验，运用数学公式推导出的作物发育动态模型。这些模型在教学和科学研究中发挥了重要作用，例如模拟气候变化条件下的作物产量变化等。\n然而，传统作物模型在实际应用中面临诸多挑战：\n\n预测精度不足：在实际条件下往往难以准确预测\n实用性受限：由于缺乏必要的输入数据或基本假设不成立，许多模型难以实际应用\n理论与实践脱节：大量农业模型研究论文发表，但实际应用效果有限"
+    "text": "用途\n宽度 × 高度（英寸）\n说明\n\n\n\n\n单栏图\n3.5 × 2.5\n常用于插图、简单图\n\n\n1.5 栏图\n4.75 × 3.5\n用于稍复杂的图\n\n\n全栏图\n6.89 × 4.5\n推荐用于双栏图或主图\n\n\n宽幅图（横图）\n6.89 × 2.5\n常用于时间序列或宽图"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#机器学习在农业建模中的兴起",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
+    "href": "posts/2025-6-10-paper_fig_size.html#python-中设置图片尺寸",
+    "title": "Python 论文图片尺寸规范指南",
     "section": "",
-    "text": "在计算机和数据科学快速发展的背景下，农业建模研究逐渐转向机器学习领域。目前已有大量研究使用机器学习进行产量预测和农业胁迫预测等。但现有的机器学习建模研究往往难以形成完整的模型架构。\n一个理想的农业模型架构应该：\n\n符合人们对作物长势的直观感知\n以天为单位动态输出关键指标\n包含以下要素：\n\n生育期\n叶面积\n株高\n生物量\n产量\n健康状态\n\n\n这些输出指标具有以下特点： - 符合实际生产需求 - 便于观测和验证 - 保证模型透明性 - 包含传统模型缺少的健康状态指标"
+    "text": "import matplotlib.pyplot as plt\n\n# 设置图片尺寸（英寸）\nplt.figure(figsize=(3.5, 2.5))  # 单栏图\n# 或\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\n\n\n\nimport seaborn as sns\n\n# 设置图片尺寸\nplt.figure(figsize=(3.5, 2.5))\nsns.set(rc={'figure.figsize': (3.5, 2.5)})"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#物理知识引导的机器学习模型",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
+    "href": "posts/2025-6-10-paper_fig_size.html#其他注意事项",
+    "title": "Python 论文图片尺寸规范指南",
     "section": "",
-    "text": "目前出现的物理知识引导的机器学习模型，可以视为训练数据不足条件下的折中方案。这种方法：\n\n利用传统作物模型的知识作为引导\n让机器学习模型先学习基础知识\n减少后续训练所需的数据量\n\n这类似于教导博士生和小学生的区别：博士生因具备基础知识，学习新知识所需时间更少。"
+    "text": "分辨率要求：\n\n建议使用 300 DPI 或更高\n保存时使用 plt.savefig('figure.png', dpi=300)\n\n文件格式：\n\n推荐使用 PDF 或 EPS 格式（矢量图）\n或使用高分辨率 PNG 格式\n\n字体大小：\n\n标题：12-14pt\n轴标签：10-12pt\n图例：10pt\n刻度标签：8-10pt"
   },
   {
-    "objectID": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "href": "posts/2025-6-1-machine_leaning_vs_crop_model.html#未来展望",
-    "title": "机器学习与传统作物模型的未来展望",
+    "objectID": "posts/2025-6-10-paper_fig_size.html#代码示例",
+    "href": "posts/2025-6-10-paper_fig_size.html#代码示例",
+    "title": "Python 论文图片尺寸规范指南",
     "section": "",
-    "text": "未来的作物模型发展趋势将是：\n\n以机器学习为主导\n面向实际农业生产问题\n具备自适应和自学习能力\n能够独立输出关键决策信息\n真正成为智慧农业的”大脑”\n\n这种转变将推动农业建模从理论走向实践，从实验室走向田间，最终服务于实际农业生产需求。"
+    "text": "import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置图片尺寸和样式\nplt.figure(figsize=(6.89, 4.5))  # 全栏图\nsns.set_style(\"whitegrid\")\nsns.set_context(\"paper\", font_scale=1.2)\n\n# 绘制图形\n# ... 你的绘图代码 ...\n\n# 保存图片\nplt.savefig('figure.pdf', \n            dpi=300,\n            bbox_inches='tight',\n            pad_inches=0.1)"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html",
-    "href": "posts/2026-4-1-meteo-data-workflow.html",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "objectID": "posts/2025-6-10-paper_fig_size.html#常见问题",
+    "href": "posts/2025-6-10-paper_fig_size.html#常见问题",
+    "title": "Python 论文图片尺寸规范指南",
     "section": "",
-    "text": "在科研和数据分析项目中，获取气象数据是一个常见需求。但每次手动查文档、写代码、调试接口，效率极低。\n本文介绍一套标准化的气象数据服务工作流程：通过 Docker 本地部署服务，使用 OpenAPI 规范自动获取接口定义，再借助 AI 生成调用代码。整个过程无需记忆 API，每个新项目都能快速复用。"
+    "text": "图片模糊：\n\n检查 DPI 设置\n使用矢量格式（PDF/EPS）\n确保原始数据分辨率足够\n\n图片过大：\n\n使用 bbox_inches='tight' 自动调整边距\n适当调整 pad_inches 参数\n\n文字不清晰：\n\n使用 plt.rcParams['font.size'] 调整字体大小\n确保使用支持中文的字体（如 SimHei）"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html#引言",
-    "href": "posts/2026-4-1-meteo-data-workflow.html#引言",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "objectID": "posts/2026-1-4-front_and_backend_server.html",
+    "href": "posts/2026-1-4-front_and_backend_server.html",
+    "title": "后端服务部署：systemd + venv + Nginx",
     "section": "",
-    "text": "在科研和数据分析项目中，获取气象数据是一个常见需求。但每次手动查文档、写代码、调试接口，效率极低。\n本文介绍一套标准化的气象数据服务工作流程：通过 Docker 本地部署服务，使用 OpenAPI 规范自动获取接口定义，再借助 AI 生成调用代码。整个过程无需记忆 API，每个新项目都能快速复用。"
+    "text": "以玫瑰通 agent 项目为例，记录后端服务部署流程。部署方案：原生部署（systemd + venv）+ Nginx。\n\n\nsudo apt-get update\nsudo apt-get install -y python3-venv python3-pip\n\n\n\ncd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env\n\n\n\n\n\nsudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target\n\n\n\n\nsudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f\n\n\n\n\n\nsudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}\n\n\n\n\n\n重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html#核心架构",
-    "href": "posts/2026-4-1-meteo-data-workflow.html#核心架构",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
-    "section": "2 核心架构",
-    "text": "2 核心架构\n┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐\n│   Docker 容器    │────▶│  OpenAPI 规范    │────▶│  AI 代码生成     │\n│ meteo-data-     │     │  openapi.json    │     │  Python 脚本     │\n│ download:8000   │     │  (机器可读)      │     │  (自动编写)      │\n└─────────────────┘     └──────────────────┘     └─────────────────┘\n关键原则：\n\n❌ 不依赖 /docs（给人看的页面，不适合自动化）\n✅ 必须使用 openapi.json（机器可读标准）\n✅ 每个新项目重复标准流程\n✅ 不需要记忆 API，只需要标准流程"
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
+    "href": "posts/2026-1-4-front_and_backend_server.html#安装依赖",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo apt-get update\nsudo apt-get install -y python3-venv python3-pip"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html#前提条件",
-    "href": "posts/2026-4-1-meteo-data-workflow.html#前提条件",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
-    "section": "3 前提条件",
-    "text": "3 前提条件\n\n3.1 环境要求\n\nDocker 已安装并运行\nPython 3.8+\ncurl 或 wget\n任意 AI 助手（如 OpenClaw、Claude Code 等）\n\n\n\n3.2 服务地址\n\n\n\n项目\n值\n\n\n\n\n本地服务地址\nhttp://127.0.0.1:8000\n\n\nOpenAPI 定义\nhttp://127.0.0.1:8000/openapi.json\n\n\n文档页面\nhttp://127.0.0.1:8000/docs（仅供参考）"
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
+    "href": "posts/2026-1-4-front_and_backend_server.html#创建虚拟环境并安装依赖",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "cd rose-wechat-agent\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -U pip\npip install -r requirements.txt\ncp .env.example .env\nnano .env"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html#标准使用流程",
-    "href": "posts/2026-4-1-meteo-data-workflow.html#标准使用流程",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
-    "section": "4 标准使用流程",
-    "text": "4 标准使用流程\n\n4.1 Step 1：检查 Docker 服务是否启动\ndocker ps | grep meteo-data-download\n如果已启动 → 继续下一步\n如果未启动 → 启动服务：\n# 已有容器\ndocker start meteo-data-download\n\n# 或首次运行\ndocker run -d -p 8000:8000 --name meteo-data-download your-image\n\n\n\n4.2 Step 2：获取 API 接口定义\n在每个新项目中，先创建 api 目录并下载 OpenAPI 规范：\nmkdir -p api && curl -s http://127.0.0.1:8000/openapi.json -o ./api/openapi.json\n为什么需要这一步？\n\nOpenAPI 规范包含所有接口的完整定义\nAI 可以基于此自动生成准确的调用代码\n避免手动查文档导致的错误\n\n\n\n\n4.3 Step 3：让 AI 基于接口定义编写代码\n向 AI 提供以下信息：\n\n本地服务地址：http://127.0.0.1:8000\n接口定义文件：./api/openapi.json\n用户需求（例如：下载某区域、某时间段气象数据）\n\n标准提示模板：\n本项目需要调用本地气象服务。\n\n服务地址：\nhttp://127.0.0.1:8000\n\n接口定义文件：\n./api/openapi.json\n\n请完成以下任务：\n1. 先阅读 ./api/openapi.json，识别可用接口、参数和返回结构\n2. 基于真实接口，编写代码实现气象数据下载\n\n要求：\n- 必须严格依据 openapi.json 中的接口，不得假设\n- 使用 Python 实现\n- 封装为可复用函数或类\n- 所有注释使用 English\n- 包含错误处理和超时控制\n- 提供最小可运行示例\n\n\n\n4.4 Step 4：执行 AI 生成的代码\nAI 会生成类似以下的代码：\nimport requests\nimport json\nfrom typing import Dict, Any\n\nclass MeteoDataClient:\n    \"\"\"Client for downloading meteorological data from local Docker service.\"\"\"\n    \n    def __init__(self, base_url: str = \"http://127.0.0.1:8000\", timeout: int = 30):\n        self.base_url = base_url\n        self.timeout = timeout\n        self.session = requests.Session()\n    \n    def download_weather_data(\n        self,\n        latitude: float,\n        longitude: float,\n        start_date: str,\n        end_date: str,\n        variables: list[str]\n    ) -&gt; Dict[str, Any]:\n        \"\"\"\n        Download weather data for specified location and time range.\n        \n        Args:\n            latitude: Latitude coordinate\n            longitude: Longitude coordinate\n            start_date: Start date in YYYY-MM-DD format\n            end_date: End date in YYYY-MM-DD format\n            variables: List of weather variables to download\n        \n        Returns:\n            Dictionary containing weather data\n        \n        Raises:\n            requests.exceptions.RequestException: If API call fails\n        \"\"\"\n        endpoint = f\"{self.base_url}/api/download\"\n        payload = {\n            \"latitude\": latitude,\n            \"longitude\": longitude,\n            \"start_date\": start_date,\n            \"end_date\": end_date,\n            \"variables\": variables\n        }\n        \n        response = self.session.post(\n            endpoint,\n            json=payload,\n            timeout=self.timeout\n        )\n        response.raise_for_status()\n        return response.json()\n\n\n# 使用示例\nif __name__ == \"__main__\":\n    client = MeteoDataClient()\n    \n    try:\n        data = client.download_weather_data(\n            latitude=39.9042,\n            longitude=116.4074,\n            start_date=\"2026-01-01\",\n            end_date=\"2026-01-31\",\n            variables=[\"temperature\", \"humidity\", \"precipitation\"]\n        )\n        \n        # 保存为 JSON\n        with open(\"weather_data.json\", \"w\") as f:\n            json.dump(data, f, indent=2)\n        \n        print(f\"✅ Downloaded {len(data.get('results', []))} records\")\n        \n    except requests.exceptions.RequestException as e:\n        print(f\"❌ Error: {e}\")\n执行代码，获取气象数据：\n\n可保存为 CSV / JSON 等格式\n可扩展为批量下载\n可集成到现有数据处理流程"
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
+    "href": "posts/2026-1-4-front_and_backend_server.html#用-systemd-托管",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo nano /etc/systemd/system/rose-wechat-agent.service\n\n\n\n建议使用 uvicorn 作为入口，便于后续扩展异步能力。\n[Unit]\nDescription=Rose WeChat Agent\nAfter=network.target\n\n[Service]\nWorkingDirectory=/path/to/rose-wechat-agent\nEnvironmentFile=/path/to/rose-wechat-agent/.env\nExecStart=/path/to/rose-wechat-agent/.venv/bin/python /path/to/rose-wechat-agent/scripts/run_server.py\nRestart=always\nRestartSec=3\nUser=www-data\n\n[Install]\nWantedBy=multi-user.target"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html#项目结构示例",
-    "href": "posts/2026-4-1-meteo-data-workflow.html#项目结构示例",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
-    "section": "5 项目结构示例",
-    "text": "5 项目结构示例\nmy-research-project/\n├── api/\n│   └── openapi.json          # 从本地服务获取\n├── scripts/\n│   └── download_weather.py   # AI 生成的下载脚本\n├── data/\n│   └── weather_data.json     # 下载的气象数据\n└── README.md"
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#启动服务",
+    "href": "posts/2026-1-4-front_and_backend_server.html#启动服务",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo systemctl daemon-reload\nsudo systemctl enable --now rose-wechat-agent\nsudo journalctl -u rose-wechat-agent -f"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html#常见问题",
-    "href": "posts/2026-4-1-meteo-data-workflow.html#常见问题",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
-    "section": "6 常见问题",
-    "text": "6 常见问题\n\n6.1 Q1: 服务无法启动怎么办？\n检查 Docker 日志：\ndocker logs meteo-data-download\n常见原因：\n\n端口 8000 被占用 → 修改端口映射：-p 8001:8000\n镜像不存在 → 先拉取或构建镜像\n内存不足 → 检查系统资源\n\n\n\n\n6.2 Q2: OpenAPI 规范获取失败？\n手动检查服务是否可用：\ncurl http://127.0.0.1:8000/openapi.json\n如果返回 JSON → 服务正常，检查网络或防火墙\n如果无法连接 → 服务未启动或端口错误\n\n\n\n6.3 Q3: AI 生成的代码无法运行？\n检查点：\n\n确认 openapi.json 是最新的（服务可能更新）\n重新运行 Step 2 获取最新接口定义\n检查 AI 是否严格依据接口定义（不要假设）\n查看错误信息，调整提示词重新生成\n\n\n\n\n6.4 Q4: 如何批量下载多个地点的数据？\n扩展 AI 生成的代码：\nlocations = [\n    {\"name\": \"Beijing\", \"lat\": 39.9042, \"lon\": 116.4074},\n    {\"name\": \"Shanghai\", \"lat\": 31.2304, \"lon\": 121.4737},\n    {\"name\": \"Guangzhou\", \"lat\": 23.1291, \"lon\": 113.2644},\n]\n\nfor loc in locations:\n    data = client.download_weather_data(\n        latitude=loc[\"lat\"],\n        longitude=loc[\"lon\"],\n        start_date=\"2026-01-01\",\n        end_date=\"2026-01-31\",\n        variables=[\"temperature\", \"humidity\"]\n    )\n    \n    with open(f\"data/{loc['name']}_weather.json\", \"w\") as f:\n        json.dump(data, f, indent=2)\n    \n    print(f\"✅ {loc['name']} downloaded\")"
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
+    "href": "posts/2026-1-4-front_and_backend_server.html#用-nginx-做反向代理-https",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "sudo apt-get install -y nginx\n\n\n\nsudo nano /etc/nginx/sites-available/grape\n在 server 块内添加：\nlocation /rose_wechat_agent/ {\n    proxy_pass http://127.0.0.1:18008/;\n\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    proxy_set_header X-Forwarded-Proto $scheme;\n    proxy_set_header X-Forwarded-Prefix /rose_wechat_agent;\n    proxy_set_header X-Script-Name /rose_wechat_agent;\n\n    proxy_buffering off;\n    proxy_read_timeout 3600s;\n}"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html#优势总结",
-    "href": "posts/2026-4-1-meteo-data-workflow.html#优势总结",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
-    "section": "7 优势总结",
-    "text": "7 优势总结\n\n\n\n传统方式\n标准流程\n\n\n\n\n手动查文档，容易出错\nAI 基于 OpenAPI 自动生成\n\n\n每个项目重复写代码\n标准化流程，快速复用\n\n\nAPI 变更需要手动更新\n重新获取 openapi.json 即可\n\n\n需要记忆接口参数\n无需记忆，流程驱动\n\n\n调试时间长\nAI 生成 + 自动错误处理"
+    "objectID": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
+    "href": "posts/2026-1-4-front_and_backend_server.html#维护常用命令",
+    "title": "后端服务部署：systemd + venv + Nginx",
+    "section": "",
+    "text": "重启后端服务：sudo systemctl restart rose-wechat-agent\n查看后端服务日志：sudo journalctl -u rose-wechat-agent -n 100 --no-pager\n重启 Nginx：sudo systemctl restart nginx"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html#扩展应用",
-    "href": "posts/2026-4-1-meteo-data-workflow.html#扩展应用",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
-    "section": "8 扩展应用",
-    "text": "8 扩展应用\n这套流程不仅适用于气象数据，还可用于：\n\n其他本地 API 服务（数据库、文件处理、AI 模型等）\n团队标准化：所有成员使用相同流程\nCI/CD 集成：自动化数据获取流程\n科研可复现性：标准化的数据获取脚本"
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html",
+    "href": "posts/2026-4-3-git-worktree-advanced.html",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
+    "section": "",
+    "text": "你是否遇到过这样的场景：\n\n正在 feature/login 分支开发到一半，突然需要紧急修复 main 分支的 bug\n想同时测试两个不同分支的功能对比\n需要在多个功能分支之间频繁切换，每次都要 git stash 保存现场\n\n传统的 git checkout 方案需要频繁切换分支，不仅打断思路，还可能因为忘记 stash 而丢失代码。\nGit Worktree 就是为了解决这个问题而生的——它允许你在多个独立的工作目录中同时检出同一个仓库的不同分支，真正实现并行开发。"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html#总结",
-    "href": "posts/2026-4-1-meteo-data-workflow.html#总结",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html#引言",
+    "href": "posts/2026-4-3-git-worktree-advanced.html#引言",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
+    "section": "",
+    "text": "你是否遇到过这样的场景：\n\n正在 feature/login 分支开发到一半，突然需要紧急修复 main 分支的 bug\n想同时测试两个不同分支的功能对比\n需要在多个功能分支之间频繁切换，每次都要 git stash 保存现场\n\n传统的 git checkout 方案需要频繁切换分支，不仅打断思路，还可能因为忘记 stash 而丢失代码。\nGit Worktree 就是为了解决这个问题而生的——它允许你在多个独立的工作目录中同时检出同一个仓库的不同分支，真正实现并行开发。"
+  },
+  {
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html#什么是-git-worktree",
+    "href": "posts/2026-4-3-git-worktree-advanced.html#什么是-git-worktree",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
+    "section": "2 什么是 Git Worktree？",
+    "text": "2 什么是 Git Worktree？\nGit Worktree 是 Git 2.5+ 引入的功能，允许你为同一个仓库创建多个关联的工作目录。每个 worktree 都有自己独立的检出分支，但共享同一个 .git 目录。\n\n2.1 传统方式 vs Worktree\n\n\n\n方式\n目录结构\n切换成本\n并行能力\n\n\n\n\ngit checkout\n单工作目录\n高（需要 stash）\n❌ 单任务\n\n\ngit clone 多次\n多独立仓库\n低\n✅ 但浪费空间\n\n\nGit Worktree\n多工作目录共享 .git\n低\n✅ 高效共享"
+  },
+  {
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html#基础用法",
+    "href": "posts/2026-4-3-git-worktree-advanced.html#基础用法",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
+    "section": "3 基础用法",
+    "text": "3 基础用法\n\n3.1 1. 查看当前 Worktree 状态\n# 列出所有 worktree\ngit worktree list\n\n# 输出示例：\n# /Users/bin/projects/my-app      main       [主分支]\n# /Users/bin/projects/my-app-feat feature/ui [feature/ui]\n\n\n3.2 2. 创建新的 Worktree\n# 基本语法\ngit worktree add &lt;路径&gt; &lt;分支名&gt;\n\n# 示例：在主仓库旁边创建 feature 分支的工作目录\ngit worktree add ../my-app-feature feature/ui\n\n# 如果分支不存在，可以自动创建\ngit worktree add ../my-app-hotfix -b hotfix/login-bug\n\n\n3.3 3. 进入 Worktree 工作\ncd ../my-app-feature\n\n# 现在你在这个目录中操作的是 feature/ui 分支\n# 可以独立编辑、提交、推送，互不干扰\n\n\n3.4 4. 移除 Worktree\n# 从主仓库移除 worktree（不影响分支本身）\ngit worktree remove ../my-app-feature\n\n# 如果 worktree 有未提交的更改，强制移除\ngit worktree remove ../my-app-feature --force"
+  },
+  {
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html#高级用法",
+    "href": "posts/2026-4-3-git-worktree-advanced.html#高级用法",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
+    "section": "4 高级用法",
+    "text": "4 高级用法\n\n4.1 1. 并行开发多个功能\n场景：你同时负责三个功能开发，需要在它们之间频繁切换测试。\n# 主仓库保持 main 分支干净\ncd ~/projects/my-app\ngit checkout main\n\n# 创建三个 worktree 分别处理不同功能\ngit worktree add ../my-app-login feature/login\ngit worktree add ../my-app-payment feature/payment\ngit worktree add ../my-app-dashboard feature/dashboard\n\n# 现在你可以：\n# - 在 my-app-login 中开发登录功能\n# - 在 my-app-payment 中开发支付功能\n# - 在 my-app-dashboard 中开发仪表板\n# - 随时切换，无需 stash\n目录结构：\n~/projects/\n├── my-app/           # main 分支\n├── my-app-login/     # feature/login\n├── my-app-payment/   # feature/payment\n└── my-app-dashboard/ # feature/dashboard\n\n\n4.2 2. 紧急 Bug 修复不中断当前工作\n场景：正在开发功能时，收到紧急 bug 报告需要立即修复。\n# 当前正在 feature/login 中开发，代码写到一半不想提交\n\n# 直接创建 hotfix worktree\ncd ~/projects/my-app\ngit worktree add ../my-app-hotfix -b hotfix/critical-bug\n\n# 进入 hotfix 目录修复\ncd ../my-app-hotfix\n# 编辑、测试、提交\ngit commit -m \"fix: 修复紧急登录 bug\"\ngit push origin hotfix/critical-bug\n\n# 修复完成后，回到原来的 worktree 继续开发\ncd ../my-app-login\n# 之前的代码还在，无需 stash/restore\n\n\n4.3 3. 代码审查与对比\n场景：需要对比两个分支的差异，或者审查同事的 PR。\n# 主仓库保持 main\ncd ~/projects/my-app\n\n# 检出同事的 PR 分支到独立 worktree\ngit worktree add ../my-app-pr-review pr/123-new-feature\n\n# 在独立目录中运行、测试、审查\ncd ../my-app-pr-review\nnpm install\nnpm test\nnpm run dev\n\n# 同时可以在主仓库查看 main 分支作为对比\ncd ../my-app\n\n\n4.4 4. CI/CD 本地调试\n场景：CI 流水线在某个分支失败，需要本地复现。\n# 创建与 CI 环境一致的 worktree\ngit worktree add ../my-app-ci-debug ci/test-branch\n\ncd ../my-app-ci-debug\n\n# 清理所有未跟踪文件，确保干净环境\ngit clean -fdx\n\n# 运行与 CI 相同的命令\nnpm ci\nnpm run build\nnpm test\n\n# 调试完成后移除\ncd ..\ngit worktree remove ../my-app-ci-debug\n\n\n4.5 5. 多版本文档维护\n场景：需要同时维护多个版本的文档（如 v1.x、v2.x、main）。\n# 主仓库用于最新开发\ncd ~/projects/docs\ngit checkout main\n\n# 创建旧版本维护 worktree\ngit worktree add ../docs-v1 v1.x\ngit worktree add ../docs-v2 v2.x\n\n# 现在可以：\n# - 在 docs/ 中编写最新文档\n# - 在 docs-v1/ 中修复 v1.x 文档问题\n# - 在 docs-v2/ 中更新 v2.x 文档\n# - 每个版本独立构建预览"
+  },
+  {
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html#实用技巧",
+    "href": "posts/2026-4-3-git-worktree-advanced.html#实用技巧",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
+    "section": "5 实用技巧",
+    "text": "5 实用技巧\n\n5.1 1. Worktree 命名规范\n建议使用有意义的目录名，方便识别：\n# 好的命名\ngit worktree add ../myapp-feat-login feature/login\ngit worktree add ../myapp-hotfix-bug hotfix/login-bug\n\n# 避免的命名\ngit worktree add ../temp test  # 太模糊\ngit worktree add ../aaa main   # 无意义\n\n\n5.2 2. 快速返回主仓库\n# 在主仓库设置别名\ngit config --global alias.main 'worktree list | head -1 | cut -d\" \" -f1'\n\n# 或者创建快捷脚本\n# ~/.zshrc 中添加：\ngtm() { cd $(git worktree list | head -1 | cut -d\" \" -f1); }\n\n\n5.3 3. 清理孤立的 Worktree\n# 查看是否有 worktree 指向不存在的分支\ngit worktree list --porcelain\n\n# 移除已删除分支的 worktree\ngit worktree prune\n\n\n5.4 4. Worktree 与 Git Hooks\n每个 worktree 共享相同的 Git hooks，但如果需要为不同分支设置不同的 hooks：\n# 在 worktree 的 config.local 中覆盖\ncd ../my-app-feature\ngit config core.hooksPath .git-hooks-feature"
+  },
+  {
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html#常见问题faq",
+    "href": "posts/2026-4-3-git-worktree-advanced.html#常见问题faq",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
+    "section": "6 常见问题（FAQ）",
+    "text": "6 常见问题（FAQ）\n\n6.1 Q1: Worktree 和 Clone 有什么区别？\n\n\n\n特性\nWorktree\nClone\n\n\n\n\n磁盘空间\n共享 .git，节省空间\n完整复制，占用多\n\n\n同步\n自动共享对象数据库\n需要 fetch/push\n\n\n分支管理\n统一管理\n独立管理\n\n\n适用场景\n同一仓库多分支\n完全独立的环境\n\n\n\n建议：同一仓库的并行开发用 Worktree；需要隔离环境（如测试不同 Git 配置）用 Clone。\n\n\n6.2 Q2: Worktree 会影响性能吗？\n\n磁盘空间：显著节省（共享对象数据库）\n内存占用：每个 worktree 独立进程，略有增加\nGit 操作：几乎无影响，共享对象查询更快\n\n\n\n6.3 Q3: 可以同时在多个 worktree 中提交吗？\n可以！ 每个 worktree 有独立的 HEAD 和索引，提交互不干扰。但注意：\n\n不要同时在多个 worktree 中修改同一个文件\n推送前确保各分支已正确合并\n\n\n\n6.4 Q4: Worktree 删除后，分支还在吗？\n在！ git worktree remove 只删除工作目录，分支本身仍然存在于仓库中。如果需要删除分支：\ngit branch -d feature/login  # 删除本地分支\ngit push origin --delete feature/login  # 删除远程分支\n\n\n6.5 Q5: 可以在 worktree 中创建新的 worktree 吗？\n可以，但不推荐。 最佳实践是从主仓库创建所有 worktree，避免嵌套混乱。"
+  },
+  {
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html#最佳实践总结",
+    "href": "posts/2026-4-3-git-worktree-advanced.html#最佳实践总结",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
+    "section": "7 最佳实践总结",
+    "text": "7 最佳实践总结\n\n7.1 ✅ 推荐做法\n\n统一目录结构：将 worktree 放在主仓库的相邻目录\n~/projects/\n├── my-app/        # 主仓库\n├── my-app-feat1/  # worktree 1\n└── my-app-feat2/  # worktree 2\n及时清理：功能完成后移除不再需要的 worktree\ngit worktree prune  # 定期清理\n明确用途：用目录名区分 worktree 用途（feat/hotfix/pr-review）\n保持主仓库干净：主仓库用于 main 分支和管理工作\n\n\n\n7.2 ❌ 避免做法\n\n不要在 worktree 中嵌套创建 worktree\n不要同时修改同一文件（会导致冲突）\n不要忘记 worktree 的存在（定期 git worktree list 检查）"
+  },
+  {
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html#与其他工具的对比",
+    "href": "posts/2026-4-3-git-worktree-advanced.html#与其他工具的对比",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
+    "section": "8 与其他工具的对比",
+    "text": "8 与其他工具的对比\n\n8.1 Git Worktree vs VS Code Multi-Root\n\n\n\n特性\nWorktree\nVS Code Multi-Root\n\n\n\n\n分支隔离\n✅ 完全隔离\n❌ 同一仓库\n\n\n磁盘占用\n✅ 共享 .git\n✅ 共享\n\n\nIDE 支持\n任意编辑器\nVS Code 专属\n\n\n\n建议：两者可以结合使用——用 Worktree 管理分支，用 Multi-Root 同时打开多个 worktree 窗口。\n\n\n8.2 Git Worktree vs GitHub Codespaces\n\n\n\n特性\nWorktree\nCodespaces\n\n\n\n\n运行位置\n本地\n云端\n\n\n成本\n免费\n按使用计费\n\n\n网络依赖\n无需\n需要\n\n\n适用场景\n本地并行开发\n远程协作/演示"
+  },
+  {
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html#总结",
+    "href": "posts/2026-4-3-git-worktree-advanced.html#总结",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
     "section": "9 总结",
-    "text": "9 总结\n通过 Docker 本地服务 + OpenAPI 规范 + AI 代码生成 的组合，我们实现了一套标准化的气象数据服务工作流程：\n\n✅ 无需记忆 API 细节\n✅ 每个项目快速复用\n✅ 代码准确可靠\n✅ 易于维护和扩展\n\n核心理念： 把重复的工作标准化，把标准化的工作自动化，让 AI 处理繁琐的细节，人类专注于更高层次的决策。"
+    "text": "9 总结\nGit Worktree 是提升并行开发效率的利器，特别适合：\n\n✅ 同时开发多个功能分支\n✅ 紧急 bug 修复不中断当前工作\n✅ 代码审查与对比测试\n✅ 多版本文档/代码维护\n\n核心优势： - 节省磁盘空间（共享 .git） - 零切换成本（无需 stash） - 真正的并行开发\n一句话总结：如果你还在用 git checkout 频繁切换分支，Git Worktree 会让你的开发效率提升一个量级。"
   },
   {
-    "objectID": "posts/2026-4-1-meteo-data-workflow.html#参考链接",
-    "href": "posts/2026-4-1-meteo-data-workflow.html#参考链接",
-    "title": "气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化",
+    "objectID": "posts/2026-4-3-git-worktree-advanced.html#参考链接",
+    "href": "posts/2026-4-3-git-worktree-advanced.html#参考链接",
+    "title": "Git Worktree 高级用法：并行开发多分支的终极指南",
     "section": "10 参考链接",
-    "text": "10 参考链接\n\nOpenAPI Specification\nDocker Documentation\nRequests Library\nAI for Code Generation Best Practices\n\n\n本文示例代码和完整项目结构可在作者 GitHub 获取。"
+    "text": "10 参考链接\n\nGit 官方文档 - git-worktree\nGit Worktree 详解（Atlassian）\nGitHub Docs - Multiple working trees\n\n\n发布时间：2026 年 4 月 3 日\n标签：#Git #DevOps #生产力"
   },
   {
     "objectID": "posts/2025-6-8-local_package_install.html",

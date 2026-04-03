@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-04-03">
+<meta name="description" content="告别频繁的 git checkout！使用 Git Worktree 同时在多个工作目录中处理不同分支，提升并行开发效率。">
+
+<title>Git Worktree 高级用法：并行开发多分支的终极指南 – Binchen’s Tech Blog</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-be3771519f21acc1c5b6733774c6dcd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Binchen’s Tech Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts/"> 
+<span class="menu-text">Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#引言" id="toc-引言" class="nav-link active" data-scroll-target="#引言"><span class="header-section-number">1</span> 引言</a></li>
+  <li><a href="#什么是-git-worktree" id="toc-什么是-git-worktree" class="nav-link" data-scroll-target="#什么是-git-worktree"><span class="header-section-number">2</span> 什么是 Git Worktree？</a>
+  <ul class="collapse">
+  <li><a href="#传统方式-vs-worktree" id="toc-传统方式-vs-worktree" class="nav-link" data-scroll-target="#传统方式-vs-worktree"><span class="header-section-number">2.1</span> 传统方式 vs Worktree</a></li>
+  </ul></li>
+  <li><a href="#基础用法" id="toc-基础用法" class="nav-link" data-scroll-target="#基础用法"><span class="header-section-number">3</span> 基础用法</a>
+  <ul class="collapse">
+  <li><a href="#查看当前-worktree-状态" id="toc-查看当前-worktree-状态" class="nav-link" data-scroll-target="#查看当前-worktree-状态"><span class="header-section-number">3.1</span> 1. 查看当前 Worktree 状态</a></li>
+  <li><a href="#创建新的-worktree" id="toc-创建新的-worktree" class="nav-link" data-scroll-target="#创建新的-worktree"><span class="header-section-number">3.2</span> 2. 创建新的 Worktree</a></li>
+  <li><a href="#进入-worktree-工作" id="toc-进入-worktree-工作" class="nav-link" data-scroll-target="#进入-worktree-工作"><span class="header-section-number">3.3</span> 3. 进入 Worktree 工作</a></li>
+  <li><a href="#移除-worktree" id="toc-移除-worktree" class="nav-link" data-scroll-target="#移除-worktree"><span class="header-section-number">3.4</span> 4. 移除 Worktree</a></li>
+  </ul></li>
+  <li><a href="#高级用法" id="toc-高级用法" class="nav-link" data-scroll-target="#高级用法"><span class="header-section-number">4</span> 高级用法</a>
+  <ul class="collapse">
+  <li><a href="#并行开发多个功能" id="toc-并行开发多个功能" class="nav-link" data-scroll-target="#并行开发多个功能"><span class="header-section-number">4.1</span> 1. 并行开发多个功能</a></li>
+  <li><a href="#紧急-bug-修复不中断当前工作" id="toc-紧急-bug-修复不中断当前工作" class="nav-link" data-scroll-target="#紧急-bug-修复不中断当前工作"><span class="header-section-number">4.2</span> 2. 紧急 Bug 修复不中断当前工作</a></li>
+  <li><a href="#代码审查与对比" id="toc-代码审查与对比" class="nav-link" data-scroll-target="#代码审查与对比"><span class="header-section-number">4.3</span> 3. 代码审查与对比</a></li>
+  <li><a href="#cicd-本地调试" id="toc-cicd-本地调试" class="nav-link" data-scroll-target="#cicd-本地调试"><span class="header-section-number">4.4</span> 4. CI/CD 本地调试</a></li>
+  <li><a href="#多版本文档维护" id="toc-多版本文档维护" class="nav-link" data-scroll-target="#多版本文档维护"><span class="header-section-number">4.5</span> 5. 多版本文档维护</a></li>
+  </ul></li>
+  <li><a href="#实用技巧" id="toc-实用技巧" class="nav-link" data-scroll-target="#实用技巧"><span class="header-section-number">5</span> 实用技巧</a>
+  <ul class="collapse">
+  <li><a href="#worktree-命名规范" id="toc-worktree-命名规范" class="nav-link" data-scroll-target="#worktree-命名规范"><span class="header-section-number">5.1</span> 1. Worktree 命名规范</a></li>
+  <li><a href="#快速返回主仓库" id="toc-快速返回主仓库" class="nav-link" data-scroll-target="#快速返回主仓库"><span class="header-section-number">5.2</span> 2. 快速返回主仓库</a></li>
+  <li><a href="#清理孤立的-worktree" id="toc-清理孤立的-worktree" class="nav-link" data-scroll-target="#清理孤立的-worktree"><span class="header-section-number">5.3</span> 3. 清理孤立的 Worktree</a></li>
+  <li><a href="#worktree-与-git-hooks" id="toc-worktree-与-git-hooks" class="nav-link" data-scroll-target="#worktree-与-git-hooks"><span class="header-section-number">5.4</span> 4. Worktree 与 Git Hooks</a></li>
+  </ul></li>
+  <li><a href="#常见问题faq" id="toc-常见问题faq" class="nav-link" data-scroll-target="#常见问题faq"><span class="header-section-number">6</span> 常见问题（FAQ）</a>
+  <ul class="collapse">
+  <li><a href="#q1-worktree-和-clone-有什么区别" id="toc-q1-worktree-和-clone-有什么区别" class="nav-link" data-scroll-target="#q1-worktree-和-clone-有什么区别"><span class="header-section-number">6.1</span> Q1: Worktree 和 Clone 有什么区别？</a></li>
+  <li><a href="#q2-worktree-会影响性能吗" id="toc-q2-worktree-会影响性能吗" class="nav-link" data-scroll-target="#q2-worktree-会影响性能吗"><span class="header-section-number">6.2</span> Q2: Worktree 会影响性能吗？</a></li>
+  <li><a href="#q3-可以同时在多个-worktree-中提交吗" id="toc-q3-可以同时在多个-worktree-中提交吗" class="nav-link" data-scroll-target="#q3-可以同时在多个-worktree-中提交吗"><span class="header-section-number">6.3</span> Q3: 可以同时在多个 worktree 中提交吗？</a></li>
+  <li><a href="#q4-worktree-删除后分支还在吗" id="toc-q4-worktree-删除后分支还在吗" class="nav-link" data-scroll-target="#q4-worktree-删除后分支还在吗"><span class="header-section-number">6.4</span> Q4: Worktree 删除后，分支还在吗？</a></li>
+  <li><a href="#q5-可以在-worktree-中创建新的-worktree-吗" id="toc-q5-可以在-worktree-中创建新的-worktree-吗" class="nav-link" data-scroll-target="#q5-可以在-worktree-中创建新的-worktree-吗"><span class="header-section-number">6.5</span> Q5: 可以在 worktree 中创建新的 worktree 吗？</a></li>
+  </ul></li>
+  <li><a href="#最佳实践总结" id="toc-最佳实践总结" class="nav-link" data-scroll-target="#最佳实践总结"><span class="header-section-number">7</span> 最佳实践总结</a>
+  <ul class="collapse">
+  <li><a href="#推荐做法" id="toc-推荐做法" class="nav-link" data-scroll-target="#推荐做法"><span class="header-section-number">7.1</span> ✅ 推荐做法</a></li>
+  <li><a href="#避免做法" id="toc-避免做法" class="nav-link" data-scroll-target="#避免做法"><span class="header-section-number">7.2</span> ❌ 避免做法</a></li>
+  </ul></li>
+  <li><a href="#与其他工具的对比" id="toc-与其他工具的对比" class="nav-link" data-scroll-target="#与其他工具的对比"><span class="header-section-number">8</span> 与其他工具的对比</a>
+  <ul class="collapse">
+  <li><a href="#git-worktree-vs-vs-code-multi-root" id="toc-git-worktree-vs-vs-code-multi-root" class="nav-link" data-scroll-target="#git-worktree-vs-vs-code-multi-root"><span class="header-section-number">8.1</span> Git Worktree vs VS Code Multi-Root</a></li>
+  <li><a href="#git-worktree-vs-github-codespaces" id="toc-git-worktree-vs-github-codespaces" class="nav-link" data-scroll-target="#git-worktree-vs-github-codespaces"><span class="header-section-number">8.2</span> Git Worktree vs GitHub Codespaces</a></li>
+  </ul></li>
+  <li><a href="#总结" id="toc-总结" class="nav-link" data-scroll-target="#总结"><span class="header-section-number">9</span> 总结</a></li>
+  <li><a href="#参考链接" id="toc-参考链接" class="nav-link" data-scroll-target="#参考链接"><span class="header-section-number">10</span> 参考链接</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Git Worktree 高级用法：并行开发多分支的终极指南</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Git</div>
+    <div class="quarto-category">DevOps</div>
+    <div class="quarto-category">Productivity</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    告别频繁的 git checkout！使用 Git Worktree 同时在多个工作目录中处理不同分支，提升并行开发效率。
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 3, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="引言" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="引言"><span class="header-section-number">1</span> 引言</h2>
+<p>你是否遇到过这样的场景：</p>
+<ul>
+<li>正在 <code>feature/login</code> 分支开发到一半，突然需要紧急修复 <code>main</code> 分支的 bug</li>
+<li>想同时测试两个不同分支的功能对比</li>
+<li>需要在多个功能分支之间频繁切换，每次都要 <code>git stash</code> 保存现场</li>
+</ul>
+<p>传统的 <code>git checkout</code> 方案需要频繁切换分支，不仅打断思路，还可能因为忘记 stash 而丢失代码。</p>
+<p><strong>Git Worktree</strong> 就是为了解决这个问题而生的——它允许你在<strong>多个独立的工作目录</strong>中同时检出同一个仓库的不同分支，真正实现并行开发。</p>
+<hr>
+</section>
+<section id="什么是-git-worktree" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="什么是-git-worktree"><span class="header-section-number">2</span> 什么是 Git Worktree？</h2>
+<p><strong>Git Worktree</strong> 是 Git 2.5+ 引入的功能，允许你为同一个仓库创建多个<strong>关联的工作目录</strong>。每个 worktree 都有自己独立的检出分支，但共享同一个 <code>.git</code> 目录。</p>
+<section id="传统方式-vs-worktree" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="传统方式-vs-worktree"><span class="header-section-number">2.1</span> 传统方式 vs Worktree</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>方式</th>
+<th>目录结构</th>
+<th>切换成本</th>
+<th>并行能力</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>git checkout</code></td>
+<td>单工作目录</td>
+<td>高（需要 stash）</td>
+<td>❌ 单任务</td>
+</tr>
+<tr class="even">
+<td><code>git clone</code> 多次</td>
+<td>多独立仓库</td>
+<td>低</td>
+<td>✅ 但浪费空间</td>
+</tr>
+<tr class="odd">
+<td><strong>Git Worktree</strong></td>
+<td>多工作目录共享 <code>.git</code></td>
+<td>低</td>
+<td>✅ 高效共享</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="基础用法" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="基础用法"><span class="header-section-number">3</span> 基础用法</h2>
+<section id="查看当前-worktree-状态" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="查看当前-worktree-状态"><span class="header-section-number">3.1</span> 1. 查看当前 Worktree 状态</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 列出所有 worktree</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree list</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 输出示例：</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># /Users/bin/projects/my-app      main       [主分支]</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># /Users/bin/projects/my-app-feat feature/ui [feature/ui]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="创建新的-worktree" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="创建新的-worktree"><span class="header-section-number">3.2</span> 2. 创建新的 Worktree</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 基本语法</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add <span class="op">&lt;</span>路径<span class="op">&gt;</span> <span class="op">&lt;</span>分支名<span class="op">&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 示例：在主仓库旁边创建 feature 分支的工作目录</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../my-app-feature feature/ui</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 如果分支不存在，可以自动创建</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../my-app-hotfix <span class="at">-b</span> hotfix/login-bug</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="进入-worktree-工作" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="进入-worktree-工作"><span class="header-section-number">3.3</span> 3. 进入 Worktree 工作</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../my-app-feature</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 现在你在这个目录中操作的是 feature/ui 分支</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 可以独立编辑、提交、推送，互不干扰</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="移除-worktree" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="移除-worktree"><span class="header-section-number">3.4</span> 4. 移除 Worktree</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 从主仓库移除 worktree（不影响分支本身）</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree remove ../my-app-feature</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 如果 worktree 有未提交的更改，强制移除</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree remove ../my-app-feature <span class="at">--force</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="高级用法" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="高级用法"><span class="header-section-number">4</span> 高级用法</h2>
+<section id="并行开发多个功能" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="并行开发多个功能"><span class="header-section-number">4.1</span> 1. 并行开发多个功能</h3>
+<p><strong>场景</strong>：你同时负责三个功能开发，需要在它们之间频繁切换测试。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 主仓库保持 main 分支干净</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/projects/my-app</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout main</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建三个 worktree 分别处理不同功能</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../my-app-login feature/login</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../my-app-payment feature/payment</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../my-app-dashboard feature/dashboard</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 现在你可以：</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># - 在 my-app-login 中开发登录功能</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># - 在 my-app-payment 中开发支付功能</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># - 在 my-app-dashboard 中开发仪表板</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># - 随时切换，无需 stash</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>目录结构</strong>：</p>
+<pre><code>~/projects/
+├── my-app/           # main 分支
+├── my-app-login/     # feature/login
+├── my-app-payment/   # feature/payment
+└── my-app-dashboard/ # feature/dashboard</code></pre>
+</section>
+<section id="紧急-bug-修复不中断当前工作" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="紧急-bug-修复不中断当前工作"><span class="header-section-number">4.2</span> 2. 紧急 Bug 修复不中断当前工作</h3>
+<p><strong>场景</strong>：正在开发功能时，收到紧急 bug 报告需要立即修复。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 当前正在 feature/login 中开发，代码写到一半不想提交</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 直接创建 hotfix worktree</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/projects/my-app</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../my-app-hotfix <span class="at">-b</span> hotfix/critical-bug</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 进入 hotfix 目录修复</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../my-app-hotfix</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 编辑、测试、提交</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"fix: 修复紧急登录 bug"</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin hotfix/critical-bug</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 修复完成后，回到原来的 worktree 继续开发</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../my-app-login</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 之前的代码还在，无需 stash/restore</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="代码审查与对比" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="代码审查与对比"><span class="header-section-number">4.3</span> 3. 代码审查与对比</h3>
+<p><strong>场景</strong>：需要对比两个分支的差异，或者审查同事的 PR。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 主仓库保持 main</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/projects/my-app</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 检出同事的 PR 分支到独立 worktree</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../my-app-pr-review pr/123-new-feature</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 在独立目录中运行、测试、审查</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../my-app-pr-review</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dev</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 同时可以在主仓库查看 main 分支作为对比</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../my-app</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="cicd-本地调试" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="cicd-本地调试"><span class="header-section-number">4.4</span> 4. CI/CD 本地调试</h3>
+<p><strong>场景</strong>：CI 流水线在某个分支失败，需要本地复现。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建与 CI 环境一致的 worktree</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../my-app-ci-debug ci/test-branch</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../my-app-ci-debug</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 清理所有未跟踪文件，确保干净环境</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clean <span class="at">-fdx</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 运行与 CI 相同的命令</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> ci</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 调试完成后移除</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ..</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree remove ../my-app-ci-debug</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="多版本文档维护" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="多版本文档维护"><span class="header-section-number">4.5</span> 5. 多版本文档维护</h3>
+<p><strong>场景</strong>：需要同时维护多个版本的文档（如 v1.x、v2.x、main）。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 主仓库用于最新开发</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/projects/docs</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout main</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建旧版本维护 worktree</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../docs-v1 v1.x</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../docs-v2 v2.x</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 现在可以：</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># - 在 docs/ 中编写最新文档</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># - 在 docs-v1/ 中修复 v1.x 文档问题</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co"># - 在 docs-v2/ 中更新 v2.x 文档</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># - 每个版本独立构建预览</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="实用技巧" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="实用技巧"><span class="header-section-number">5</span> 实用技巧</h2>
+<section id="worktree-命名规范" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="worktree-命名规范"><span class="header-section-number">5.1</span> 1. Worktree 命名规范</h3>
+<p>建议使用<strong>有意义的目录名</strong>，方便识别：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 好的命名</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../myapp-feat-login feature/login</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../myapp-hotfix-bug hotfix/login-bug</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 避免的命名</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../temp test  <span class="co"># 太模糊</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree add ../aaa main   <span class="co"># 无意义</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="快速返回主仓库" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="快速返回主仓库"><span class="header-section-number">5.2</span> 2. 快速返回主仓库</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 在主仓库设置别名</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> alias.main <span class="st">'worktree list | head -1 | cut -d" " -f1'</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 或者创建快捷脚本</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ~/.zshrc 中添加：</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">gtm()</span> <span class="kw">{</span> <span class="bu">cd</span> <span class="va">$(</span><span class="fu">git</span> worktree list <span class="kw">|</span> <span class="fu">head</span> <span class="at">-1</span> <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span><span class="st">" "</span> <span class="at">-f1</span><span class="va">)</span><span class="kw">;</span> <span class="kw">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="清理孤立的-worktree" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="清理孤立的-worktree"><span class="header-section-number">5.3</span> 3. 清理孤立的 Worktree</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 查看是否有 worktree 指向不存在的分支</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree list <span class="at">--porcelain</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 移除已删除分支的 worktree</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree prune</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="worktree-与-git-hooks" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="worktree-与-git-hooks"><span class="header-section-number">5.4</span> 4. Worktree 与 Git Hooks</h3>
+<p>每个 worktree 共享相同的 Git hooks，但如果需要为不同分支设置不同的 hooks：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 在 worktree 的 config.local 中覆盖</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../my-app-feature</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config core.hooksPath .git-hooks-feature</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="常见问题faq" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="常见问题faq"><span class="header-section-number">6</span> 常见问题（FAQ）</h2>
+<section id="q1-worktree-和-clone-有什么区别" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="q1-worktree-和-clone-有什么区别"><span class="header-section-number">6.1</span> Q1: Worktree 和 Clone 有什么区别？</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>特性</th>
+<th>Worktree</th>
+<th>Clone</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>磁盘空间</td>
+<td>共享 <code>.git</code>，节省空间</td>
+<td>完整复制，占用多</td>
+</tr>
+<tr class="even">
+<td>同步</td>
+<td>自动共享对象数据库</td>
+<td>需要 fetch/push</td>
+</tr>
+<tr class="odd">
+<td>分支管理</td>
+<td>统一管理</td>
+<td>独立管理</td>
+</tr>
+<tr class="even">
+<td>适用场景</td>
+<td>同一仓库多分支</td>
+<td>完全独立的环境</td>
+</tr>
+</tbody>
+</table>
+<p><strong>建议</strong>：同一仓库的并行开发用 Worktree；需要隔离环境（如测试不同 Git 配置）用 Clone。</p>
+</section>
+<section id="q2-worktree-会影响性能吗" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="q2-worktree-会影响性能吗"><span class="header-section-number">6.2</span> Q2: Worktree 会影响性能吗？</h3>
+<ul>
+<li><strong>磁盘空间</strong>：显著节省（共享对象数据库）</li>
+<li><strong>内存占用</strong>：每个 worktree 独立进程，略有增加</li>
+<li><strong>Git 操作</strong>：几乎无影响，共享对象查询更快</li>
+</ul>
+</section>
+<section id="q3-可以同时在多个-worktree-中提交吗" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="q3-可以同时在多个-worktree-中提交吗"><span class="header-section-number">6.3</span> Q3: 可以同时在多个 worktree 中提交吗？</h3>
+<p><strong>可以！</strong> 每个 worktree 有独立的 HEAD 和索引，提交互不干扰。但注意：</p>
+<ul>
+<li>不要同时在多个 worktree 中修改<strong>同一个文件</strong></li>
+<li>推送前确保各分支已正确合并</li>
+</ul>
+</section>
+<section id="q4-worktree-删除后分支还在吗" class="level3" data-number="6.4">
+<h3 data-number="6.4" class="anchored" data-anchor-id="q4-worktree-删除后分支还在吗"><span class="header-section-number">6.4</span> Q4: Worktree 删除后，分支还在吗？</h3>
+<p><strong>在！</strong> <code>git worktree remove</code> 只删除工作目录，分支本身仍然存在于仓库中。如果需要删除分支：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch <span class="at">-d</span> feature/login  <span class="co"># 删除本地分支</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin <span class="at">--delete</span> feature/login  <span class="co"># 删除远程分支</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="q5-可以在-worktree-中创建新的-worktree-吗" class="level3" data-number="6.5">
+<h3 data-number="6.5" class="anchored" data-anchor-id="q5-可以在-worktree-中创建新的-worktree-吗"><span class="header-section-number">6.5</span> Q5: 可以在 worktree 中创建新的 worktree 吗？</h3>
+<p><strong>可以，但不推荐。</strong> 最佳实践是从<strong>主仓库</strong>创建所有 worktree，避免嵌套混乱。</p>
+<hr>
+</section>
+</section>
+<section id="最佳实践总结" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="最佳实践总结"><span class="header-section-number">7</span> 最佳实践总结</h2>
+<section id="推荐做法" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="推荐做法"><span class="header-section-number">7.1</span> ✅ 推荐做法</h3>
+<ol type="1">
+<li><p><strong>统一目录结构</strong>：将 worktree 放在主仓库的相邻目录</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">~/projects/</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> my-app/        <span class="co"># 主仓库</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> my-app-feat1/  <span class="co"># worktree 1</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> my-app-feat2/  <span class="co"># worktree 2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p><strong>及时清理</strong>：功能完成后移除不再需要的 worktree</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> worktree prune  <span class="co"># 定期清理</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p><strong>明确用途</strong>：用目录名区分 worktree 用途（feat/hotfix/pr-review）</p></li>
+<li><p><strong>保持主仓库干净</strong>：主仓库用于 main 分支和管理工作</p></li>
+</ol>
+</section>
+<section id="避免做法" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="避免做法"><span class="header-section-number">7.2</span> ❌ 避免做法</h3>
+<ol type="1">
+<li><strong>不要在 worktree 中嵌套创建 worktree</strong></li>
+<li><strong>不要同时修改同一文件</strong>（会导致冲突）</li>
+<li><strong>不要忘记 worktree 的存在</strong>（定期 <code>git worktree list</code> 检查）</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="与其他工具的对比" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="与其他工具的对比"><span class="header-section-number">8</span> 与其他工具的对比</h2>
+<section id="git-worktree-vs-vs-code-multi-root" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="git-worktree-vs-vs-code-multi-root"><span class="header-section-number">8.1</span> Git Worktree vs VS Code Multi-Root</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>特性</th>
+<th>Worktree</th>
+<th>VS Code Multi-Root</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>分支隔离</td>
+<td>✅ 完全隔离</td>
+<td>❌ 同一仓库</td>
+</tr>
+<tr class="even">
+<td>磁盘占用</td>
+<td>✅ 共享 .git</td>
+<td>✅ 共享</td>
+</tr>
+<tr class="odd">
+<td>IDE 支持</td>
+<td>任意编辑器</td>
+<td>VS Code 专属</td>
+</tr>
+</tbody>
+</table>
+<p><strong>建议</strong>：两者可以结合使用——用 Worktree 管理分支，用 Multi-Root 同时打开多个 worktree 窗口。</p>
+</section>
+<section id="git-worktree-vs-github-codespaces" class="level3" data-number="8.2">
+<h3 data-number="8.2" class="anchored" data-anchor-id="git-worktree-vs-github-codespaces"><span class="header-section-number">8.2</span> Git Worktree vs GitHub Codespaces</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>特性</th>
+<th>Worktree</th>
+<th>Codespaces</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>运行位置</td>
+<td>本地</td>
+<td>云端</td>
+</tr>
+<tr class="even">
+<td>成本</td>
+<td>免费</td>
+<td>按使用计费</td>
+</tr>
+<tr class="odd">
+<td>网络依赖</td>
+<td>无需</td>
+<td>需要</td>
+</tr>
+<tr class="even">
+<td>适用场景</td>
+<td>本地并行开发</td>
+<td>远程协作/演示</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="总结" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="总结"><span class="header-section-number">9</span> 总结</h2>
+<p>Git Worktree 是提升并行开发效率的利器，特别适合：</p>
+<ul>
+<li>✅ 同时开发多个功能分支</li>
+<li>✅ 紧急 bug 修复不中断当前工作</li>
+<li>✅ 代码审查与对比测试</li>
+<li>✅ 多版本文档/代码维护</li>
+</ul>
+<p><strong>核心优势</strong>： - 节省磁盘空间（共享 <code>.git</code>） - 零切换成本（无需 stash） - 真正的并行开发</p>
+<p><strong>一句话总结</strong>：如果你还在用 <code>git checkout</code> 频繁切换分支，Git Worktree 会让你的开发效率提升一个量级。</p>
+<hr>
+</section>
+<section id="参考链接" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="参考链接"><span class="header-section-number">10</span> 参考链接</h2>
+<ul>
+<li><a href="https://git-scm.com/docs/git-worktree">Git 官方文档 - git-worktree</a></li>
+<li><a href="https://www.atlassian.com/git/tutorials/git-worktree">Git Worktree 详解（Atlassian）</a></li>
+<li><a href="https://docs.github.com/en/get-started/using-git/checking-out-multiple-branches">GitHub Docs - Multiple working trees</a></li>
+</ul>
+<hr>
+<p><em>发布时间：2026 年 4 月 3 日</em><br>
+<em>标签：#Git #DevOps #生产力</em></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2025 Binchen Chen</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

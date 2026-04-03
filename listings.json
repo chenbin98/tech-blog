@@ -1,7 +1,9 @@
 [
   {
-    "listing": "/index.html",
+    "listing": "/posts/index.html",
     "items": [
+      "/posts/2026-4-3-ai-for-science-breakthrough.html",
+      "/posts/2026-4-3-git-worktree-advanced.html",
       "/posts/2026-4-1-meteo-data-workflow.html",
       "/posts/2026-3-19-codex-xhigh-error-fix.html",
       "/posts/2026-3-17-github-connection-fix.html",
@@ -18,8 +20,10 @@
     ]
   },
   {
-    "listing": "/posts/index.html",
+    "listing": "/index.html",
     "items": [
+      "/posts/2026-4-3-ai-for-science-breakthrough.html",
+      "/posts/2026-4-3-git-worktree-advanced.html",
       "/posts/2026-4-1-meteo-data-workflow.html",
       "/posts/2026-3-19-codex-xhigh-error-fix.html",
       "/posts/2026-3-17-github-connection-fix.html",
