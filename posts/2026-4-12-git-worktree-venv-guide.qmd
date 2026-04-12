@@ -1,0 +1,294 @@
+---
+title: "Git Worktree + Python 虚拟环境配置指南"
+date: "2026-04-12"
+categories: [Git, Python, DevOps]
+tags: [Git Worktree, Python, venv, 开发环境]
+description: "使用 git worktree 进行多分支开发时，如何为每个 worktree 配置独立的 Python 虚拟环境，避免依赖污染和路径混乱。"
+---
+
+## 问题背景
+
+在使用 `git worktree` 进行多分支并行开发时，一个常见但容易被忽视的问题是：
+
+**每个 worktree 应该拥有独立的 Python 虚拟环境**。
+
+如果多个 worktree 共享同一个虚拟环境，会导致：
+
+- ❌ 依赖污染：不同分支的依赖版本冲突
+- ❌ 路径混乱：`pip install -e .` 指向错误的 worktree
+- ❌ 调试困难：导入的模块来自错误的分支
+
+本文介绍如何为每个 worktree 配置独立的 Python 虚拟环境。
+
+---
+
+## 解决方案
+
+### 核心原则
+
+> **代码隔离靠 worktree，依赖隔离靠 venv**
+
+每个 worktree 应该：
+- 独立的代码目录
+- 独立的 Python 环境
+- 独立的依赖状态
+
+---
+
+## 配置步骤
+
+### 步骤 1：进入新的 worktree
+
+```bash
+cd /path/to/new/worktree
+```
+
+---
+
+### 步骤 2：创建独立虚拟环境
+
+```bash
+python3.12 -m venv .venv
+```
+
+**说明**：
+- 推荐使用 `.venv` 作为目录名（隐藏且约定俗成）
+- 指定 Python 版本（如 `python3.12`）确保环境一致性
+
+---
+
+### 步骤 3：激活虚拟环境
+
+```bash
+source .venv/bin/activate
+```
+
+**提示**：可使用 `direnv` 或 `autoenv` 实现自动激活（见后文）。
+
+---
+
+### 步骤 4：初始化依赖
+
+```bash
+# 升级 pip
+python -m pip install -U pip
+
+# 安装项目依赖
+pip install -r requirements.txt
+
+# 以 editable 模式安装当前项目
+pip install -e .
+```
+
+**说明**：
+- `-r requirements.txt`：安装项目依赖
+- `-e .`：以 editable 模式安装当前项目（开发模式），这是关键步骤
+
+---
+
+### 步骤 5：验证环境配置
+
+运行以下验证代码：
+
+```bash
+./.venv/bin/python - <<'PY'
+import inspect, your_package_name
+from your_package_name.settings import SETTINGS
+print(inspect.getfile(your_package_name))
+print(SETTINGS.root)
+PY
+```
+
+**正确结果**：
+- 包路径指向当前 worktree
+- `SETTINGS.root` 指向当前 worktree
+
+示例输出：
+```
+/path/to/new/worktree/your_package_name/__init__.py
+/path/to/new/worktree
+```
+
+---
+
+## 常见问题排查
+
+### 问题 1：导入路径指向旧 worktree
+
+**症状**：
+```python
+import your_package
+print(your_package.__file__)
+# 输出：/path/to/OLD/worktree/your_package/__init__.py  ❌
+```
+
+**原因**：
+- 使用了全局 Python 而非虚拟环境
+- 没有激活 `.venv`
+
+**排查**：
+```bash
+which python
+# 应该输出：/path/to/new/worktree/.venv/bin/python
+```
+
+**解决**：
+```bash
+source .venv/bin/activate
+pip install -e .
+```
+
+---
+
+### 问题 2：SETTINGS.root 不正确
+
+**症状**：
+```python
+print(SETTINGS.root)
+# 输出：/path/to/OLD/worktree  ❌
+```
+
+**原因**：
+- 项目未以 editable 模式安装
+- 或安装时指向了错误的目录
+
+**解决**：
+```bash
+pip uninstall your_package
+pip install -e .
+```
+
+---
+
+## 最佳实践
+
+### 1. Git 忽略虚拟环境
+
+在 `.gitignore` 中添加：
+```gitignore
+# Python 虚拟环境
+.venv/
+venv/
+__pycache__/
+*.pyc
+```
+
+---
+
+### 2. 自动激活虚拟环境
+
+使用 `direnv` 实现进入目录自动激活：
+
+**安装 direnv**：
+```bash
+# macOS
+brew install direnv
+
+# 在 ~/.zshrc 或 ~/.bashrc 中添加
+eval "$(direnv hook zsh)"  # 或 bash
+```
+
+**创建 `.envrc` 文件**：
+```bash
+# 在 worktree 根目录创建 .envrc
+echo "source .venv/bin/activate" > .envrc
+direnv allow
+```
+
+**效果**：进入目录自动激活虚拟环境，离开自动退出。
+
+---
+
+### 3. 标准化初始化脚本
+
+创建 `scripts/init_worktree.sh`：
+```bash
+#!/bin/bash
+# 初始化新的 git worktree 虚拟环境
+
+set -e
+
+echo "🔧 初始化 worktree 虚拟环境..."
+
+# 创建虚拟环境
+python3.12 -m venv .venv
+
+# 激活环境
+source .venv/bin/activate
+
+# 升级 pip
+python -m pip install -U pip
+
+# 安装依赖
+pip install -r requirements.txt
+pip install -e .
+
+# 验证
+echo "✅ 验证环境..."
+./.venv/bin/python -c "import your_package; print('OK:', your_package.__file__)"
+
+echo "🎉 初始化完成！"
+```
+
+**使用**：
+```bash
+chmod +x scripts/init_worktree.sh
+./scripts/init_worktree.sh
+```
+
+---
+
+## 完整工作流示例
+
+```bash
+# 1. 创建新的 worktree
+cd ~/projects/my-project
+git worktree add ../my-project-feature feature-branch
+
+# 2. 进入新 worktree
+cd ../my-project-feature
+
+# 3. 运行初始化脚本
+./scripts/init_worktree.sh
+
+# 4. 开始开发
+source .venv/bin/activate  # 如未使用 direnv
+python your_script.py
+
+# 5. 完成后清理（可选）
+cd ..
+git worktree remove my-project-feature
+```
+
+---
+
+## 总结
+
+使用 `git worktree` 进行多分支开发时，虚拟环境配置是关键基础设施：
+
+| 组件 | 作用 | 配置要点 |
+|------|------|----------|
+| **git worktree** | 代码隔离 | 每个分支独立目录 |
+| **venv** | 依赖隔离 | 每个 worktree 独立 `.venv` |
+| **pip install -e .** | 路径绑定 | 确保导入指向当前 worktree |
+
+**核心检查清单**：
+- [ ] 每个 worktree 有独立的 `.venv`
+- [ ] `.venv` 已添加到 `.gitignore`
+- [ ] 使用 `pip install -e .` 安装项目
+- [ ] 验证导入路径指向当前 worktree
+
+遵循以上实践，可避免多分支开发中的依赖冲突和路径混乱问题。
+
+---
+
+## 参考链接
+
+- [Git Worktree 官方文档](https://git-scm.com/docs/git-worktree)
+- [Python venv 文档](https://docs.python.org/3/library/venv.html)
+- [direnv 官网](https://direnv.net/)
+
+---
+
+*发布时间：2026 年 4 月 12 日*  
+*标签：#Git #Python #DevOps*
