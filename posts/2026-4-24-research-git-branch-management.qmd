@@ -1,0 +1,561 @@
+---
+title: "科研项目 Git 分支管理规范（适用于多实验 + AI 协作）"
+date: "2026-04-24"
+categories: [Git, 科研, DevOps, AI协作]
+tags: [Git分支, 多实验, Codex, Worktree, 版本管理]
+description: "面向科研场景的 Git 分支管理规范——支持多实验并行、AI Agent 协作、worktree 多设备开发，保证 main 永远稳定可复现。"
+---
+
+## 问题背景
+
+在科研项目中，我们常常面临以下痛点：
+
+- 🔀 **多实验并行**：不同模型/策略同时开发，分支混乱
+- 🤖 **AI 辅助编程**：使用 Codex / AI Agent 修改代码，难以追踪
+- 💻 **多设备开发**：worktree、多机器同步，环境不一致
+- 📄 **论文复现**：结果冻结、版本追溯困难
+
+如果缺乏规范的分支管理，很容易导致：
+
+- ❌ main 分支不稳定，无法复现论文结果
+- ❌ 实验分支互相污染，难以独立验证
+- ❌ AI 修改与手动修改混在一起，代码审查困难
+- ❌ 分支泛滥，清理困难
+
+本文介绍一套经过实践检验的 Git 分支管理规范，专为科研场景设计。
+
+---
+
+## 核心设计目标
+
+| 目标 | 说明 |
+|------|------|
+| **main 永远稳定** | 随时可以交付、复现、展示 |
+| **实验解耦** | 每个实验独立，不互相污染 |
+| **快速试错** | 支持失败、废弃、快速切换 |
+| **可控收敛** | 实验结果有序集成到主线 |
+
+---
+
+## 核心分支体系
+
+### 1. `main`（主分支）
+
+**作用：**
+- 存放最终稳定版本
+- 用于论文、报告、对外发布
+
+**要求：**
+- ✅ 必须可以完整运行
+- ✅ 实验结果可复现
+- ✅ 无临时文件（cache / log / checkpoint）
+- ✅ README 清晰说明如何运行
+
+> **原则：`main` = "随时可以交付的版本"**
+
+```bash
+# main 分支应该满足的检查清单
+git switch main
+python -m pytest tests/          # 测试通过
+python train.py --config config.yaml  # 可以完整运行
+ls -la results/                  # 结果文件存在且可复现
+cat README.md                    # 文档清晰
+```
+
+---
+
+### 2. `dev`（集成分支）
+
+**作用：**
+- 多实验结果汇总
+- 作为进入 main 的前置缓冲层
+
+**特点：**
+- 可以有轻微不稳定，但不能崩
+- 所有 exp 分支必须先进入 dev
+
+> **流程：`exp → dev → main`**
+
+```bash
+# 实验完成后的集成流程
+git switch dev
+git pull origin dev
+git merge exp/xxx --no-ff
+git push origin dev
+
+# dev 稳定后合并到 main
+git switch main
+git pull origin main
+git merge dev --no-ff
+git push origin main
+```
+
+---
+
+### 3. `release` 分支（冻结版本）
+
+**命名规范：**
+```
+release/<版本名>
+```
+
+**示例：**
+```bash
+release/paper-v1       # 论文投稿版本
+release/rebuttal-v1    #  rebuttal 版本
+release/final-model    # 最终模型存档
+```
+
+**作用：**
+- 论文投稿版本冻结
+- 答辩版本存档
+- 重要阶段快照
+
+**规则：**
+- ❌ 不做新功能开发
+- ✅ 只允许小修复（bug fix、文档修正）
+
+```bash
+# 创建 release 分支
+git switch main
+git switch -c release/paper-v1
+git push origin release/paper-v1
+
+# 只在 release 分支上做小修复
+git commit -m "fix: 修正图表标注"
+```
+
+---
+
+## 实验分支（核心机制）
+
+### 命名规范
+
+```
+exp/<研究主题>
+```
+
+### 示例
+
+```bash
+exp/m1-dvr-daily-modifier      # 实验 1：DVR 日修正
+exp/spatiotemporal-eval        # 时空评估实验
+exp/site-year-split            # 站点-年份划分策略
+exp/four-model-compare         # 四模型对比实验
+```
+
+### 原则
+
+| 原则 | 说明 |
+|------|------|
+| **独立** | 每个实验独立分支，互不影响 |
+| **可失败** | 实验可以失败、可以废弃 |
+| **不污染主线** | 不直接合入 main |
+
+### 禁止行为
+
+- ❌ 在 exp 分支上长期维护主逻辑
+- ❌ 直接 push 到 main
+- ❌ 多个实验共用一个分支
+
+### 实验分支生命周期
+
+```
+创建 → 开发 → 评估 → 合并/废弃
+  ↓        ↓       ↓         ↓
+git     编码    对比      merge / delete
+switch  实验    结果      或归档
+-c      调参
+exp/xxx
+```
+
+---
+
+## Codex 分支（AI 协作专用）
+
+### 命名规范
+
+```
+codex/<任务描述>
+```
+
+### 示例
+
+```bash
+codex/fix-rollout-eval     # 修复 rollout 评估
+codex/refactor-dataset     # 重构数据集模块
+codex/add-figure1          # 添加论文 Figure 1 的代码
+```
+
+### 作用
+
+- 🔒 隔离 AI 修改，防止污染实验逻辑
+- 🔍 便于代码审查（明确哪些是 AI 生成的）
+- 🔄 支持快速回滚（AI 修改有问题时直接丢弃分支）
+
+### 推荐流程
+
+```
+codex → exp → dev → main
+```
+
+```bash
+# 1. 从实验分支创建 codex 分支
+git switch exp/m1-dvr-daily-modifier
+git switch -c codex/fix-rollout-eval
+
+# 2. 让 Codex 修改代码
+# ... Codex 工作 ...
+
+# 3. 审查后合并回实验分支
+git switch exp/m1-dvr-daily-modifier
+git merge codex/fix-rollout-eval --no-ff
+
+# 4. 删除 codex 分支
+git branch -d codex/fix-rollout-eval
+git push origin --delete codex/fix-rollout-eval
+```
+
+---
+
+## Backup 分支（安全机制）
+
+### 命名规范
+
+```
+backup/<对象>-<日期>
+```
+
+### 示例
+
+```bash
+backup/main-20260424           # main 分支备份
+backup/exp-m1-before-reset     # 实验分支重置前备份
+```
+
+### 必须创建 backup 的场景
+
+| 场景 | 命令 |
+|------|------|
+| `reset --hard` | `git branch backup/main-$(date +%Y%m%d)` |
+| `force push` | `git branch backup/exp-xxx-$(date +%Y%m%d)` |
+| 大规模重构 | 同上 |
+| 替换 main | 同上 |
+
+```bash
+# 安全操作模板
+# 1. 先备份
+git branch backup/main-$(date +%Y%m%d)
+
+# 2. 再操作
+git reset --hard HEAD~3
+
+# 3. 如果出问题，随时恢复
+git switch main
+git reset --hard backup/main-$(date +%Y%m%d)
+```
+
+---
+
+## 标准工作流
+
+### 场景 1：开始一个实验
+
+```bash
+# 从 dev 创建实验分支
+git switch dev
+git pull origin dev
+git switch -c exp/my-experiment
+```
+
+### 场景 2：实验完成 → 合并到 dev
+
+```bash
+git switch dev
+git merge exp/my-experiment --no-ff
+git push origin dev
+```
+
+### 场景 3：dev 稳定 → 合并到 main
+
+```bash
+git switch main
+git pull origin main
+git merge dev --no-ff
+git push origin main
+```
+
+### 场景 4：冻结论文版本
+
+```bash
+git switch main
+git switch -c release/paper-v1
+git push origin release/paper-v1
+```
+
+### 场景 5：Codex 辅助开发
+
+```bash
+# 从实验分支创建 codex 分支
+git switch exp/my-experiment
+git switch -c codex/refactor-dataset
+
+# Codex 工作完成后审查
+git diff exp/my-experiment...codex/refactor-dataset
+
+# 合并回实验分支
+git switch exp/my-experiment
+git merge codex/refactor-dataset --no-ff
+```
+
+---
+
+## Codex / Worktree 使用规范
+
+### 每个任务独立分支
+
+```bash
+# ✅ 正确做法
+git switch -c codex/fix-eval
+git switch -c codex/add-visualization
+
+# ❌ 错误做法：多个任务共用一个分支
+```
+
+### 每个 worktree 独立环境
+
+```bash
+# 创建 worktree
+git worktree add ../project-exp2 exp/my-experiment
+
+# 进入 worktree 并创建独立虚拟环境
+cd ../project-exp2
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+```
+
+### 禁止行为
+
+- ❌ 多个任务共用一个分支
+- ❌ 在 main 上直接让 Codex 修改
+- ❌ worktree 共享虚拟环境
+
+---
+
+## Main 分支准入标准
+
+进入 main 前必须满足以下所有条件：
+
+- [ ] ✅ 代码可以完整运行
+- [ ] ✅ 关键实验可复现
+- [ ] ✅ 数据路径清晰
+- [ ] ✅ 无临时文件污染
+- [ ] ✅ 文档已更新
+
+```bash
+# 准入检查脚本
+#!/bin/bash
+echo "=== Main 分支准入检查 ==="
+
+# 1. 测试通过
+echo "1/5 运行测试..."
+python -m pytest tests/ -v || exit 1
+
+# 2. 关键实验可复现
+echo "2/5 复现关键实验..."
+python train.py --config config.yaml --reproduce || exit 1
+
+# 3. 数据路径检查
+echo "3/5 检查数据路径..."
+test -d data/ || echo "⚠️  data/ 目录不存在"
+
+# 4. 临时文件检查
+echo "4/5 检查临时文件..."
+git status --porcelain | grep -E "\.(log|cache|pt|pth)$" && exit 1
+
+# 5. 文档检查
+echo "5/5 检查文档..."
+test -f README.md || exit 1
+
+echo "✅ 所有检查通过！"
+```
+
+---
+
+## 分支清理策略
+
+### 已合并的分支
+
+```bash
+# 删除本地分支
+git branch -d exp/xxx
+
+# 删除远程分支
+git push origin --delete exp/xxx
+```
+
+### 未合并但废弃的分支
+
+```bash
+# 强制删除本地分支
+git branch -D exp/xxx
+
+# 删除远程分支
+git push origin --delete exp/xxx
+```
+
+### 归档（保留历史记录）
+
+```bash
+# 打 tag 归档
+git tag archive-exp-xxx-$(date +%Y%m%d)
+git push origin archive-exp-xxx-$(date +%Y%m%d)
+
+# 然后删除分支
+git branch -D exp/xxx
+git push origin --delete exp/xxx
+```
+
+### 定期清理脚本
+
+```bash
+#!/bin/bash
+# cleanup-branches.sh
+echo "=== 清理已合并的分支 ==="
+
+# 列出已合并的 exp 分支
+echo "已合并的 exp 分支："
+git branch --merged | grep "exp/"
+
+# 列出已合并的 codex 分支
+echo "已合并的 codex 分支："
+git branch --merged | grep "codex/"
+
+# 批量删除（需确认）
+read -p "是否删除以上分支？(y/N) " confirm
+if [[ "$confirm" == "y" || "$confirm" == "Y" ]]; then
+    git branch --merged | grep "exp/\|codex/" | xargs git branch -d
+    echo "✅ 清理完成！"
+fi
+```
+
+---
+
+## 推荐仓库结构
+
+```
+main                          # 稳定版本
+dev                           # 集成测试
+
+exp/*                         # 科研实验
+  ├── exp/m1-dvr-daily-modifier
+  ├── exp/spatiotemporal-eval
+  └── exp/four-model-compare
+
+codex/*                       # AI 任务隔离
+  ├── codex/fix-rollout-eval
+  └── codex/refactor-dataset
+
+release/*                     # 论文冻结
+  ├── release/paper-v1
+  └── release/rebuttal-v1
+
+backup/*                      # 风险兜底
+  └── backup/main-20260424
+```
+
+---
+
+## 核心原则总结
+
+| 分支类型 | 作用 | 稳定性 |
+|----------|------|--------|
+| **main** | 稳定版本 | 🟢 最高 |
+| **dev** | 集成测试 | 🟡 中等 |
+| **exp** | 科研实验 | 🔴 可变 |
+| **codex** | AI 任务隔离 | 🔴 可变 |
+| **release** | 论文冻结 | 🟢 高 |
+| **backup** | 风险兜底 | - |
+
+---
+
+## 一句话理解
+
+> 👉 **不要在 main 上做实验**
+>
+> 👉 **不要让实验分支承担主线**
+>
+> 👉 **永远保留可回退路径**
+
+---
+
+## 进阶建议
+
+### 1. 使用 Git Hooks 自动化检查
+
+```bash
+# .git/hooks/pre-push
+#!/bin/bash
+# 推送前自动检查
+
+# 禁止直接推送到 main
+current_branch=$(git symbolic-ref --short HEAD)
+if [[ "$current_branch" == "main" ]]; then
+    echo "❌ 禁止直接推送到 main 分支！"
+    echo "请通过 dev 分支合并。"
+    exit 1
+fi
+```
+
+### 2. 使用 Git Aliases 简化操作
+
+```bash
+# ~/.gitconfig
+[alias]
+    # 快速创建实验分支
+    newexp = "!f() { git switch dev && git pull origin dev && git switch -c exp/$1; }; f"
+    
+    # 快速创建 codex 分支
+    newcodex = "!f() { git switch -c codex/$1; }; f"
+    
+    # 创建 backup
+    backup = "!f() { git branch backup/$1-$(date +%Y%m%d); }; f"
+    
+    # 清理已合并分支
+    cleanup = "!git branch --merged | grep -E 'exp/|codex/' | xargs git branch -d"
+```
+
+### 3. 使用 .gitignore 保护仓库
+
+```gitignore
+# 临时文件
+*.log
+*.cache
+*.pt
+*.pth
+__pycache__/
+.pytest_cache/
+
+# 大型结果文件
+results/large_*/
+checkpoints/
+*.zip
+
+# 但保留小结果文件
+!results/small_result.csv
+```
+
+---
+
+## 参考链接
+
+- [Git 官方文档 - Branching](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell)
+- [Git Worktree 使用指南](https://git-scm.com/docs/git-worktree)
+- [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow)
+
+---
+
+*发布时间：2026 年 4 月 24 日*  
+*标签：#Git #科研 #DevOps #AI协作 #版本管理*
