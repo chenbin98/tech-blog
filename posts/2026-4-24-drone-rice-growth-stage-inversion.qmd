@@ -1,0 +1,537 @@
+---
+title: "无人机水稻生育期反演预测：AI + 遥感的技术方案"
+date: "2026-04-24"
+categories: [农业AI, 遥感, 深度学习, 项目规划]
+tags: [无人机, 水稻, 生育期预测, 多光谱, ViT, Transformer, 精准农业]
+description: "利用无人机遥感影像（RGB + 多光谱 + DSM）结合 AI 模型，实现水稻生育期的自动反演与预测。从技术架构、模型选择到部署方案，完整梳理项目思路。"
+---
+
+## 项目背景
+
+精准农业的核心挑战之一是如何**快速、准确、非破坏性地**获取作物生长状态信息。传统方法依赖人工田间调查，耗时费力且难以规模化。
+
+无人机（UAV）遥感技术的成熟，为我们提供了高时空分辨率的数据采集手段。结合深度学习模型，我们可以从影像中反演出作物的关键生理参数，并预测其生育期进程。
+
+> **生育期反演**：从遥感影像特征 → 生育期参数（叶面积指数 LAI、生物量、株高等）
+>
+> **生育期预测**：基于历史时序 → 未来生育期阶段（分蘖期、拔节期、抽穗期、成熟期）
+
+本文梳理一个完整的技术方案，涵盖从数据采集到模型部署的全流程。
+
+---
+
+## 技术架构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    无人机水稻生育期预测系统                     │
+├─────────────┬─────────────┬──────────────┬──────────────────┤
+│  📷 数据采集 │  🧠 模型训练 │  📊 反演预测  │  📱 可视化展示    │
+│             │             │              │                  │
+│ • RGB 影像  │ • CNN/ViT   │ • 生育期分类 │ • Web Dashboard  │
+│ • 多光谱    │ • 时序模型  │ • 生长曲线   │ • 地块地图       │
+│ • DSM/NDVI  │ • Transformer│ • 预测预警   │ • 导出报告       │
+└─────────────┴─────────────┴──────────────┴──────────────────┘
+```
+
+---
+
+## 数据采集层
+
+### 传感器配置
+
+| 传感器类型 | 分辨率 | 关键信息 | 应用场景 |
+|-----------|--------|---------|---------|
+| **RGB 相机** | 12-48 MP | 颜色、纹理、冠层覆盖度 | 株数统计、病害初筛 |
+| **多光谱** | 5 波段（B/G/R/RedEdge/NIR） | NDVI、EVI 等植被指数 | 长势评估、氮含量反演 |
+| **热红外** | 640×512 | 冠层温度 | 水分胁迫监测 |
+| **LiDAR** | 点云密度 50-200 pts/m² | 植株高度、三维结构 | 生物量估算、倒伏检测 |
+
+### 飞行规划
+
+```python
+# 使用 Python 计算最佳飞行高度和重叠率
+import math
+
+# 参数
+GSD_target = 2.0  # 地面采样距离 (cm/pixel)
+sensor_width = 13.2  # 传感器宽度 (mm)
+focal_length = 4.5  # 焦距 (mm)
+image_width = 5472  # 图像宽度 (像素)
+
+# 计算飞行高度
+altitude = (GSD_target * focal_length) / (sensor_width / image_width)
+print(f"建议飞行高度: {altitude:.0f} m")
+
+# 计算覆盖面积
+coverage_width = (GSD_target * image_width) / 100  # 米
+print(f"单张覆盖宽度: {coverage_width:.1f} m")
+```
+
+### 数据处理流程
+
+```bash
+# 1. 影像拼接（使用 OpenDroneMap 或 Pix4D）
+odm_project.sh /path/to/images /path/to/output
+
+# 2. 提取植被指数
+python extract_vegetation_indices.py \
+    --multispec orthomosaic.tif \
+    --indices NDVI,EVI,GNDVI \
+    --output vegetation_indices/
+
+# 3. 生成 DSM（数字表面模型）
+python generate_dsm.py \
+    --point_cloud dense_point_cloud.laz \
+    --resolution 0.05 \
+    --output dsm.tif
+```
+
+---
+
+## 特征工程
+
+### 植被指数计算
+
+| 指数 | 公式 | 适用场景 |
+|------|------|---------|
+| **NDVI** | (NIR - R) / (NIR + R) | 总体长势、生物量 |
+| **EVI** | 2.5 × (NIR - R) / (NIR + 6R - 7.5B + 1) | 高生物量区域 |
+| **GNDVI** | (NIR - G) / (NIR + G) | 叶绿素含量 |
+| **NDRE** | (NIR - RedEdge) / (NIR + RedEdge) | 冠层氮含量 |
+| **CIrededge** | (NIR / RedEdge) - 1 | 光合活性 |
+
+```python
+import rasterio
+import numpy as np
+
+def calculate_ndvi(nir_band, red_band):
+    """计算 NDVI"""
+    ndvi = (nir_band.astype(float) - red_band.astype(float)) / \
+           (nir_band.astype(float) + red_band.astype(float) + 1e-8)
+    return np.clip(ndvi, -1, 1)
+
+# 读取多光谱波段
+with rasterio.open('orthomosaic.tif') as src:
+    nir = src.read(4)  # 第 4 波段：近红外
+    red = src.read(3)  # 第 3 波段：红光
+    ndvi = calculate_ndvi(nir, red)
+```
+
+### 时序特征构建
+
+```python
+# 构建多时相特征矩阵
+# 形状: (地块数, 时点数, 特征数)
+features = {
+    'spectral': ['NDVI', 'EVI', 'GNDVI', 'NDRE'],  # 光谱特征
+    'texture': ['ASM', 'Contrast', 'Entropy'],       # 纹理特征
+    'structural': ['plant_height', 'canopy_cover'],   # 结构特征
+    'environmental': ['temp', 'precip', 'soil_moist'] # 环境特征
+}
+```
+
+---
+
+## 模型设计
+
+### 方案一：单时相分类（ViT/ResNet）
+
+适用于从单期影像中识别当前生育期阶段。
+
+```python
+from transformers import ViTForImageClassification, ViTFeatureExtractor
+import torch
+
+# 加载预训练 ViT 模型
+feature_extractor = ViTFeatureExtractor.from_pretrained(
+    'google/vit-base-patch16-224-in21k'
+)
+model = ViTForImageClassification.from_pretrained(
+    'google/vit-base-patch16-224-in21k',
+    num_labels=5  # 5 个生育期类别
+)
+
+# 前向传播
+inputs = feature_extractor(images=images, return_tensors="pt")
+outputs = model(**inputs)
+logits = outputs.logits
+predictions = torch.argmax(logits, dim=-1)
+```
+
+### 方案二：时序建模（LSTM / Transformer）
+
+适用于基于多时相数据预测生育期进程。
+
+```python
+import torch
+import torch.nn as nn
+
+class RiceGrowthPredictor(nn.Module):
+    """水稻生育期时序预测模型"""
+    
+    def __init__(self, num_features=12, hidden_dim=256, num_classes=5):
+        super().__init__()
+        
+        # 特征编码器
+        self.encoder = nn.Sequential(
+            nn.Linear(num_features, hidden_dim),
+            nn.LayerNorm(hidden_dim),
+            nn.GELU(),
+            nn.Dropout(0.1)
+        )
+        
+        # 时序建模（Transformer）
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=hidden_dim,
+            nhead=8,
+            dim_feedforward=512,
+            dropout=0.1,
+            batch_first=True
+        )
+        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=4)
+        
+        # 分类头
+        self.classifier = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim // 2),
+            nn.GELU(),
+            nn.Dropout(0.1),
+            nn.Linear(hidden_dim // 2, num_classes)
+        )
+    
+    def forward(self, x):
+        """
+        x: (batch, time_steps, num_features)
+        """
+        # 编码
+        encoded = self.encoder(x)
+        
+        # 时序建模
+        temporal = self.transformer(encoded)
+        
+        # 取最后一个时间步
+        last_step = temporal[:, -1, :]
+        
+        # 分类
+        logits = self.classifier(last_step)
+        return logits
+```
+
+### 方案三：多模态融合
+
+融合影像特征 + 气象数据 + 土壤数据。
+
+```python
+class MultiModalPredictor(nn.Module):
+    """多模态水稻生育期预测"""
+    
+    def __init__(self):
+        super().__init__()
+        
+        # 影像分支（ViT）
+        self.vision_encoder = ViTForImageClassification.from_pretrained(
+            'google/vit-base-patch16-224', num_labels=256
+        )
+        
+        # 气象分支（MLP）
+        self.weather_encoder = nn.Sequential(
+            nn.Linear(8),  # 温度、降水、湿度等 8 个气象因子
+            nn.Linear(128),
+            nn.GELU(),
+            nn.Linear(64)
+        )
+        
+        # 土壤分支（MLP）
+        self.soil_encoder = nn.Sequential(
+            nn.Linear(5),  # pH、有机质、氮磷钾等
+            nn.Linear(64),
+            nn.GELU(),
+            nn.Linear(32)
+        )
+        
+        # 融合层
+        self.fusion = nn.Sequential(
+            nn.Linear(256 + 64 + 32, 256),
+            nn.LayerNorm(256),
+            nn.GELU(),
+            nn.Dropout(0.1),
+            nn.Linear(256, 5)  # 5 个生育期
+        )
+    
+    def forward(self, images, weather, soil):
+        # 各分支编码
+        with torch.no_grad():
+            vision_feat = self.vision_encoder(images).logits
+        weather_feat = self.weather_encoder(weather)
+        soil_feat = self.soil_encoder(soil)
+        
+        # 拼接融合
+        combined = torch.cat([vision_feat, weather_feat, soil_feat], dim=1)
+        return self.fusion(combined)
+```
+
+---
+
+## 训练策略
+
+### 数据增强
+
+```python
+from albumentations import Compose, RandomRotate90, HorizontalFlip, \
+    VerticalFlip, RandomBrightnessContrast, HueSaturationValue
+
+train_transform = Compose([
+    RandomRotate90(p=0.5),
+    HorizontalFlip(p=0.5),
+    VerticalFlip(p=0.5),
+    RandomBrightnessContrast(p=0.3),
+    HueSaturationValue(p=0.3),
+])
+```
+
+### 损失函数
+
+```python
+import torch.nn as nn
+
+# 类别不平衡时使用加权交叉熵
+class_weights = torch.tensor([1.0, 1.5, 2.0, 1.5, 1.0])  # 根据类别频率调整
+criterion = nn.CrossEntropyLoss(weight=class_weights)
+
+# 或使用 Focal Loss 处理难样本
+class FocalLoss(nn.Module):
+    def __init__(self, alpha=0.25, gamma=2.0):
+        super().__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+    
+    def forward(self, logits, targets):
+        ce = nn.functional.cross_entropy(logits, targets, reduction='none')
+        pt = torch.exp(-ce)
+        focal = self.alpha * (1 - pt) ** self.gamma * ce
+        return focal.mean()
+```
+
+### 训练配置
+
+```python
+from accelerate import Accelerator
+
+accelerator = Accelerator()
+
+model, optimizer, train_dataloader = accelerator.prepare(
+    model, optimizer, train_dataloader
+)
+
+for epoch in range(num_epochs):
+    for batch in train_dataloader:
+        outputs = model(batch['images'])
+        loss = criterion(outputs, batch['labels'])
+        
+        accelerator.backward(loss)
+        optimizer.step()
+        optimizer.zero_grad()
+```
+
+---
+
+## 评估指标
+
+| 指标 | 公式 | 说明 |
+|------|------|------|
+| **Accuracy** | (TP+TN) / Total | 总体准确率 |
+| **F1-Score** | 2 × P × R / (P+R) | 类别不平衡时更可靠 |
+| **MAE** | \|预测值 - 真实值\| | 回归任务（如 LAI 预测） |
+| **RMSE** | √(MAE²) | 对大误差更敏感 |
+| **R²** | 1 - SS_res / SS_tot | 拟合优度 |
+
+```python
+from sklearn.metrics import classification_report, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# 分类报告
+print(classification_report(y_true, y_pred, target_names=class_names))
+
+# 混淆矩阵可视化
+cm = confusion_matrix(y_true, y_pred)
+sns.heatmap(cm, annot=True, cmap='Blues', 
+            xticklabels=class_names, yticklabels=class_names)
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.show()
+```
+
+---
+
+## 部署方案
+
+### 本地部署（FastAPI）
+
+```python
+from fastapi import FastAPI, UploadFile
+from PIL import Image
+import torch
+
+app = FastAPI()
+
+@app.post("/predict")
+async def predict(image: UploadFile):
+    # 加载模型
+    img = Image.open(image.file).convert('RGB')
+    inputs = feature_extractor(img, return_tensors="pt")
+    
+    with torch.no_grad():
+        outputs = model(**inputs)
+        probs = torch.softmax(outputs.logits, dim=-1)
+    
+    # 返回预测结果
+    stage_idx = torch.argmax(probs, dim=-1).item()
+    confidence = probs[0][stage_idx].item()
+    
+    return {
+        "growth_stage": class_names[stage_idx],
+        "confidence": f"{confidence:.2%}",
+        "probabilities": {
+            name: f"{prob:.2%}" 
+            for name, prob in zip(class_names, probs[0])
+        }
+    }
+```
+
+### 云端部署（Hugging Face Space）
+
+使用 HF Space 可以快速部署 Web 应用：
+
+```python
+# app.py - Gradio 界面
+import gradio as gr
+
+def predict_rice_stage(image):
+    # 预处理
+    inputs = feature_extractor(image, return_tensors="pt")
+    
+    # 推理
+    with torch.no_grad():
+        outputs = model(**inputs)
+        probs = torch.softmax(outputs.logits, dim=-1)
+    
+    # 格式化输出
+    results = []
+    for name, prob in zip(class_names, probs[0]):
+        results.append(f"{name}: {prob:.2%}")
+    
+    return "\n".join(results)
+
+iface = gr.Interface(
+    fn=predict_rice_stage,
+    inputs=gr.Image(type="pil"),
+    outputs=gr.Textbox(lines=8),
+    title="水稻生育期预测",
+    description="上传无人机拍摄的稻田影像，AI 自动识别当前生育期阶段"
+)
+
+iface.launch()
+```
+
+---
+
+## 技术栈总结
+
+| 模块 | 推荐方案 | 替代方案 |
+|------|----------|---------|
+| 影像处理 | OpenCV + rasterio + GDAL | scikit-image |
+| 植被指数 | 自定义计算 | RSGISLib |
+| 特征提取 | ViT / ResNet-50 | EfficientNet |
+| 时序建模 | Transformer / LSTM | TimesNet |
+| 训练框架 | Hugging Face transformers + accelerate | PyTorch Lightning |
+| 实验追踪 | Weights & Biases | TensorBoard |
+| Web 界面 | Gradio / Streamlit | FastAPI + Vue |
+| 部署 | HF Space / Docker | AWS SageMaker |
+
+---
+
+## 核心科学问题
+
+### 1. 反演（Inversion）
+
+从影像特征反演作物生理参数，本质上是**病态反问题**（ill-posed inverse problem）。需要：
+
+- 建立影像特征与生理参数的映射关系
+- 引入先验知识（作物生长模型）约束解空间
+- 使用物理信息神经网络（PINN）融合机理模型
+
+### 2. 预测（Prediction）
+
+基于历史时序预测未来生育期，需要解决：
+
+- **时序对齐**：不同年份、不同品种的生长节律差异
+- **外推能力**：模型在未见过的生长条件下的泛化能力
+- **不确定性量化**：预测结果的置信区间
+
+### 3. 融合（Fusion）
+
+多源数据融合的关键挑战：
+
+- **时空对齐**：影像（空间）与气象（时间）的尺度匹配
+- **模态缺失**：部分数据不可用时的鲁棒性
+- **特征交互**：如何建模不同模态间的非线性关系
+
+---
+
+## 可用数据集
+
+| 数据集 | 内容 | 来源 |
+|--------|------|------|
+| **EuroSAT** | 多光谱卫星影像分类 | HF Datasets |
+| **CropNet** | 作物类型识别 | 公开数据集 |
+| **PHENO** | 作物表型数据 | 研究数据集 |
+| **自建数据集** | 无人机影像 + 地面标注 | 项目采集 |
+
+> 💡 **自建数据集**是最关键的一环。建议：
+> - 覆盖多个品种、多个地块
+> - 每个生育期至少采集 3-5 次
+> - 同步记录地面真值（LAI、生物量、株高等）
+
+---
+
+## 实施路线图
+
+```
+Phase 1: 技术调研（1-2 周）
+├── 搜索 HF 上相关 datasets 和 models
+├── 阅读关键文献，确定技术路线
+└── 搭建开发环境
+
+Phase 2: 数据准备（2-3 周）
+├── 无人机数据采集（或获取公开数据集）
+├── 影像预处理和特征提取
+└── 数据标注和划分
+
+Phase 3: 模型训练（3-4 周）
+├── 基线模型（ResNet 分类）
+├── 时序模型（Transformer）
+├── 多模态融合模型
+└── 模型评估和调优
+
+Phase 4: 系统集成（2-3 周）
+├── 训练 Pipeline 自动化
+├── Web 可视化界面
+└── 部署到 HF Space
+```
+
+---
+
+## 参考链接
+
+- [Hugging Face Datasets](https://huggingface.co/datasets)
+- [Hugging Face Models](https://huggingface.co/models)
+- [OpenDroneMap](https://www.opendronemap.org/)
+- [albumentations 文档](https://albumentations.ai/docs/)
+- [smolagents/ml-intern](https://huggingface.co/spaces/smolagents/ml-intern) — HF 官方 ML 研究 Agent
+
+---
+
+*发布时间：2026 年 4 月 24 日*  
+*标签：#农业AI #遥感 #深度学习 #精准农业 #无人机*
