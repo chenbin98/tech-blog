@@ -2,6 +2,7 @@
   {
     "listing": "/posts/index.html",
     "items": [
+      "/posts/2026-4-24-drone-rice-growth-stage-inversion.html",
       "/posts/2026-4-12-git-worktree-venv-guide.html",
       "/posts/2026-4-3-git-worktree-advanced.html",
       "/posts/2026-4-1-meteo-data-workflow.html",
@@ -22,6 +23,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2026-4-24-drone-rice-growth-stage-inversion.html",
       "/posts/2026-4-12-git-worktree-venv-guide.html",
       "/posts/2026-4-3-git-worktree-advanced.html",
       "/posts/2026-4-1-meteo-data-workflow.html",
