@@ -2,6 +2,7 @@
   {
     "listing": "/posts/index.html",
     "items": [
+      "/posts/2026-4-25-ssh-key-login-debug.html",
       "/posts/2026-4-24-research-git-branch-management.html",
       "/posts/2026-4-24-drone-rice-growth-stage-inversion.html",
       "/posts/2026-4-12-git-worktree-venv-guide.html",
@@ -24,6 +25,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2026-4-25-ssh-key-login-debug.html",
       "/posts/2026-4-24-drone-rice-growth-stage-inversion.html",
       "/posts/2026-4-24-research-git-branch-management.html",
       "/posts/2026-4-12-git-worktree-venv-guide.html",
