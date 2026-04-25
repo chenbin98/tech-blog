@@ -1,5 +1,5 @@
 ---
-title: "Codex 报错 `unknown variant 'xhigh'` 的原因与解决方法"
+title: "Codex 报错 unknown variant 'xhigh' 的原因与解决方法"
 author: "Binchen Chen"
 date: "2026-03-19"
 categories:
