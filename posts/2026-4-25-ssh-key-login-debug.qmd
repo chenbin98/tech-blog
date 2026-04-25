@@ -1,0 +1,390 @@
+---
+title: "SSH 免密登录失败排查：服务器接受公钥后仍然 Permission denied"
+date: "2026-04-25"
+categories: [运维开发, SSH]
+tags: [SSH, OpenSSH, Windows Server, ssh-agent, 密钥登录]
+description: "记录一次 SSH 公钥已在远端 authorized_keys 中、服务器也接受公钥，但客户端仍无法免密登录的排查过程与修复方法。"
+---
+
+## 问题背景
+
+这次要解决的是一个看起来很常见、但细节容易误判的问题：
+
+```bash
+ssh user@192.168.x.x
+```
+
+密码登录是正常的，但希望改成 SSH key 免密登录时始终失败。
+
+一般遇到这种问题，第一反应通常是远端 `authorized_keys` 没放对、公钥内容复制错了，或者远端 `.ssh` 权限不对。实际这次不是这些原因：**远端已经有正确的公钥，sshd 也已经接受了这把公钥，但本地客户端没有办法使用对应私钥完成签名。**
+
+这篇文章记录完整排查路径，重点是解释一个容易忽略的现象：
+
+> `Server accepts key` 不等于登录已经完成。它只说明服务器认可这把公钥，后面客户端还必须能用对应私钥完成签名。
+
+为了安全，文中会隐藏真实密码、私钥内容和完整公钥内容，只保留可复用的诊断方法。
+
+---
+
+## 环境
+
+本次环境大致如下：
+
+| 项目 | 信息 |
+|---|---|
+| 本地系统 | macOS |
+| 本地 SSH 客户端 | OpenSSH |
+| 远端系统 | Windows OpenSSH Server |
+| 远端用户目录 | `C:\Users\<user>` |
+| 目标 | 后续执行 `ssh user@host` 时不再输入密码 |
+
+远端是 Windows OpenSSH，所以远端用户的 `authorized_keys` 路径是：
+
+```text
+C:\Users\<user>\.ssh\authorized_keys
+```
+
+---
+
+## 第一步：先复现真正的公钥登录失败
+
+不要直接用普通的 `ssh user@host` 判断免密是否成功，因为它可能在公钥失败后自动回退到密码登录。
+
+更好的测试方式是显式禁用密码和键盘交互认证：
+
+```bash
+ssh -vvv \
+  -o BatchMode=yes \
+  -o PasswordAuthentication=no \
+  -o KbdInteractiveAuthentication=no \
+  user@192.168.x.x \
+  "whoami"
+```
+
+这几个参数的意义是：
+
+| 参数 | 作用 |
+|---|---|
+| `-vvv` | 输出详细 SSH 调试日志 |
+| `BatchMode=yes` | 禁止交互式输入，适合验证真正的免密登录 |
+| `PasswordAuthentication=no` | 禁用密码认证 |
+| `KbdInteractiveAuthentication=no` | 禁用键盘交互认证 |
+
+如果这条命令成功，基本可以确认免密登录可用。
+
+如果失败，就要看 `-vvv` 日志里公钥认证到底卡在哪一步。
+
+---
+
+## 关键现象：服务器接受了公钥，但登录仍失败
+
+本次调试日志里有一个非常关键的片段：
+
+```text
+Offering public key: /Users/.../.ssh/id_ed25519_new ED25519 SHA256:...
+Server accepts key: /Users/.../.ssh/id_ed25519_new ED25519 SHA256:...
+sign_and_send_pubkey: signing using ssh-ed25519 SHA256:...
+No more authentication methods to try.
+Permission denied (publickey,password,keyboard-interactive).
+```
+
+这里最容易误判的地方是 `Server accepts key`。
+
+它说明：
+
+- 远端 `authorized_keys` 中确实有这把公钥；
+- 远端 `sshd_config` 允许公钥认证；
+- 远端用户和 authorized key 路径基本没有问题。
+
+但这还不是认证结束。SSH 公钥认证至少有两步：
+
+1. 客户端告诉服务器：我想用这把公钥登录；
+2. 服务器说：这把公钥我认识；
+3. 客户端必须用对应的私钥对认证数据签名；
+4. 服务器用公钥验证签名，通过后才算登录成功。
+
+所以如果服务器接受公钥后仍然 `Permission denied`，排查重点就应该转向本地私钥是否可用。
+
+---
+
+## 检查本地 SSH 配置
+
+先看 SSH 客户端对这个主机实际使用了什么配置：
+
+```bash
+ssh -G user@192.168.x.x | sed -n \
+  '/^user /p;
+   /^hostname /p;
+   /^port /p;
+   /^identityfile /p;
+   /^identitiesonly /p;
+   /^pubkeyauthentication /p'
+```
+
+本次看到的核心配置是：
+
+```text
+identityfile ~/.ssh/id_ed25519_new
+pubkeyauthentication true
+```
+
+也就是说，客户端明确使用的是：
+
+```bash
+~/.ssh/id_ed25519_new
+```
+
+继续检查本地 key：
+
+```bash
+ls -ld ~/.ssh
+ls -l ~/.ssh
+ssh-add -l -E sha256
+```
+
+结果显示：
+
+```text
+The agent has no identities.
+```
+
+这说明当前 `ssh-agent` 里没有加载任何私钥。
+
+---
+
+## 检查私钥是否需要 passphrase
+
+可以用下面的命令测试私钥能否在非交互环境下直接使用：
+
+```bash
+ssh-keygen -y -f ~/.ssh/id_ed25519_new
+```
+
+本次结果类似：
+
+```text
+Enter passphrase for "/Users/.../.ssh/id_ed25519_new":
+Load key "/Users/.../.ssh/id_ed25519_new": incorrect passphrase supplied to decrypt private key
+```
+
+这就定位到了根因：
+
+> 当前 SSH 配置使用的 `id_ed25519_new` 是加密私钥；它需要 passphrase，但这把 key 又没有加载到 `ssh-agent` 中。因此服务器虽然接受了它的公钥，客户端却无法完成私钥签名。
+
+这也是为什么问题表面看起来像远端配置失败，实际上根因在本地。
+
+---
+
+## 检查远端配置，排除 authorized_keys 问题
+
+为了避免只看本地就下结论，还需要检查远端。
+
+Windows OpenSSH 常用检查项如下：
+
+```powershell
+$sshdir = Join-Path $env:USERPROFILE ".ssh"
+$ak = Join-Path $sshdir "authorized_keys"
+
+Get-ChildItem -Force $sshdir
+Get-Content $ak
+icacls $sshdir
+icacls $ak
+
+Select-String -Path "$env:ProgramData\ssh\sshd_config" `
+  -Pattern "PubkeyAuthentication|AuthorizedKeysFile|PasswordAuthentication|StrictModes"
+```
+
+本次远端关键信息是：
+
+```text
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+```
+
+同时，远端 `authorized_keys` 里已经有 `id_ed25519_new.pub` 对应的公钥指纹：
+
+```text
+SHA256:...
+```
+
+这和本地 `~/.ssh/id_ed25519_new.pub` 指纹一致。
+
+所以远端不是主要问题。
+
+---
+
+## 解决思路
+
+这个问题有两条合理修复路径。
+
+### 方案一：继续使用加密私钥，把它加载进 ssh-agent
+
+如果希望继续使用 `id_ed25519_new`，应该把它加入 `ssh-agent`：
+
+```bash
+ssh-add ~/.ssh/id_ed25519_new
+ssh-add -l -E sha256
+```
+
+macOS 上如果想把 passphrase 存入钥匙串，可以使用：
+
+```bash
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519_new
+```
+
+并在 `~/.ssh/config` 中配置：
+
+```sshconfig
+Host 192.168.x.x
+  HostName 192.168.x.x
+  User user
+  IdentityFile ~/.ssh/id_ed25519_new
+  AddKeysToAgent yes
+  UseKeychain yes
+```
+
+这个方案更安全，因为私钥仍然有 passphrase；缺点是依赖本地 agent 和钥匙串配置。
+
+### 方案二：使用已有可直接使用的 key
+
+本次最终采用的是这个方案。
+
+本地已经有一把可直接使用的 key：
+
+```bash
+~/.ssh/id_ed25519
+```
+
+先确认它可以正常导出公钥：
+
+```bash
+ssh-keygen -y -f ~/.ssh/id_ed25519 >/tmp/id_ed25519.pub
+ssh-keygen -lf ~/.ssh/id_ed25519.pub -E sha256
+```
+
+然后把对应公钥追加到远端：
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+将输出内容添加到远端：
+
+```text
+C:\Users\<user>\.ssh\authorized_keys
+```
+
+最后修改本地 SSH 配置：
+
+```sshconfig
+Host 192.168.x.x
+  HostName 192.168.x.x
+  User user
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+```
+
+其中 `IdentitiesOnly yes` 很关键。它可以让客户端只尝试这里指定的 key，避免 `ssh-agent` 或默认 key 列表带来干扰，使认证行为更确定。
+
+---
+
+## 最终验证
+
+修复后再次执行严格验证：
+
+```bash
+ssh -o BatchMode=yes \
+  -o PasswordAuthentication=no \
+  -o KbdInteractiveAuthentication=no \
+  user@192.168.x.x \
+  "whoami"
+```
+
+成功结果类似：
+
+```text
+host\user
+```
+
+如果再加 `-vvv`，应该能看到：
+
+```text
+Offering public key: /Users/.../.ssh/id_ed25519 ED25519 SHA256:...
+Server accepts key: /Users/.../.ssh/id_ed25519 ED25519 SHA256:...
+Authenticated to 192.168.x.x using "publickey".
+```
+
+这时就可以确认：免密登录已经真正生效，不是回退到了密码认证。
+
+---
+
+## 排查清单
+
+以后再遇到 SSH key 免密失败，可以按这个顺序检查：
+
+| 步骤 | 命令 | 目的 |
+|---|---|---|
+| 查看实际 SSH 配置 | `ssh -G user@host` | 确认客户端到底用了哪把 key |
+| 禁用密码验证 | `ssh -o BatchMode=yes -o PasswordAuthentication=no ...` | 排除密码回退造成的假成功 |
+| 查看详细日志 | `ssh -vvv user@host` | 判断失败发生在服务器接受公钥前还是之后 |
+| 查看 agent | `ssh-add -l -E sha256` | 确认私钥是否已加载 |
+| 测试私钥可用性 | `ssh-keygen -y -f ~/.ssh/key` | 判断私钥是否需要 passphrase 或损坏 |
+| 检查远端公钥 | `authorized_keys` | 确认公钥指纹匹配 |
+| 检查远端 sshd | `sshd_config` | 确认允许公钥认证 |
+
+---
+
+## 常见误区
+
+### 误区一：看到 `Server accepts key` 就认为远端没问题、登录应该成功
+
+`Server accepts key` 只是服务器认可这把公钥。客户端仍然必须使用私钥完成签名。
+
+如果私钥被 passphrase 加密、没有加载到 agent、或者客户端无法解锁私钥，登录仍然会失败。
+
+### 误区二：普通 `ssh user@host` 成功就说明免密成功
+
+不一定。它可能只是公钥失败后回退到了密码登录。
+
+验证免密时应该禁用密码认证：
+
+```bash
+ssh -o BatchMode=yes \
+  -o PasswordAuthentication=no \
+  -o KbdInteractiveAuthentication=no \
+  user@host true
+```
+
+### 误区三：把所有本地公钥都塞进 authorized_keys
+
+这通常能“碰巧解决”，但不利于长期维护。更好的方式是：
+
+- 明确本机对这个 host 使用哪把 key；
+- 只追加需要的公钥；
+- 在 `~/.ssh/config` 中设置 `IdentityFile` 和 `IdentitiesOnly yes`。
+
+---
+
+## 总结
+
+这次问题的根因不是远端 `authorized_keys` 错误，而是：
+
+> 本地 SSH 配置指向了一把需要 passphrase 的私钥；远端接受了对应公钥，但本地没有把私钥加载进 `ssh-agent`，导致客户端无法完成签名。
+
+最终修复是：
+
+1. 使用本地已有的 `~/.ssh/id_ed25519`；
+2. 将 `~/.ssh/id_ed25519.pub` 追加到远端 `authorized_keys`；
+3. 修改本地 `~/.ssh/config`：
+
+```sshconfig
+Host 192.168.x.x
+  HostName 192.168.x.x
+  User user
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+```
+
+最后用 `BatchMode=yes` 禁用密码回退进行验证，确认登录确实走的是 public key。
+
+这个排查过程的核心经验是：**SSH 免密失败时，不要只看远端 `authorized_keys`；也要确认本地私钥是否真的可用。**
