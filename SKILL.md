@@ -1,229 +1,198 @@
 ---
 name: blog-post-publisher
-description: Generate technical blog posts and optionally commit or push them to the tech-blog repository.
-version: 2.0.0
-author: bin
+description: Use when writing, editing, publishing, or committing technical blog posts in the local Quarto tech-blog repository, especially troubleshooting writeups, tutorials, issue-resolution notes, reproducible workflows, or posts that need sanitized examples, validation, and GitHub Pages deployment.
 ---
 
-# Blog Post Publisher Skill
+# Blog Post Publisher
 
-> 自动将用户的技术分享需求转化为博客文章，并提交到本地 tech-blog 仓库。
+将技术问题、教程、排查记录或项目经验整理成 Quarto 博客文章，并按仓库工作流验证、提交、按需推送发布。
 
----
+## 核心原则
 
-## 📋 技能信息
+- 先理解材料，再写文章；不要把聊天记录机械改写成博客。
+- 每篇博客必须有清晰的问题线索、可复用的诊断逻辑、可执行的解决步骤。
+- 默认保护隐私和凭据：不要发布密码、token、私钥、完整公钥、服务器真实内网 IP、邮箱密钥、订阅链接或任何 secrets。
+- 提交前只暂存本次相关文件，避免把 `.DS_Store`、旧的脏文件、生成产物误提交。
 
-```yaml
-name: blog-post-publisher
-version: 2.0.0
-description: 技术博客文章生成与发布工具
-author: bin
-location: ~/.openclaw/workspace/skills/blog-post-publisher
-```
+## 定位博客仓库
 
----
+- 本 skill 所在目录就是博客根目录；如果用户提供了仓库路径，以用户提供路径为准。
+- 不要硬编码旧的绝对路径。从当前 `SKILL.md` 所在目录、用户给出的路径或 `git rev-parse --show-toplevel` 定位仓库。
+- 文章目录固定为博客根目录下的 `posts/`。
+- 站点由 Quarto 构建，主配置通常是 `_quarto.yml`。
 
-## 🎯 核心功能
-
-### 1️⃣ 文章生成
-- 用户提供一个主题或想法
-- 自动生成结构完整的技术文章
-- 遵循 Quarto Markdown 格式规范
-
-### 2️⃣ 内容规范化
-- 统一的文件命名（`YYYY-M-D-主题.qmd`）
-- 标准化的 Frontmatter（标题、日期、分类、标签）
-- 一致的写作风格和质量
-
-### 3️⃣ Git 工作流
-- 自动添加到 Git 仓库
-- 提交信息规范化
-- 可选推送到远程仓库
-
----
-
-## 📁 项目路径
-
-**重要：** 本技能已集成到 OpenClaw workspace，博客项目也在同一位置。
-
-- **技能目录：** `~/.openclaw/workspace/skills/blog-post-publisher/`
-- **博客根目录：** `~/.openclaw/workspace/skills/blog-post-publisher/`
-- **文章目录：** `~/.openclaw/workspace/skills/blog-post-publisher/posts/`
-- **配置文件：** `~/.openclaw/workspace/skills/blog-post-publisher/_quarto.yml`
-- **样式文件：** `~/.openclaw/workspace/skills/blog-post-publisher/styles.css`
-
----
-
-## 📝 工作流程
-
-### 1. 接收任务
-
-用户会给你一个主题，例如：
-- "写一个 post，介绍今天安装的终端工具"
-- "写一篇关于 Python 虚拟环境的教程"
-- "记录一下今天解决的那个 Git 问题"
-
-### 2. 分析项目结构
+常用定位命令：
 
 ```bash
-# 查看博客项目结构
-ls -la ~/.openclaw/workspace/skills/blog-post-publisher/
-ls -la ~/.openclaw/workspace/skills/blog-post-publisher/posts/
-
-# 查看现有文章格式（学习写作风格）
-cat ~/.openclaw/workspace/skills/blog-post-publisher/posts/最新文章.qmd
+git rev-parse --show-toplevel
+git status --short --branch
+ls -la posts
 ```
 
-### 3. 撰写文章
+## 每篇博客的强制结构
 
-**文章格式（Quarto Markdown）：**
+每篇新博客都必须包含这四个一级内容模块，标题可以根据语境微调，但语义不能缺失：
+
+1. **描述问题**：说明背景、现象、报错、影响范围、读者为什么需要关心。
+2. **原因分析**：给出排查证据、关键日志、错误根因、为什么不是其他原因。
+3. **解决方法**：提供可执行步骤、命令、配置片段、验证命令和注意事项。
+4. **总结**：沉淀规律、检查清单、经验教训或后续建议。
+
+推荐文章骨架：
 
 ```markdown
 ---
-title: "文章标题"
-date: "2026-XX-XX"
+title: "清晰标题，包含关键词"
+date: "YYYY-MM-DD"
 categories: [分类 1, 分类 2]
 tags: [标签 1, 标签 2]
-description: "一句话描述"
+description: "一句话说明文章解决什么问题。"
 ---
 
-## 问题背景/引言
-说明为什么写这篇文章，解决什么问题
+## 描述问题
 
-## 适用环境
-- 操作系统
-- 软件版本
-- 项目类型
+## 原因分析
 
-## 解决方案/教程内容
-分步骤说明，包含代码示例
-
-## 常见问题
-Q&A 格式
+## 解决方法
 
 ## 总结
-表格对比、建议等
-
-## 参考链接
-相关文档、GitHub 仓库等
 ```
 
-**写作要点：**
-- ✅ 标题清晰，包含关键词
-- ✅ 代码块标注语言（```bash, ```python 等）
-- ✅ 使用表格对比
-- ✅ 提供可执行的命令
-- ✅ 包含常见问题解答
+可按需要增加这些可选模块，但不能替代四个强制模块：
 
-### 4. 保存文章
+- `## 适用环境`
+- `## 排查过程`
+- `## 验证结果`
+- `## 常见问题`
+- `## 参考链接`
+
+## 写作要求
+
+- 标题要具体，包含技术关键词和问题关键词。
+- Frontmatter 必须包含 `title`、`date`、`categories`、`tags`、`description`。
+- 文件名使用 `YYYY-M-D-topic-slug.qmd`，例如 `2026-4-25-ssh-key-login-debug.qmd`。
+- 使用 fenced code block，并标注语言：`bash`、`python`、`powershell`、`yaml`、`text` 等。
+- 命令必须尽量可执行；如果需要替换变量，用 `<user>`、`<host>`、`your-token` 这类占位符。
+- 对排查类文章，必须写明“观察到什么证据，因此得出什么判断”。
+- 对方案类文章，必须给出验证命令或成功输出示例。
+- 避免空泛总结；总结要能指导下次遇到同类问题时怎么做。
+
+## 安全与脱敏检查
+
+发布前必须扫描并人工确认：
+
+- 不含明文密码、API token、cookie、订阅链接、private key、完整 public key。
+- 不含不必要的真实服务器地址、内网 IP、用户名、邮箱或机器名。
+- 不含用户未要求公开的项目路径、商业信息、实验数据或个人信息。
+- 日志可以保留关键错误行，但要用 `...` 或 `<placeholder>` 替换敏感段。
+
+建议检查：
 
 ```bash
-# 文件命名格式：YYYY-M-D-主题.qmd
-# 例如：2026-3-14-modern-terminal-tools.qmd
-
-cat > ~/.openclaw/workspace/skills/blog-post-publisher/posts/2026-3-14-主题.qmd << 'EOF'
-[文章内容]
-EOF
+rg -n "password|passwd|token|secret|BEGIN .*PRIVATE KEY|ssh-ed25519 AAAA|ssh-rsa AAAA|密码|私钥|密钥" posts/<new-post>.qmd
+git diff --check -- posts/<new-post>.qmd
 ```
 
-### 5. Git 提交并推送
+如果命令有命中，不要机械删除；判断是否是安全说明文本还是泄露内容。泄露内容必须脱敏后再继续。
+
+## 工作流程
+
+### 1. 收集材料
+
+- 读取用户给出的上下文、日志、命令输出、计划文件或相关源码。
+- 查看最近 1-3 篇文章，匹配现有风格和 Quarto frontmatter。
+- 如果信息不足，优先基于已有证据写清楚边界；不要编造版本号、错误原因或验证结果。
+
+### 2. 写文章
+
+- 先确定标题、slug、分类和标签。
+- 按“描述问题 → 原因分析 → 解决方法 → 总结”的顺序组织正文。
+- 排查类文章应包含“失败现象、关键证据、根因、修复、验证”。
+- 教程类文章也要解释问题或需求的来源、方案选择原因、执行步骤和结果确认。
+
+### 3. 验证 Quarto
+
+优先用临时副本渲染，避免真实仓库的 `_site` 或缓存文件被误改：
 
 ```bash
-cd ~/.openclaw/workspace/skills/blog-post-publisher
-
-# 查看状态
-git status
-
-# 添加新文章
-git add posts/2026-3-14-主题.qmd
-
-# 提交（清晰说明变更）
-git commit -m "feat: 添加 [主题] 教程"
-
-# 推送
-git push origin main
+PREVIEW_DIR="/tmp/blog-preview-$(date +%Y%m%d%H%M%S)"
+mkdir -p "$PREVIEW_DIR"
+rsync -a --exclude .git ./ "$PREVIEW_DIR"/
+cd "$PREVIEW_DIR"
+quarto render
 ```
 
-### 6. 通知用户
+然后检查生成页面中是否包含新文章标题：
 
-告诉用户：
-- ✅ 文章已发布
-- 📝 文章标题和位置
-- 🔗 GitHub 仓库链接（如果可以访问）
+```bash
+rg -n "文章标题关键词" _site/index.html _site/posts/index.html _site/posts
+```
 
----
+如果必须在真实仓库中渲染：
 
-## 🛠️ 工具依赖
+- 先记录 `git status --short`。
+- 渲染后检查是否产生非预期 `_site` 变更。
+- 未经用户要求，不要提交 `_site` 生成产物。
 
-- **Quarto**：博客静态站点生成器
-- **Git**：版本控制
-- **GitHub**：远程仓库
+### 4. Git 提交
 
----
+提交前先同步远端并检查脏文件：
 
-## 🎯 示例任务
+```bash
+git status --short --branch
+git fetch origin main
+git merge --ff-only origin/main
+```
 
-### 示例 1：工具介绍
+只暂存本次相关文件：
 
-**用户输入：**
-> 写一个 post，把今天我们刚安装的"Ghostty、Yazi、Lazygit、Zoxide"工具，写一个新手教程指导
+```bash
+git add posts/<new-post>.qmd
+# 如果本次任务是修改 skill，才暂存 SKILL.md
+git add SKILL.md
+```
 
-**执行步骤：**
-1. 收集工具信息（功能、配置、快捷键）
-2. 按照格式撰写文章
-3. 保存为 `2026-3-14-modern-terminal-tools.qmd`
-4. Git 提交推送
+提交前必须确认暂存区：
 
-### 示例 2：问题解决方案
+```bash
+git diff --cached --name-only
+git diff --cached --check
+git diff --cached --stat
+```
 
-**用户输入：**
-> 记录一下今天解决的 Git 忽略.pyc 文件的问题
+如果暂存区包含 `.DS_Store`、无关文章、旧的用户改动或 `_site` 生成产物，先取消暂存并重新选择文件。
 
-**执行步骤：**
-1. 回顾问题背景和解决方案
-2. 按照格式撰写文章
-3. 保存为 `2026-3-4-git_ignore_pyc.qmd`
-4. Git 提交推送
+提交信息使用清晰中文：
 
-### 示例 3：技术对比
+```bash
+git commit -m "feat: 添加 XXX 教程"
+git commit -m "docs: 完善博客发布 skill"
+```
 
-**用户输入：**
-> 写一篇前端后端服务器对比的文章
+### 5. 发布
 
-**执行步骤：**
-1. 收集对比信息（功能、性能、使用场景）
-2. 用表格展示对比
-3. 保存文章
-4. Git 提交推送
+- 用户明确要求“发布到网站”“推送”“上线”时，执行 `git push origin main`。
+- 只要求“提交”时，默认完成本地 git commit；如上下文表明该仓库通过 push 触发部署，再推送前说明或确认。
+- 推送后可检查 GitHub Actions；如果 `gh` 未登录，就提供 Actions 页面链接和本地 push 结果，不要伪造部署成功状态。
 
----
+## 常见错误
 
-## ⚠️ 注意事项
+| 错误 | 正确做法 |
+|---|---|
+| 只写解决命令，没有原因分析 | 写清楚证据链：现象、日志、排除项、根因 |
+| 把聊天里的密码或 key 原样放进文章 | 全部替换为占位符，并说明已脱敏 |
+| 普通 `ssh user@host` 成功就写“免密成功” | 用禁用密码的验证命令证明 |
+| `git add .` | 只 `git add` 本次文章或本次 skill 文件 |
+| 渲染真实仓库后误提交 `_site` | 用 `/tmp` 副本预览，或明确排除生成产物 |
+| push 失败仍说已发布 | 区分“本地已提交”和“远端已发布/部署完成” |
 
-1. **日期格式：** 使用 `2026-03-14`（YYYY-MM-DD）
-2. **文件名：** 使用 `2026-3-14-主题.qmd`（短横线分隔）
-3. **提交信息：** 清晰说明变更（`feat: 添加 XXX 教程`）
-4. **网络问题：** 如果 push 失败，告知用户本地已提交
-5. **文章质量：** 确保代码示例可执行，步骤清晰
+## 交付说明
 
----
+最终回复要包含：
 
-## 🔄 未来改进
-
-- [ ] 自动构建并预览（`quarto render`）
-- [ ] 自动检查拼写错误
-- [ ] 自动生成摘要
-- [ ] 支持多语言文章
-- [ ] 自动添加标签和分类
-
----
-
-## 📊 版本历史
-
-- **v2.0.0** (2026-03-15): 迁移到 workspace 目录，规范化管理
-- **v1.0.0** (2026-03-14): 初始版本
-
----
-
-*创建时间：2026-03-14*  
-*最后更新：2026-03-15*
+- 文章标题或 skill 修改摘要。
+- 文件路径。
+- commit hash。
+- 是否已 push；如果已 push，给出仓库或网站链接。
+- 验证方式：Quarto 渲染、敏感信息扫描、git 暂存区检查等。
+- 仍然存在的无关 dirty 文件，避免用户误以为工作区完全干净。
