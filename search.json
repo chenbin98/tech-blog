@@ -144,7 +144,7 @@
     "href": "posts/index.html",
     "title": "技术文档",
     "section": "",
-    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSSH 免密登录失败排查：服务器接受公钥后仍然 Permission denied\n\n\n记录一次 SSH 公钥已在远端 authorized_keys 中、服务器也接受公钥，但客户端仍无法免密登录的排查过程与修复方法。\n\n\n\n\n\nApr 25, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n科研项目 Git 分支管理规范（适用于多实验 + AI 协作）\n\n\n面向科研场景的 Git 分支管理规范——支持多实验并行、AI Agent 协作、worktree 多设备开发，保证 main 永远稳定可复现。\n\n\n\n\n\nApr 24, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n无人机水稻生育期反演预测：AI + 遥感的技术方案\n\n\n利用无人机遥感影像（RGB + 多光谱 + DSM）结合 AI 模型，实现水稻生育期的自动反演与预测。从技术架构、模型选择到部署方案，完整梳理项目思路。\n\n\n\n\n\nApr 24, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit Worktree + Python 虚拟环境配置指南\n\n\n使用 git worktree 进行多分支开发时，如何为每个 worktree 配置独立的 Python 虚拟环境，避免依赖污染和路径混乱。\n\n\n\n\n\nApr 12, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit Worktree 高级用法：并行开发多分支的终极指南\n\n\n告别频繁的 git checkout！使用 Git Worktree 同时在多个工作目录中处理不同分支，提升并行开发效率。\n\n\n\n\n\nApr 3, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化\n\n\n介绍如何通过 Docker 本地部署气象数据服务，结合 OpenAPI 规范和 AI 代码生成，实现标准化的气象数据自动化下载流程\n\n\n\n\n\nApr 1, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nCodex 报错 unknown variant 'xhigh' 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\nBinchen Chen\n\n\n\n\n\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
+    "text": "聚焦农业数据科学与相关工具的实践记录，方便下次查找\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSSH 免密登录失败排查：服务器接受公钥后仍然 Permission denied\n\n\n记录一次 SSH 公钥已在远端 authorized_keys 中、服务器也接受公钥，但客户端仍无法免密登录的排查过程与修复方法。\n\n\n\n\n\nApr 25, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n科研项目 Git 分支管理规范（适用于多实验 + AI 协作）\n\n\n面向科研场景的 Git 分支管理规范——支持多实验并行、AI Agent 协作、worktree 多设备开发，保证 main 永远稳定可复现。\n\n\n\n\n\nApr 24, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n无人机水稻生育期反演预测：AI + 遥感的技术方案\n\n\n利用无人机遥感影像（RGB + 多光谱 + DSM）结合 AI 模型，实现水稻生育期的自动反演与预测。从技术架构、模型选择到部署方案，完整梳理项目思路。\n\n\n\n\n\nApr 24, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit Worktree + Python 虚拟环境配置指南\n\n\n使用 git worktree 进行多分支开发时，如何为每个 worktree 配置独立的 Python 虚拟环境，避免依赖污染和路径混乱。\n\n\n\n\n\nApr 12, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit Worktree 高级用法：并行开发多分支的终极指南\n\n\n告别频繁的 git checkout！使用 Git Worktree 同时在多个工作目录中处理不同分支，提升并行开发效率。\n\n\n\n\n\nApr 3, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n气象数据服务标准使用流程：Docker + OpenAPI + AI 自动化\n\n\n介绍如何通过 Docker 本地部署气象数据服务，结合 OpenAPI 规范和 AI 代码生成，实现标准化的气象数据自动化下载流程\n\n\n\n\n\nApr 1, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nCodex 报错 unknown variant ‘xhigh’ 的原因与解决方法\n\n\n解决 Codex CLI 启动时报错 unknown variant 'xhigh' 的问题，原因是配置文件中的 reasoning effort 设置了当前版本不支持的值。\n\n\n\n\n\nMar 19, 2026\n\n\nBinchen Chen\n\n\n\n\n\n\n\n\n\n\n\n\nGitHub 连接超时问题解决方案：HTTP/2 转 HTTP/1.1\n\n\n解决 git push 时 GitHub 连接超时问题，通过禁用 HTTP/2 改用 HTTP/1.1 提高连接稳定性。\n\n\n\n\n\nMar 17, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n中国大陆服务器访问 Google API / Earth Engine 完整解决方案\n\n\n记录阿里云中国大陆 ECS 服务器无法访问 Google API 的问题排查与 sing-box 代理解决方案。\n\n\n\n\n\nMar 16, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n现代终端工具全家桶：Ghostty + Yazi + Lazygit + Zoxide 新手教程\n\n\n终端效率工具安装配置指南，让你的命令行体验接近 GUI 应用。\n\n\n\n\n\nMar 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nGit 忽略 Python .pyc 编译文件解决方案\n\n\npython 文档的gitigonre文件配置。\n\n\n\n\n\nMar 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n后端服务部署：systemd + venv + Nginx\n\n\n以玫瑰通 agent 项目为例，整理后端服务的原生部署流程。\n\n\n\n\n\nJan 4, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n学术论文常用缩写与写作规范\n\n\n整理学术论文中缩写的使用原则与常见清单，覆盖通用拉丁缩写、统计与方法、单位与符号、学科常见缩写，并提供可直接复用的检查清单。\n\n\n\n\n\nSep 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n使用 Geemap 从 GEE 下载全球栅格数据\n\n\n本技术文档提供了使用 geemap Python 库从谷歌地球引擎（GEE）下载大规模栅格数据的完整工作流程，包括分段下载、断点续传和图像镶嵌等关键技术。\n\n\n\n\n\nSep 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n解决 Google Earth Engine 认证问题的最新方法\n\n\n\n\n\n\n\n\nJun 13, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 论文图片尺寸规范指南\n\n\n\n\n\n\n\n\nJun 10, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nPython 本地包安装与更新指南\n\n\n\n\n\n\n\n\nJun 8, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n机器学习与传统作物模型的未来展望\n\n\n\n\n\n\n\n\nJun 1, 2025\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/2026-4-25-ssh-key-login-debug.html",
@@ -548,72 +548,65 @@
   {
     "objectID": "SKILL.html",
     "href": "SKILL.html",
-    "title": "1 Blog Post Publisher Skill",
+    "title": "1 Blog Post Publisher",
     "section": "",
-    "text": "自动将用户的技术分享需求转化为博客文章，并提交到本地 tech-blog 仓库。\n\n\n\n\nname: blog-post-publisher\nversion: 2.0.0\ndescription: 技术博客文章生成与发布工具\nauthor: bin\nlocation: ~/.openclaw/workspace/skills/blog-post-publisher\n\n\n\n\n\n\n\n用户提供一个主题或想法\n自动生成结构完整的技术文章\n遵循 Quarto Markdown 格式规范\n\n\n\n\n\n统一的文件命名（YYYY-M-D-主题.qmd）\n标准化的 Frontmatter（标题、日期、分类、标签）\n一致的写作风格和质量\n\n\n\n\n\n自动添加到 Git 仓库\n提交信息规范化\n可选推送到远程仓库\n\n\n\n\n\n\n重要： 本技能已集成到 OpenClaw workspace，博客项目也在同一位置。\n\n技能目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n博客根目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n文章目录： ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n配置文件： ~/.openclaw/workspace/skills/blog-post-publisher/_quarto.yml\n样式文件： ~/.openclaw/workspace/skills/blog-post-publisher/styles.css\n\n\n\n\n\n\n\n用户会给你一个主题，例如： - “写一个 post，介绍今天安装的终端工具” - “写一篇关于 Python 虚拟环境的教程” - “记录一下今天解决的那个 Git 问题”\n\n\n\n# 查看博客项目结构\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n\n# 查看现有文章格式（学习写作风格）\ncat ~/.openclaw/workspace/skills/blog-post-publisher/posts/最新文章.qmd\n\n\n\n文章格式（Quarto Markdown）：\n---\ntitle: \"文章标题\"\ndate: \"2026-XX-XX\"\ncategories: [分类 1, 分类 2]\ntags: [标签 1, 标签 2]\ndescription: \"一句话描述\"\n---\n\n## 问题背景/引言\n说明为什么写这篇文章，解决什么问题\n\n## 适用环境\n- 操作系统\n- 软件版本\n- 项目类型\n\n## 解决方案/教程内容\n分步骤说明，包含代码示例\n\n## 常见问题\nQ&A 格式\n\n## 总结\n表格对比、建议等\n\n## 参考链接\n相关文档、GitHub 仓库等\n写作要点： - ✅ 标题清晰，包含关键词 - ✅ 代码块标注语言（bash,python 等） - ✅ 使用表格对比 - ✅ 提供可执行的命令 - ✅ 包含常见问题解答\n\n\n\n# 文件命名格式：YYYY-M-D-主题.qmd\n# 例如：2026-3-14-modern-terminal-tools.qmd\n\ncat &gt; ~/.openclaw/workspace/skills/blog-post-publisher/posts/2026-3-14-主题.qmd &lt;&lt; 'EOF'\n[文章内容]\nEOF\n\n\n\ncd ~/.openclaw/workspace/skills/blog-post-publisher\n\n# 查看状态\ngit status\n\n# 添加新文章\ngit add posts/2026-3-14-主题.qmd\n\n# 提交（清晰说明变更）\ngit commit -m \"feat: 添加 [主题] 教程\"\n\n# 推送\ngit push origin main\n\n\n\n告诉用户： - ✅ 文章已发布 - 📝 文章标题和位置 - 🔗 GitHub 仓库链接（如果可以访问）\n\n\n\n\n\n\nQuarto：博客静态站点生成器\nGit：版本控制\nGitHub：远程仓库\n\n\n\n\n\n\n\n用户输入： &gt; 写一个 post，把今天我们刚安装的”Ghostty、Yazi、Lazygit、Zoxide”工具，写一个新手教程指导\n执行步骤： 1. 收集工具信息（功能、配置、快捷键） 2. 按照格式撰写文章 3. 保存为 2026-3-14-modern-terminal-tools.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 记录一下今天解决的 Git 忽略.pyc 文件的问题\n执行步骤： 1. 回顾问题背景和解决方案 2. 按照格式撰写文章 3. 保存为 2026-3-4-git_ignore_pyc.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 写一篇前端后端服务器对比的文章\n执行步骤： 1. 收集对比信息（功能、性能、使用场景） 2. 用表格展示对比 3. 保存文章 4. Git 提交推送\n\n\n\n\n\n\n日期格式： 使用 2026-03-14（YYYY-MM-DD）\n文件名： 使用 2026-3-14-主题.qmd（短横线分隔）\n提交信息： 清晰说明变更（feat: 添加 XXX 教程）\n网络问题： 如果 push 失败，告知用户本地已提交\n文章质量： 确保代码示例可执行，步骤清晰\n\n\n\n\n\n\n自动构建并预览（quarto render）\n自动检查拼写错误\n自动生成摘要\n支持多语言文章\n自动添加标签和分类\n\n\n\n\n\n\nv2.0.0 (2026-03-15): 迁移到 workspace 目录，规范化管理\nv1.0.0 (2026-03-14): 初始版本\n\n\n创建时间：2026-03-14\n最后更新：2026-03-15"
+    "text": "将技术问题、教程、排查记录或项目经验整理成 Quarto 博客文章，并按仓库工作流验证、提交、按需推送发布。\n\n\n\n先理解材料，再写文章；不要把聊天记录机械改写成博客。\n每篇博客必须有清晰的问题线索、可复用的诊断逻辑、可执行的解决步骤。\n默认保护隐私和凭据：不要发布密码、token、私钥、完整公钥、服务器真实内网 IP、邮箱密钥、订阅链接或任何 secrets。\n提交前只暂存本次相关文件，避免把 .DS_Store、旧的脏文件、生成产物误提交。\n\n\n\n\n\n本 skill 所在目录就是博客根目录；如果用户提供了仓库路径，以用户提供路径为准。\n不要硬编码旧的绝对路径。从当前 SKILL.md 所在目录、用户给出的路径或 git rev-parse --show-toplevel 定位仓库。\n文章目录固定为博客根目录下的 posts/。\n站点由 Quarto 构建，主配置通常是 _quarto.yml。\n\n常用定位命令：\ngit rev-parse --show-toplevel\ngit status --short --branch\nls -la posts\n\n\n\n每篇新博客都必须包含这四个一级内容模块，标题可以根据语境微调，但语义不能缺失：\n\n描述问题：说明背景、现象、报错、影响范围、读者为什么需要关心。\n原因分析：给出排查证据、关键日志、错误根因、为什么不是其他原因。\n解决方法：提供可执行步骤、命令、配置片段、验证命令和注意事项。\n总结：沉淀规律、检查清单、经验教训或后续建议。\n\n推荐文章骨架：\n---\ntitle: \"清晰标题，包含关键词\"\ndate: \"YYYY-MM-DD\"\ncategories: [分类 1, 分类 2]\ntags: [标签 1, 标签 2]\ndescription: \"一句话说明文章解决什么问题。\"\n---\n\n## 描述问题\n\n## 原因分析\n\n## 解决方法\n\n## 总结\n可按需要增加这些可选模块，但不能替代四个强制模块：\n\n## 适用环境\n## 排查过程\n## 验证结果\n## 常见问题\n## 参考链接\n\n\n\n\n\n标题要具体，包含技术关键词和问题关键词。\nFrontmatter 必须包含 title、date、categories、tags、description。\n文件名使用 YYYY-M-D-topic-slug.qmd，例如 2026-4-25-ssh-key-login-debug.qmd。\n使用 fenced code block，并标注语言：bash、python、powershell、yaml、text 等。\n命令必须尽量可执行；如果需要替换变量，用 &lt;user&gt;、&lt;host&gt;、your-token 这类占位符。\n对排查类文章，必须写明“观察到什么证据，因此得出什么判断”。\n对方案类文章，必须给出验证命令或成功输出示例。\n避免空泛总结；总结要能指导下次遇到同类问题时怎么做。\n\n\n\n\n发布前必须扫描并人工确认：\n\n不含明文密码、API token、cookie、订阅链接、private key、完整 public key。\n不含不必要的真实服务器地址、内网 IP、用户名、邮箱或机器名。\n不含用户未要求公开的项目路径、商业信息、实验数据或个人信息。\n日志可以保留关键错误行，但要用 ... 或 &lt;placeholder&gt; 替换敏感段。\n\n建议检查：\nrg -n \"password|passwd|token|secret|BEGIN .*PRIVATE KEY|ssh-ed25519 AAAA|ssh-rsa AAAA|密码|私钥|密钥\" posts/&lt;new-post&gt;.qmd\ngit diff --check -- posts/&lt;new-post&gt;.qmd\n如果命令有命中，不要机械删除；判断是否是安全说明文本还是泄露内容。泄露内容必须脱敏后再继续。\n\n\n\n\n\n\n读取用户给出的上下文、日志、命令输出、计划文件或相关源码。\n查看最近 1-3 篇文章，匹配现有风格和 Quarto frontmatter。\n如果信息不足，优先基于已有证据写清楚边界；不要编造版本号、错误原因或验证结果。\n\n\n\n\n\n先确定标题、slug、分类和标签。\n按“描述问题 → 原因分析 → 解决方法 → 总结”的顺序组织正文。\n排查类文章应包含“失败现象、关键证据、根因、修复、验证”。\n教程类文章也要解释问题或需求的来源、方案选择原因、执行步骤和结果确认。\n\n\n\n\n优先用临时副本渲染，避免真实仓库的 _site 或缓存文件被误改：\nPREVIEW_DIR=\"/tmp/blog-preview-$(date +%Y%m%d%H%M%S)\"\nmkdir -p \"$PREVIEW_DIR\"\nrsync -a --exclude .git ./ \"$PREVIEW_DIR\"/\ncd \"$PREVIEW_DIR\"\nquarto render\n然后检查生成页面中是否包含新文章标题：\nrg -n \"文章标题关键词\" _site/index.html _site/posts/index.html _site/posts\n如果必须在真实仓库中渲染：\n\n先记录 git status --short。\n渲染后检查是否产生非预期 _site 变更。\n未经用户要求，不要提交 _site 生成产物。\n\n\n\n\n提交前先同步远端并检查脏文件：\ngit status --short --branch\ngit fetch origin main\ngit merge --ff-only origin/main\n只暂存本次相关文件：\ngit add posts/&lt;new-post&gt;.qmd\n# 如果本次任务是修改 skill，才暂存 SKILL.md\ngit add SKILL.md\n提交前必须确认暂存区：\ngit diff --cached --name-only\ngit diff --cached --check\ngit diff --cached --stat\n如果暂存区包含 .DS_Store、无关文章、旧的用户改动或 _site 生成产物，先取消暂存并重新选择文件。\n提交信息使用清晰中文：\ngit commit -m \"feat: 添加 XXX 教程\"\ngit commit -m \"docs: 完善博客发布 skill\"\n\n\n\n\n用户明确要求“发布到网站”“推送”“上线”时，执行 git push origin main。\n只要求“提交”时，默认完成本地 git commit；如上下文表明该仓库通过 push 触发部署，再推送前说明或确认。\n推送后可检查 GitHub Actions；如果 gh 未登录，就提供 Actions 页面链接和本地 push 结果，不要伪造部署成功状态。\n\n\n\n\n\n\n\n\n\n\n\n\n错误\n正确做法\n\n\n\n\n只写解决命令，没有原因分析\n写清楚证据链：现象、日志、排除项、根因\n\n\n把聊天里的密码或 key 原样放进文章\n全部替换为占位符，并说明已脱敏\n\n\n普通 ssh user@host 成功就写“免密成功”\n用禁用密码的验证命令证明\n\n\ngit add .\n只 git add 本次文章或本次 skill 文件\n\n\n渲染真实仓库后误提交 _site\n用 /tmp 副本预览，或明确排除生成产物\n\n\npush 失败仍说已发布\n区分“本地已提交”和“远端已发布/部署完成”\n\n\n\n\n\n\n最终回复要包含：\n\n文章标题或 skill 修改摘要。\n文件路径。\ncommit hash。\n是否已 push；如果已 push，给出仓库或网站链接。\n验证方式：Quarto 渲染、敏感信息扫描、git 暂存区检查等。\n仍然存在的无关 dirty 文件，避免用户误以为工作区完全干净。"
   },
   {
-    "objectID": "SKILL.html#技能信息",
-    "href": "SKILL.html#技能信息",
-    "title": "1 Blog Post Publisher Skill",
+    "objectID": "SKILL.html#核心原则",
+    "href": "SKILL.html#核心原则",
+    "title": "1 Blog Post Publisher",
     "section": "",
-    "text": "name: blog-post-publisher\nversion: 2.0.0\ndescription: 技术博客文章生成与发布工具\nauthor: bin\nlocation: ~/.openclaw/workspace/skills/blog-post-publisher"
+    "text": "先理解材料，再写文章；不要把聊天记录机械改写成博客。\n每篇博客必须有清晰的问题线索、可复用的诊断逻辑、可执行的解决步骤。\n默认保护隐私和凭据：不要发布密码、token、私钥、完整公钥、服务器真实内网 IP、邮箱密钥、订阅链接或任何 secrets。\n提交前只暂存本次相关文件，避免把 .DS_Store、旧的脏文件、生成产物误提交。"
   },
   {
-    "objectID": "SKILL.html#核心功能",
-    "href": "SKILL.html#核心功能",
-    "title": "1 Blog Post Publisher Skill",
+    "objectID": "SKILL.html#定位博客仓库",
+    "href": "SKILL.html#定位博客仓库",
+    "title": "1 Blog Post Publisher",
     "section": "",
-    "text": "用户提供一个主题或想法\n自动生成结构完整的技术文章\n遵循 Quarto Markdown 格式规范\n\n\n\n\n\n统一的文件命名（YYYY-M-D-主题.qmd）\n标准化的 Frontmatter（标题、日期、分类、标签）\n一致的写作风格和质量\n\n\n\n\n\n自动添加到 Git 仓库\n提交信息规范化\n可选推送到远程仓库"
+    "text": "本 skill 所在目录就是博客根目录；如果用户提供了仓库路径，以用户提供路径为准。\n不要硬编码旧的绝对路径。从当前 SKILL.md 所在目录、用户给出的路径或 git rev-parse --show-toplevel 定位仓库。\n文章目录固定为博客根目录下的 posts/。\n站点由 Quarto 构建，主配置通常是 _quarto.yml。\n\n常用定位命令：\ngit rev-parse --show-toplevel\ngit status --short --branch\nls -la posts"
   },
   {
-    "objectID": "SKILL.html#项目路径",
-    "href": "SKILL.html#项目路径",
-    "title": "1 Blog Post Publisher Skill",
+    "objectID": "SKILL.html#每篇博客的强制结构",
+    "href": "SKILL.html#每篇博客的强制结构",
+    "title": "1 Blog Post Publisher",
     "section": "",
-    "text": "重要： 本技能已集成到 OpenClaw workspace，博客项目也在同一位置。\n\n技能目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n博客根目录： ~/.openclaw/workspace/skills/blog-post-publisher/\n文章目录： ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n配置文件： ~/.openclaw/workspace/skills/blog-post-publisher/_quarto.yml\n样式文件： ~/.openclaw/workspace/skills/blog-post-publisher/styles.css"
+    "text": "每篇新博客都必须包含这四个一级内容模块，标题可以根据语境微调，但语义不能缺失：\n\n描述问题：说明背景、现象、报错、影响范围、读者为什么需要关心。\n原因分析：给出排查证据、关键日志、错误根因、为什么不是其他原因。\n解决方法：提供可执行步骤、命令、配置片段、验证命令和注意事项。\n总结：沉淀规律、检查清单、经验教训或后续建议。\n\n推荐文章骨架：\n---\ntitle: \"清晰标题，包含关键词\"\ndate: \"YYYY-MM-DD\"\ncategories: [分类 1, 分类 2]\ntags: [标签 1, 标签 2]\ndescription: \"一句话说明文章解决什么问题。\"\n---\n\n## 描述问题\n\n## 原因分析\n\n## 解决方法\n\n## 总结\n可按需要增加这些可选模块，但不能替代四个强制模块：\n\n## 适用环境\n## 排查过程\n## 验证结果\n## 常见问题\n## 参考链接"
+  },
+  {
+    "objectID": "SKILL.html#写作要求",
+    "href": "SKILL.html#写作要求",
+    "title": "1 Blog Post Publisher",
+    "section": "",
+    "text": "标题要具体，包含技术关键词和问题关键词。\nFrontmatter 必须包含 title、date、categories、tags、description。\n文件名使用 YYYY-M-D-topic-slug.qmd，例如 2026-4-25-ssh-key-login-debug.qmd。\n使用 fenced code block，并标注语言：bash、python、powershell、yaml、text 等。\n命令必须尽量可执行；如果需要替换变量，用 &lt;user&gt;、&lt;host&gt;、your-token 这类占位符。\n对排查类文章，必须写明“观察到什么证据，因此得出什么判断”。\n对方案类文章，必须给出验证命令或成功输出示例。\n避免空泛总结；总结要能指导下次遇到同类问题时怎么做。"
+  },
+  {
+    "objectID": "SKILL.html#安全与脱敏检查",
+    "href": "SKILL.html#安全与脱敏检查",
+    "title": "1 Blog Post Publisher",
+    "section": "",
+    "text": "发布前必须扫描并人工确认：\n\n不含明文密码、API token、cookie、订阅链接、private key、完整 public key。\n不含不必要的真实服务器地址、内网 IP、用户名、邮箱或机器名。\n不含用户未要求公开的项目路径、商业信息、实验数据或个人信息。\n日志可以保留关键错误行，但要用 ... 或 &lt;placeholder&gt; 替换敏感段。\n\n建议检查：\nrg -n \"password|passwd|token|secret|BEGIN .*PRIVATE KEY|ssh-ed25519 AAAA|ssh-rsa AAAA|密码|私钥|密钥\" posts/&lt;new-post&gt;.qmd\ngit diff --check -- posts/&lt;new-post&gt;.qmd\n如果命令有命中，不要机械删除；判断是否是安全说明文本还是泄露内容。泄露内容必须脱敏后再继续。"
   },
   {
     "objectID": "SKILL.html#工作流程",
     "href": "SKILL.html#工作流程",
-    "title": "1 Blog Post Publisher Skill",
+    "title": "1 Blog Post Publisher",
     "section": "",
-    "text": "用户会给你一个主题，例如： - “写一个 post，介绍今天安装的终端工具” - “写一篇关于 Python 虚拟环境的教程” - “记录一下今天解决的那个 Git 问题”\n\n\n\n# 查看博客项目结构\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/\nls -la ~/.openclaw/workspace/skills/blog-post-publisher/posts/\n\n# 查看现有文章格式（学习写作风格）\ncat ~/.openclaw/workspace/skills/blog-post-publisher/posts/最新文章.qmd\n\n\n\n文章格式（Quarto Markdown）：\n---\ntitle: \"文章标题\"\ndate: \"2026-XX-XX\"\ncategories: [分类 1, 分类 2]\ntags: [标签 1, 标签 2]\ndescription: \"一句话描述\"\n---\n\n## 问题背景/引言\n说明为什么写这篇文章，解决什么问题\n\n## 适用环境\n- 操作系统\n- 软件版本\n- 项目类型\n\n## 解决方案/教程内容\n分步骤说明，包含代码示例\n\n## 常见问题\nQ&A 格式\n\n## 总结\n表格对比、建议等\n\n## 参考链接\n相关文档、GitHub 仓库等\n写作要点： - ✅ 标题清晰，包含关键词 - ✅ 代码块标注语言（bash,python 等） - ✅ 使用表格对比 - ✅ 提供可执行的命令 - ✅ 包含常见问题解答\n\n\n\n# 文件命名格式：YYYY-M-D-主题.qmd\n# 例如：2026-3-14-modern-terminal-tools.qmd\n\ncat &gt; ~/.openclaw/workspace/skills/blog-post-publisher/posts/2026-3-14-主题.qmd &lt;&lt; 'EOF'\n[文章内容]\nEOF\n\n\n\ncd ~/.openclaw/workspace/skills/blog-post-publisher\n\n# 查看状态\ngit status\n\n# 添加新文章\ngit add posts/2026-3-14-主题.qmd\n\n# 提交（清晰说明变更）\ngit commit -m \"feat: 添加 [主题] 教程\"\n\n# 推送\ngit push origin main\n\n\n\n告诉用户： - ✅ 文章已发布 - 📝 文章标题和位置 - 🔗 GitHub 仓库链接（如果可以访问）"
+    "text": "读取用户给出的上下文、日志、命令输出、计划文件或相关源码。\n查看最近 1-3 篇文章，匹配现有风格和 Quarto frontmatter。\n如果信息不足，优先基于已有证据写清楚边界；不要编造版本号、错误原因或验证结果。\n\n\n\n\n\n先确定标题、slug、分类和标签。\n按“描述问题 → 原因分析 → 解决方法 → 总结”的顺序组织正文。\n排查类文章应包含“失败现象、关键证据、根因、修复、验证”。\n教程类文章也要解释问题或需求的来源、方案选择原因、执行步骤和结果确认。\n\n\n\n\n优先用临时副本渲染，避免真实仓库的 _site 或缓存文件被误改：\nPREVIEW_DIR=\"/tmp/blog-preview-$(date +%Y%m%d%H%M%S)\"\nmkdir -p \"$PREVIEW_DIR\"\nrsync -a --exclude .git ./ \"$PREVIEW_DIR\"/\ncd \"$PREVIEW_DIR\"\nquarto render\n然后检查生成页面中是否包含新文章标题：\nrg -n \"文章标题关键词\" _site/index.html _site/posts/index.html _site/posts\n如果必须在真实仓库中渲染：\n\n先记录 git status --short。\n渲染后检查是否产生非预期 _site 变更。\n未经用户要求，不要提交 _site 生成产物。\n\n\n\n\n提交前先同步远端并检查脏文件：\ngit status --short --branch\ngit fetch origin main\ngit merge --ff-only origin/main\n只暂存本次相关文件：\ngit add posts/&lt;new-post&gt;.qmd\n# 如果本次任务是修改 skill，才暂存 SKILL.md\ngit add SKILL.md\n提交前必须确认暂存区：\ngit diff --cached --name-only\ngit diff --cached --check\ngit diff --cached --stat\n如果暂存区包含 .DS_Store、无关文章、旧的用户改动或 _site 生成产物，先取消暂存并重新选择文件。\n提交信息使用清晰中文：\ngit commit -m \"feat: 添加 XXX 教程\"\ngit commit -m \"docs: 完善博客发布 skill\"\n\n\n\n\n用户明确要求“发布到网站”“推送”“上线”时，执行 git push origin main。\n只要求“提交”时，默认完成本地 git commit；如上下文表明该仓库通过 push 触发部署，再推送前说明或确认。\n推送后可检查 GitHub Actions；如果 gh 未登录，就提供 Actions 页面链接和本地 push 结果，不要伪造部署成功状态。"
   },
   {
-    "objectID": "SKILL.html#工具依赖",
-    "href": "SKILL.html#工具依赖",
-    "title": "1 Blog Post Publisher Skill",
+    "objectID": "SKILL.html#常见错误",
+    "href": "SKILL.html#常见错误",
+    "title": "1 Blog Post Publisher",
     "section": "",
-    "text": "Quarto：博客静态站点生成器\nGit：版本控制\nGitHub：远程仓库"
+    "text": "错误\n正确做法\n\n\n\n\n只写解决命令，没有原因分析\n写清楚证据链：现象、日志、排除项、根因\n\n\n把聊天里的密码或 key 原样放进文章\n全部替换为占位符，并说明已脱敏\n\n\n普通 ssh user@host 成功就写“免密成功”\n用禁用密码的验证命令证明\n\n\ngit add .\n只 git add 本次文章或本次 skill 文件\n\n\n渲染真实仓库后误提交 _site\n用 /tmp 副本预览，或明确排除生成产物\n\n\npush 失败仍说已发布\n区分“本地已提交”和“远端已发布/部署完成”"
   },
   {
-    "objectID": "SKILL.html#示例任务",
-    "href": "SKILL.html#示例任务",
-    "title": "1 Blog Post Publisher Skill",
+    "objectID": "SKILL.html#交付说明",
+    "href": "SKILL.html#交付说明",
+    "title": "1 Blog Post Publisher",
     "section": "",
-    "text": "用户输入： &gt; 写一个 post，把今天我们刚安装的”Ghostty、Yazi、Lazygit、Zoxide”工具，写一个新手教程指导\n执行步骤： 1. 收集工具信息（功能、配置、快捷键） 2. 按照格式撰写文章 3. 保存为 2026-3-14-modern-terminal-tools.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 记录一下今天解决的 Git 忽略.pyc 文件的问题\n执行步骤： 1. 回顾问题背景和解决方案 2. 按照格式撰写文章 3. 保存为 2026-3-4-git_ignore_pyc.qmd 4. Git 提交推送\n\n\n\n用户输入： &gt; 写一篇前端后端服务器对比的文章\n执行步骤： 1. 收集对比信息（功能、性能、使用场景） 2. 用表格展示对比 3. 保存文章 4. Git 提交推送"
-  },
-  {
-    "objectID": "SKILL.html#注意事项",
-    "href": "SKILL.html#注意事项",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "日期格式： 使用 2026-03-14（YYYY-MM-DD）\n文件名： 使用 2026-3-14-主题.qmd（短横线分隔）\n提交信息： 清晰说明变更（feat: 添加 XXX 教程）\n网络问题： 如果 push 失败，告知用户本地已提交\n文章质量： 确保代码示例可执行，步骤清晰"
-  },
-  {
-    "objectID": "SKILL.html#未来改进",
-    "href": "SKILL.html#未来改进",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "自动构建并预览（quarto render）\n自动检查拼写错误\n自动生成摘要\n支持多语言文章\n自动添加标签和分类"
-  },
-  {
-    "objectID": "SKILL.html#版本历史",
-    "href": "SKILL.html#版本历史",
-    "title": "1 Blog Post Publisher Skill",
-    "section": "",
-    "text": "v2.0.0 (2026-03-15): 迁移到 workspace 目录，规范化管理\nv1.0.0 (2026-03-14): 初始版本\n\n\n创建时间：2026-03-14\n最后更新：2026-03-15"
+    "text": "最终回复要包含：\n\n文章标题或 skill 修改摘要。\n文件路径。\ncommit hash。\n是否已 push；如果已 push，给出仓库或网站链接。\n验证方式：Quarto 渲染、敏感信息扫描、git 暂存区检查等。\n仍然存在的无关 dirty 文件，避免用户误以为工作区完全干净。"
   },
   {
     "objectID": "flood-prediction/docs/google-flood-research.html",
@@ -1227,63 +1220,63 @@
   {
     "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html",
     "href": "posts/2026-3-19-codex-xhigh-error-fix.html",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "title": "Codex 报错 unknown variant ‘xhigh’ 的原因与解决方法",
     "section": "",
     "text": "在终端运行 codex 时，出现如下报错：\nError loading configuration: unknown variant `xhigh`, expected one of `minimal`, `low`, `medium`, `high`\nin `model_reasoning_effort`\n这说明 Codex 在读取配置文件时，发现 model_reasoning_effort 被设置成了当前版本不支持的值 xhigh。"
   },
   {
     "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#问题现象",
     "href": "posts/2026-3-19-codex-xhigh-error-fix.html#问题现象",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "title": "Codex 报错 unknown variant ‘xhigh’ 的原因与解决方法",
     "section": "",
     "text": "在终端运行 codex 时，出现如下报错：\nError loading configuration: unknown variant `xhigh`, expected one of `minimal`, `low`, `medium`, `high`\nin `model_reasoning_effort`\n这说明 Codex 在读取配置文件时，发现 model_reasoning_effort 被设置成了当前版本不支持的值 xhigh。"
   },
   {
     "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#报错原因",
     "href": "posts/2026-3-19-codex-xhigh-error-fix.html#报错原因",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "title": "Codex 报错 unknown variant ‘xhigh’ 的原因与解决方法",
     "section": "2 报错原因",
     "text": "2 报错原因\n根本原因是：\n\n本地 Codex 配置文件中存在如下配置：\n\nmodel_reasoning_effort = \"xhigh\"\n\n但当前 CLI 版本只支持以下四个取值：\n\nminimal\nlow\nmedium\nhigh\n也就是说，当前环境下 xhigh 这个枚举值无法被解析，因此启动失败。\n\n2.1 常见触发场景\n\n之前在某些图形界面、IDE 插件或其他环境中，把 reasoning effort 设成了更高档位；\n该设置被写入 ~/.codex/config.toml；\n但当前终端里的 codex CLI 版本并不支持 xhigh；\n于是每次启动都会报错。"
   },
   {
     "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#解决思路",
     "href": "posts/2026-3-19-codex-xhigh-error-fix.html#解决思路",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "title": "Codex 报错 unknown variant ‘xhigh’ 的原因与解决方法",
     "section": "3 解决思路",
     "text": "3 解决思路\n处理方法很直接：\n\n先备份原始配置文件；\n把配置文件里的所有 \"xhigh\" 替换成 \"high\"；\n重新运行 codex。"
   },
   {
     "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#解决方法",
     "href": "posts/2026-3-19-codex-xhigh-error-fix.html#解决方法",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "title": "Codex 报错 unknown variant ‘xhigh’ 的原因与解决方法",
     "section": "4 解决方法",
     "text": "4 解决方法\n\n4.1 一键修复命令\n# 1. 备份配置文件\ncp ~/.codex/config.toml ~/.codex/config.toml.bak\n\n# 2. 批量替换配置值\nperl -0pi -e 's/\"xhigh\"/\"high\"/g' ~/.codex/config.toml\n\n# 3. 重新运行 Codex\ncodex\n\n\n4.2 命令说明\n\n4.2.1 备份配置文件\ncp ~/.codex/config.toml ~/.codex/config.toml.bak\n作用：\n\n将当前配置文件复制一份作为备份；\n如果后续修改有问题，可以随时恢复。\n\n\n\n4.2.2 批量替换配置值\nperl -0pi -e 's/\"xhigh\"/\"high\"/g' ~/.codex/config.toml\n作用：\n\n直接原地修改 ~/.codex/config.toml；\n将文件中所有 \"xhigh\" 全部替换成 \"high\"；\n不需要手动打开编辑器逐行查找。"
   },
   {
     "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#手动检查与编辑",
     "href": "posts/2026-3-19-codex-xhigh-error-fix.html#手动检查与编辑",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "title": "Codex 报错 unknown variant ‘xhigh’ 的原因与解决方法",
     "section": "5 手动检查与编辑",
     "text": "5 手动检查与编辑\n如果想手动检查配置中是否仍然包含 xhigh：\ngrep -n \"xhigh\" ~/.codex/config.toml\n也可以直接打开文件手动编辑：\ncode ~/.codex/config.toml\n把类似下面的内容：\nmodel_reasoning_effort = \"xhigh\"\nplan_mode_reasoning_effort = \"xhigh\"\n改成：\nmodel_reasoning_effort = \"high\"\nplan_mode_reasoning_effort = \"high\""
   },
   {
     "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#如果问题再次出现",
     "href": "posts/2026-3-19-codex-xhigh-error-fix.html#如果问题再次出现",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "title": "Codex 报错 unknown variant ‘xhigh’ 的原因与解决方法",
     "section": "6 如果问题再次出现",
     "text": "6 如果问题再次出现\n如果已经修改了 ~/.codex/config.toml，但还是报同样错误，可能还有其他位置也存在配置文件，例如项目目录下的：\n./.codex/config.toml\n可以用下面命令全局搜索：\ngrep -Rn 'xhigh' ~/.codex ./.codex 2&gt;/dev/null\n如果项目配置里也有 xhigh，同样需要改掉。"
   },
   {
     "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#总结",
     "href": "posts/2026-3-19-codex-xhigh-error-fix.html#总结",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "title": "Codex 报错 unknown variant ‘xhigh’ 的原因与解决方法",
     "section": "7 总结",
     "text": "7 总结\n这个报错不是 codex 本身坏了，而是配置文件里写了当前 CLI 不支持的 model_reasoning_effort = \"xhigh\"。\n把它改成 high 即可恢复正常。\n\n7.1 推荐保留的最终修复命令\ncp ~/.codex/config.toml ~/.codex/config.toml.bak\nperl -0pi -e 's/\"xhigh\"/\"high\"/g' ~/.codex/config.toml\ncodex"
   },
   {
     "objectID": "posts/2026-3-19-codex-xhigh-error-fix.html#参考资料",
     "href": "posts/2026-3-19-codex-xhigh-error-fix.html#参考资料",
-    "title": "Codex 报错 unknown variant 'xhigh' 的原因与解决方法",
+    "title": "Codex 报错 unknown variant ‘xhigh’ 的原因与解决方法",
     "section": "8 参考资料",
     "text": "8 参考资料\n\nCodex 官方文档\nCodex 配置指南"
   },

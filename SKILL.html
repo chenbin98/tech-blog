@@ -6,8 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="bin">
-<meta name="description" content="Generate technical blog posts and optionally commit or push them to the tech-blog repository.">
+<meta name="description" content="Use when writing, editing, publishing, or committing technical blog posts in the local Quarto tech-blog repository, especially troubleshooting writeups, tutorials, issue-resolution notes, reproducible workflows, or posts that need sanitized examples, validation, and GitHub Pages deployment.">
 
 <title>skill – Binchen's Tech Blog</title>
 <style>
@@ -156,35 +155,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#blog-post-publisher-skill" id="toc-blog-post-publisher-skill" class="nav-link active" data-scroll-target="#blog-post-publisher-skill"><span class="header-section-number">1</span> Blog Post Publisher Skill</a>
+  <li><a href="#blog-post-publisher" id="toc-blog-post-publisher" class="nav-link active" data-scroll-target="#blog-post-publisher"><span class="header-section-number">1</span> Blog Post Publisher</a>
   <ul class="collapse">
-  <li><a href="#技能信息" id="toc-技能信息" class="nav-link" data-scroll-target="#技能信息"><span class="header-section-number">1.1</span> 📋 技能信息</a></li>
-  <li><a href="#核心功能" id="toc-核心功能" class="nav-link" data-scroll-target="#核心功能"><span class="header-section-number">1.2</span> 🎯 核心功能</a>
+  <li><a href="#核心原则" id="toc-核心原则" class="nav-link" data-scroll-target="#核心原则"><span class="header-section-number">1.1</span> 核心原则</a></li>
+  <li><a href="#定位博客仓库" id="toc-定位博客仓库" class="nav-link" data-scroll-target="#定位博客仓库"><span class="header-section-number">1.2</span> 定位博客仓库</a></li>
+  <li><a href="#每篇博客的强制结构" id="toc-每篇博客的强制结构" class="nav-link" data-scroll-target="#每篇博客的强制结构"><span class="header-section-number">1.3</span> 每篇博客的强制结构</a></li>
+  <li><a href="#写作要求" id="toc-写作要求" class="nav-link" data-scroll-target="#写作要求"><span class="header-section-number">1.4</span> 写作要求</a></li>
+  <li><a href="#安全与脱敏检查" id="toc-安全与脱敏检查" class="nav-link" data-scroll-target="#安全与脱敏检查"><span class="header-section-number">1.5</span> 安全与脱敏检查</a></li>
+  <li><a href="#工作流程" id="toc-工作流程" class="nav-link" data-scroll-target="#工作流程"><span class="header-section-number">1.6</span> 工作流程</a>
   <ul class="collapse">
-  <li><a href="#文章生成" id="toc-文章生成" class="nav-link" data-scroll-target="#文章生成"><span class="header-section-number">1.2.1</span> 1️⃣ 文章生成</a></li>
-  <li><a href="#内容规范化" id="toc-内容规范化" class="nav-link" data-scroll-target="#内容规范化"><span class="header-section-number">1.2.2</span> 2️⃣ 内容规范化</a></li>
-  <li><a href="#git-工作流" id="toc-git-工作流" class="nav-link" data-scroll-target="#git-工作流"><span class="header-section-number">1.2.3</span> 3️⃣ Git 工作流</a></li>
+  <li><a href="#收集材料" id="toc-收集材料" class="nav-link" data-scroll-target="#收集材料"><span class="header-section-number">1.6.1</span> 1. 收集材料</a></li>
+  <li><a href="#写文章" id="toc-写文章" class="nav-link" data-scroll-target="#写文章"><span class="header-section-number">1.6.2</span> 2. 写文章</a></li>
+  <li><a href="#验证-quarto" id="toc-验证-quarto" class="nav-link" data-scroll-target="#验证-quarto"><span class="header-section-number">1.6.3</span> 3. 验证 Quarto</a></li>
+  <li><a href="#git-提交" id="toc-git-提交" class="nav-link" data-scroll-target="#git-提交"><span class="header-section-number">1.6.4</span> 4. Git 提交</a></li>
+  <li><a href="#发布" id="toc-发布" class="nav-link" data-scroll-target="#发布"><span class="header-section-number">1.6.5</span> 5. 发布</a></li>
   </ul></li>
-  <li><a href="#项目路径" id="toc-项目路径" class="nav-link" data-scroll-target="#项目路径"><span class="header-section-number">1.3</span> 📁 项目路径</a></li>
-  <li><a href="#工作流程" id="toc-工作流程" class="nav-link" data-scroll-target="#工作流程"><span class="header-section-number">1.4</span> 📝 工作流程</a>
-  <ul class="collapse">
-  <li><a href="#接收任务" id="toc-接收任务" class="nav-link" data-scroll-target="#接收任务"><span class="header-section-number">1.4.1</span> 1. 接收任务</a></li>
-  <li><a href="#分析项目结构" id="toc-分析项目结构" class="nav-link" data-scroll-target="#分析项目结构"><span class="header-section-number">1.4.2</span> 2. 分析项目结构</a></li>
-  <li><a href="#撰写文章" id="toc-撰写文章" class="nav-link" data-scroll-target="#撰写文章"><span class="header-section-number">1.4.3</span> 3. 撰写文章</a></li>
-  <li><a href="#保存文章" id="toc-保存文章" class="nav-link" data-scroll-target="#保存文章"><span class="header-section-number">1.4.4</span> 4. 保存文章</a></li>
-  <li><a href="#git-提交并推送" id="toc-git-提交并推送" class="nav-link" data-scroll-target="#git-提交并推送"><span class="header-section-number">1.4.5</span> 5. Git 提交并推送</a></li>
-  <li><a href="#通知用户" id="toc-通知用户" class="nav-link" data-scroll-target="#通知用户"><span class="header-section-number">1.4.6</span> 6. 通知用户</a></li>
-  </ul></li>
-  <li><a href="#工具依赖" id="toc-工具依赖" class="nav-link" data-scroll-target="#工具依赖"><span class="header-section-number">1.5</span> 🛠️ 工具依赖</a></li>
-  <li><a href="#示例任务" id="toc-示例任务" class="nav-link" data-scroll-target="#示例任务"><span class="header-section-number">1.6</span> 🎯 示例任务</a>
-  <ul class="collapse">
-  <li><a href="#示例-1工具介绍" id="toc-示例-1工具介绍" class="nav-link" data-scroll-target="#示例-1工具介绍"><span class="header-section-number">1.6.1</span> 示例 1：工具介绍</a></li>
-  <li><a href="#示例-2问题解决方案" id="toc-示例-2问题解决方案" class="nav-link" data-scroll-target="#示例-2问题解决方案"><span class="header-section-number">1.6.2</span> 示例 2：问题解决方案</a></li>
-  <li><a href="#示例-3技术对比" id="toc-示例-3技术对比" class="nav-link" data-scroll-target="#示例-3技术对比"><span class="header-section-number">1.6.3</span> 示例 3：技术对比</a></li>
-  </ul></li>
-  <li><a href="#注意事项" id="toc-注意事项" class="nav-link" data-scroll-target="#注意事项"><span class="header-section-number">1.7</span> ⚠️ 注意事项</a></li>
-  <li><a href="#未来改进" id="toc-未来改进" class="nav-link" data-scroll-target="#未来改进"><span class="header-section-number">1.8</span> 🔄 未来改进</a></li>
-  <li><a href="#版本历史" id="toc-版本历史" class="nav-link" data-scroll-target="#版本历史"><span class="header-section-number">1.9</span> 📊 版本历史</a></li>
+  <li><a href="#常见错误" id="toc-常见错误" class="nav-link" data-scroll-target="#常见错误"><span class="header-section-number">1.7</span> 常见错误</a></li>
+  <li><a href="#交付说明" id="toc-交付说明" class="nav-link" data-scroll-target="#交付说明"><span class="header-section-number">1.8</span> 交付说明</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -194,229 +181,213 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
-<main class="content column-page-right" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-</div>
-
-<div>
-  <div class="description">
-    Generate technical blog posts and optionally commit or push them to the tech-blog repository.
-  </div>
-</div>
+<main class="content column-page-right" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
-<div class="quarto-title-meta column-page-right">
-
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>bin </p>
-          </div>
-  </div>
-    
-  
-    
-  </div>
-  
 
 
-</header>
-
-
-<section id="blog-post-publisher-skill" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Blog Post Publisher Skill</h1>
-<blockquote class="blockquote">
-<p>自动将用户的技术分享需求转化为博客文章，并提交到本地 tech-blog 仓库。</p>
-</blockquote>
-<hr>
-<section id="技能信息" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="技能信息"><span class="header-section-number">1.1</span> 📋 技能信息</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> blog-post-publisher</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">2.0.0</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">description</span><span class="kw">:</span><span class="at"> 技术博客文章生成与发布工具</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="at"> bin</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">location</span><span class="kw">:</span><span class="at"> ~/.openclaw/workspace/skills/blog-post-publisher</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<hr>
-</section>
-<section id="核心功能" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="核心功能"><span class="header-section-number">1.2</span> 🎯 核心功能</h2>
-<section id="文章生成" class="level3" data-number="1.2.1">
-<h3 data-number="1.2.1" class="anchored" data-anchor-id="文章生成"><span class="header-section-number">1.2.1</span> 1️⃣ 文章生成</h3>
+<section id="blog-post-publisher" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Blog Post Publisher</h1>
+<p>将技术问题、教程、排查记录或项目经验整理成 Quarto 博客文章，并按仓库工作流验证、提交、按需推送发布。</p>
+<section id="核心原则" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="核心原则"><span class="header-section-number">1.1</span> 核心原则</h2>
 <ul>
-<li>用户提供一个主题或想法</li>
-<li>自动生成结构完整的技术文章</li>
-<li>遵循 Quarto Markdown 格式规范</li>
+<li>先理解材料，再写文章；不要把聊天记录机械改写成博客。</li>
+<li>每篇博客必须有清晰的问题线索、可复用的诊断逻辑、可执行的解决步骤。</li>
+<li>默认保护隐私和凭据：不要发布密码、token、私钥、完整公钥、服务器真实内网 IP、邮箱密钥、订阅链接或任何 secrets。</li>
+<li>提交前只暂存本次相关文件，避免把 <code>.DS_Store</code>、旧的脏文件、生成产物误提交。</li>
 </ul>
 </section>
-<section id="内容规范化" class="level3" data-number="1.2.2">
-<h3 data-number="1.2.2" class="anchored" data-anchor-id="内容规范化"><span class="header-section-number">1.2.2</span> 2️⃣ 内容规范化</h3>
+<section id="定位博客仓库" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="定位博客仓库"><span class="header-section-number">1.2</span> 定位博客仓库</h2>
 <ul>
-<li>统一的文件命名（<code>YYYY-M-D-主题.qmd</code>）</li>
-<li>标准化的 Frontmatter（标题、日期、分类、标签）</li>
-<li>一致的写作风格和质量</li>
+<li>本 skill 所在目录就是博客根目录；如果用户提供了仓库路径，以用户提供路径为准。</li>
+<li>不要硬编码旧的绝对路径。从当前 <code>SKILL.md</code> 所在目录、用户给出的路径或 <code>git rev-parse --show-toplevel</code> 定位仓库。</li>
+<li>文章目录固定为博客根目录下的 <code>posts/</code>。</li>
+<li>站点由 Quarto 构建，主配置通常是 <code>_quarto.yml</code>。</li>
 </ul>
+<p>常用定位命令：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> rev-parse <span class="at">--show-toplevel</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status <span class="at">--short</span> <span class="at">--branch</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-la</span> posts</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="git-工作流" class="level3" data-number="1.2.3">
-<h3 data-number="1.2.3" class="anchored" data-anchor-id="git-工作流"><span class="header-section-number">1.2.3</span> 3️⃣ Git 工作流</h3>
-<ul>
-<li>自动添加到 Git 仓库</li>
-<li>提交信息规范化</li>
-<li>可选推送到远程仓库</li>
-</ul>
-<hr>
-</section>
-</section>
-<section id="项目路径" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="项目路径"><span class="header-section-number">1.3</span> 📁 项目路径</h2>
-<p><strong>重要：</strong> 本技能已集成到 OpenClaw workspace，博客项目也在同一位置。</p>
-<ul>
-<li><strong>技能目录：</strong> <code>~/.openclaw/workspace/skills/blog-post-publisher/</code></li>
-<li><strong>博客根目录：</strong> <code>~/.openclaw/workspace/skills/blog-post-publisher/</code></li>
-<li><strong>文章目录：</strong> <code>~/.openclaw/workspace/skills/blog-post-publisher/posts/</code></li>
-<li><strong>配置文件：</strong> <code>~/.openclaw/workspace/skills/blog-post-publisher/_quarto.yml</code></li>
-<li><strong>样式文件：</strong> <code>~/.openclaw/workspace/skills/blog-post-publisher/styles.css</code></li>
-</ul>
-<hr>
-</section>
-<section id="工作流程" class="level2" data-number="1.4">
-<h2 data-number="1.4" class="anchored" data-anchor-id="工作流程"><span class="header-section-number">1.4</span> 📝 工作流程</h2>
-<section id="接收任务" class="level3" data-number="1.4.1">
-<h3 data-number="1.4.1" class="anchored" data-anchor-id="接收任务"><span class="header-section-number">1.4.1</span> 1. 接收任务</h3>
-<p>用户会给你一个主题，例如： - “写一个 post，介绍今天安装的终端工具” - “写一篇关于 Python 虚拟环境的教程” - “记录一下今天解决的那个 Git 问题”</p>
-</section>
-<section id="分析项目结构" class="level3" data-number="1.4.2">
-<h3 data-number="1.4.2" class="anchored" data-anchor-id="分析项目结构"><span class="header-section-number">1.4.2</span> 2. 分析项目结构</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 查看博客项目结构</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-la</span> ~/.openclaw/workspace/skills/blog-post-publisher/</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-la</span> ~/.openclaw/workspace/skills/blog-post-publisher/posts/</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 查看现有文章格式（学习写作风格）</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> ~/.openclaw/workspace/skills/blog-post-publisher/posts/最新文章.qmd</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="撰写文章" class="level3" data-number="1.4.3">
-<h3 data-number="1.4.3" class="anchored" data-anchor-id="撰写文章"><span class="header-section-number">1.4.3</span> 3. 撰写文章</h3>
-<p><strong>文章格式（Quarto Markdown）：</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "文章标题"</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2026-XX-XX"</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [分类 1, 分类 2]</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [标签 1, 标签 2]</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "一句话描述"</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">## 问题背景/引言</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>说明为什么写这篇文章，解决什么问题</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## 适用环境</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>操作系统</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>软件版本</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>项目类型</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## 解决方案/教程内容</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>分步骤说明，包含代码示例</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="fu">## 常见问题</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>Q&amp;A 格式</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## 总结</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>表格对比、建议等</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## 参考链接</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>相关文档、GitHub 仓库等</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>写作要点：</strong> - ✅ 标题清晰，包含关键词 - ✅ 代码块标注语言（<code>bash,</code>python 等） - ✅ 使用表格对比 - ✅ 提供可执行的命令 - ✅ 包含常见问题解答</p>
-</section>
-<section id="保存文章" class="level3" data-number="1.4.4">
-<h3 data-number="1.4.4" class="anchored" data-anchor-id="保存文章"><span class="header-section-number">1.4.4</span> 4. 保存文章</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 文件命名格式：YYYY-M-D-主题.qmd</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 例如：2026-3-14-modern-terminal-tools.qmd</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&gt;</span> ~/.openclaw/workspace/skills/blog-post-publisher/posts/2026-3-14-主题.qmd <span class="op">&lt;&lt; 'EOF'</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">[文章内容]</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="git-提交并推送" class="level3" data-number="1.4.5">
-<h3 data-number="1.4.5" class="anchored" data-anchor-id="git-提交并推送"><span class="header-section-number">1.4.5</span> 5. Git 提交并推送</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/.openclaw/workspace/skills/blog-post-publisher</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 查看状态</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 添加新文章</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add posts/2026-3-14-主题.qmd</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 提交（清晰说明变更）</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"feat: 添加 [主题] 教程"</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 推送</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin main</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="通知用户" class="level3" data-number="1.4.6">
-<h3 data-number="1.4.6" class="anchored" data-anchor-id="通知用户"><span class="header-section-number">1.4.6</span> 6. 通知用户</h3>
-<p>告诉用户： - ✅ 文章已发布 - 📝 文章标题和位置 - 🔗 GitHub 仓库链接（如果可以访问）</p>
-<hr>
-</section>
-</section>
-<section id="工具依赖" class="level2" data-number="1.5">
-<h2 data-number="1.5" class="anchored" data-anchor-id="工具依赖"><span class="header-section-number">1.5</span> 🛠️ 工具依赖</h2>
-<ul>
-<li><strong>Quarto</strong>：博客静态站点生成器</li>
-<li><strong>Git</strong>：版本控制</li>
-<li><strong>GitHub</strong>：远程仓库</li>
-</ul>
-<hr>
-</section>
-<section id="示例任务" class="level2" data-number="1.6">
-<h2 data-number="1.6" class="anchored" data-anchor-id="示例任务"><span class="header-section-number">1.6</span> 🎯 示例任务</h2>
-<section id="示例-1工具介绍" class="level3" data-number="1.6.1">
-<h3 data-number="1.6.1" class="anchored" data-anchor-id="示例-1工具介绍"><span class="header-section-number">1.6.1</span> 示例 1：工具介绍</h3>
-<p><strong>用户输入：</strong> &gt; 写一个 post，把今天我们刚安装的”Ghostty、Yazi、Lazygit、Zoxide”工具，写一个新手教程指导</p>
-<p><strong>执行步骤：</strong> 1. 收集工具信息（功能、配置、快捷键） 2. 按照格式撰写文章 3. 保存为 <code>2026-3-14-modern-terminal-tools.qmd</code> 4. Git 提交推送</p>
-</section>
-<section id="示例-2问题解决方案" class="level3" data-number="1.6.2">
-<h3 data-number="1.6.2" class="anchored" data-anchor-id="示例-2问题解决方案"><span class="header-section-number">1.6.2</span> 示例 2：问题解决方案</h3>
-<p><strong>用户输入：</strong> &gt; 记录一下今天解决的 Git 忽略.pyc 文件的问题</p>
-<p><strong>执行步骤：</strong> 1. 回顾问题背景和解决方案 2. 按照格式撰写文章 3. 保存为 <code>2026-3-4-git_ignore_pyc.qmd</code> 4. Git 提交推送</p>
-</section>
-<section id="示例-3技术对比" class="level3" data-number="1.6.3">
-<h3 data-number="1.6.3" class="anchored" data-anchor-id="示例-3技术对比"><span class="header-section-number">1.6.3</span> 示例 3：技术对比</h3>
-<p><strong>用户输入：</strong> &gt; 写一篇前端后端服务器对比的文章</p>
-<p><strong>执行步骤：</strong> 1. 收集对比信息（功能、性能、使用场景） 2. 用表格展示对比 3. 保存文章 4. Git 提交推送</p>
-<hr>
-</section>
-</section>
-<section id="注意事项" class="level2" data-number="1.7">
-<h2 data-number="1.7" class="anchored" data-anchor-id="注意事项"><span class="header-section-number">1.7</span> ⚠️ 注意事项</h2>
+<section id="每篇博客的强制结构" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="每篇博客的强制结构"><span class="header-section-number">1.3</span> 每篇博客的强制结构</h2>
+<p>每篇新博客都必须包含这四个一级内容模块，标题可以根据语境微调，但语义不能缺失：</p>
 <ol type="1">
-<li><strong>日期格式：</strong> 使用 <code>2026-03-14</code>（YYYY-MM-DD）</li>
-<li><strong>文件名：</strong> 使用 <code>2026-3-14-主题.qmd</code>（短横线分隔）</li>
-<li><strong>提交信息：</strong> 清晰说明变更（<code>feat: 添加 XXX 教程</code>）</li>
-<li><strong>网络问题：</strong> 如果 push 失败，告知用户本地已提交</li>
-<li><strong>文章质量：</strong> 确保代码示例可执行，步骤清晰</li>
+<li><strong>描述问题</strong>：说明背景、现象、报错、影响范围、读者为什么需要关心。</li>
+<li><strong>原因分析</strong>：给出排查证据、关键日志、错误根因、为什么不是其他原因。</li>
+<li><strong>解决方法</strong>：提供可执行步骤、命令、配置片段、验证命令和注意事项。</li>
+<li><strong>总结</strong>：沉淀规律、检查清单、经验教训或后续建议。</li>
 </ol>
-<hr>
-</section>
-<section id="未来改进" class="level2" data-number="1.8">
-<h2 data-number="1.8" class="anchored" data-anchor-id="未来改进"><span class="header-section-number">1.8</span> 🔄 未来改进</h2>
-<ul class="task-list">
-<li><label><input type="checkbox">自动构建并预览（<code>quarto render</code>）</label></li>
-<li><label><input type="checkbox">自动检查拼写错误</label></li>
-<li><label><input type="checkbox">自动生成摘要</label></li>
-<li><label><input type="checkbox">支持多语言文章</label></li>
-<li><label><input type="checkbox">自动添加标签和分类</label></li>
-</ul>
-<hr>
-</section>
-<section id="版本历史" class="level2" data-number="1.9">
-<h2 data-number="1.9" class="anchored" data-anchor-id="版本历史"><span class="header-section-number">1.9</span> 📊 版本历史</h2>
+<p>推荐文章骨架：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "清晰标题，包含关键词"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "YYYY-MM-DD"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [分类 1, 分类 2]</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [标签 1, 标签 2]</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "一句话说明文章解决什么问题。"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">## 描述问题</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## 原因分析</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">## 解决方法</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">## 总结</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>可按需要增加这些可选模块，但不能替代四个强制模块：</p>
 <ul>
-<li><strong>v2.0.0</strong> (2026-03-15): 迁移到 workspace 目录，规范化管理</li>
-<li><strong>v1.0.0</strong> (2026-03-14): 初始版本</li>
+<li><code>## 适用环境</code></li>
+<li><code>## 排查过程</code></li>
+<li><code>## 验证结果</code></li>
+<li><code>## 常见问题</code></li>
+<li><code>## 参考链接</code></li>
 </ul>
-<hr>
-<p><em>创建时间：2026-03-14</em><br>
-<em>最后更新：2026-03-15</em></p>
+</section>
+<section id="写作要求" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="写作要求"><span class="header-section-number">1.4</span> 写作要求</h2>
+<ul>
+<li>标题要具体，包含技术关键词和问题关键词。</li>
+<li>Frontmatter 必须包含 <code>title</code>、<code>date</code>、<code>categories</code>、<code>tags</code>、<code>description</code>。</li>
+<li>文件名使用 <code>YYYY-M-D-topic-slug.qmd</code>，例如 <code>2026-4-25-ssh-key-login-debug.qmd</code>。</li>
+<li>使用 fenced code block，并标注语言：<code>bash</code>、<code>python</code>、<code>powershell</code>、<code>yaml</code>、<code>text</code> 等。</li>
+<li>命令必须尽量可执行；如果需要替换变量，用 <code>&lt;user&gt;</code>、<code>&lt;host&gt;</code>、<code>your-token</code> 这类占位符。</li>
+<li>对排查类文章，必须写明“观察到什么证据，因此得出什么判断”。</li>
+<li>对方案类文章，必须给出验证命令或成功输出示例。</li>
+<li>避免空泛总结；总结要能指导下次遇到同类问题时怎么做。</li>
+</ul>
+</section>
+<section id="安全与脱敏检查" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="安全与脱敏检查"><span class="header-section-number">1.5</span> 安全与脱敏检查</h2>
+<p>发布前必须扫描并人工确认：</p>
+<ul>
+<li>不含明文密码、API token、cookie、订阅链接、private key、完整 public key。</li>
+<li>不含不必要的真实服务器地址、内网 IP、用户名、邮箱或机器名。</li>
+<li>不含用户未要求公开的项目路径、商业信息、实验数据或个人信息。</li>
+<li>日志可以保留关键错误行，但要用 <code>...</code> 或 <code>&lt;placeholder&gt;</code> 替换敏感段。</li>
+</ul>
+<p>建议检查：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rg</span> <span class="at">-n</span> <span class="st">"password|passwd|token|secret|BEGIN .*PRIVATE KEY|ssh-ed25519 AAAA|ssh-rsa AAAA|密码|私钥|密钥"</span> posts/<span class="op">&lt;</span>new-post<span class="op">&gt;</span>.qmd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff <span class="at">--check</span> <span class="at">--</span> posts/<span class="op">&lt;</span>new-post<span class="op">&gt;</span>.qmd</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>如果命令有命中，不要机械删除；判断是否是安全说明文本还是泄露内容。泄露内容必须脱敏后再继续。</p>
+</section>
+<section id="工作流程" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="工作流程"><span class="header-section-number">1.6</span> 工作流程</h2>
+<section id="收集材料" class="level3" data-number="1.6.1">
+<h3 data-number="1.6.1" class="anchored" data-anchor-id="收集材料"><span class="header-section-number">1.6.1</span> 1. 收集材料</h3>
+<ul>
+<li>读取用户给出的上下文、日志、命令输出、计划文件或相关源码。</li>
+<li>查看最近 1-3 篇文章，匹配现有风格和 Quarto frontmatter。</li>
+<li>如果信息不足，优先基于已有证据写清楚边界；不要编造版本号、错误原因或验证结果。</li>
+</ul>
+</section>
+<section id="写文章" class="level3" data-number="1.6.2">
+<h3 data-number="1.6.2" class="anchored" data-anchor-id="写文章"><span class="header-section-number">1.6.2</span> 2. 写文章</h3>
+<ul>
+<li>先确定标题、slug、分类和标签。</li>
+<li>按“描述问题 → 原因分析 → 解决方法 → 总结”的顺序组织正文。</li>
+<li>排查类文章应包含“失败现象、关键证据、根因、修复、验证”。</li>
+<li>教程类文章也要解释问题或需求的来源、方案选择原因、执行步骤和结果确认。</li>
+</ul>
+</section>
+<section id="验证-quarto" class="level3" data-number="1.6.3">
+<h3 data-number="1.6.3" class="anchored" data-anchor-id="验证-quarto"><span class="header-section-number">1.6.3</span> 3. 验证 Quarto</h3>
+<p>优先用临时副本渲染，避免真实仓库的 <code>_site</code> 或缓存文件被误改：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">PREVIEW_DIR</span><span class="op">=</span><span class="st">"/tmp/blog-preview-</span><span class="va">$(</span><span class="fu">date</span> +%Y%m%d%H%M%S<span class="va">)</span><span class="st">"</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">"</span><span class="va">$PREVIEW_DIR</span><span class="st">"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rsync</span> <span class="at">-a</span> <span class="at">--exclude</span> .git ./ <span class="st">"</span><span class="va">$PREVIEW_DIR</span><span class="st">"</span>/</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="st">"</span><span class="va">$PREVIEW_DIR</span><span class="st">"</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>然后检查生成页面中是否包含新文章标题：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rg</span> <span class="at">-n</span> <span class="st">"文章标题关键词"</span> _site/index.html _site/posts/index.html _site/posts</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>如果必须在真实仓库中渲染：</p>
+<ul>
+<li>先记录 <code>git status --short</code>。</li>
+<li>渲染后检查是否产生非预期 <code>_site</code> 变更。</li>
+<li>未经用户要求，不要提交 <code>_site</code> 生成产物。</li>
+</ul>
+</section>
+<section id="git-提交" class="level3" data-number="1.6.4">
+<h3 data-number="1.6.4" class="anchored" data-anchor-id="git-提交"><span class="header-section-number">1.6.4</span> 4. Git 提交</h3>
+<p>提交前先同步远端并检查脏文件：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status <span class="at">--short</span> <span class="at">--branch</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> fetch origin main</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> merge <span class="at">--ff-only</span> origin/main</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>只暂存本次相关文件：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add posts/<span class="op">&lt;</span>new-post<span class="op">&gt;</span>.qmd</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 如果本次任务是修改 skill，才暂存 SKILL.md</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add SKILL.md</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>提交前必须确认暂存区：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff <span class="at">--cached</span> <span class="at">--name-only</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff <span class="at">--cached</span> <span class="at">--check</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff <span class="at">--cached</span> <span class="at">--stat</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>如果暂存区包含 <code>.DS_Store</code>、无关文章、旧的用户改动或 <code>_site</code> 生成产物，先取消暂存并重新选择文件。</p>
+<p>提交信息使用清晰中文：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"feat: 添加 XXX 教程"</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"docs: 完善博客发布 skill"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="发布" class="level3" data-number="1.6.5">
+<h3 data-number="1.6.5" class="anchored" data-anchor-id="发布"><span class="header-section-number">1.6.5</span> 5. 发布</h3>
+<ul>
+<li>用户明确要求“发布到网站”“推送”“上线”时，执行 <code>git push origin main</code>。</li>
+<li>只要求“提交”时，默认完成本地 git commit；如上下文表明该仓库通过 push 触发部署，再推送前说明或确认。</li>
+<li>推送后可检查 GitHub Actions；如果 <code>gh</code> 未登录，就提供 Actions 页面链接和本地 push 结果，不要伪造部署成功状态。</li>
+</ul>
+</section>
+</section>
+<section id="常见错误" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="常见错误"><span class="header-section-number">1.7</span> 常见错误</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>错误</th>
+<th>正确做法</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>只写解决命令，没有原因分析</td>
+<td>写清楚证据链：现象、日志、排除项、根因</td>
+</tr>
+<tr class="even">
+<td>把聊天里的密码或 key 原样放进文章</td>
+<td>全部替换为占位符，并说明已脱敏</td>
+</tr>
+<tr class="odd">
+<td>普通 <code>ssh user@host</code> 成功就写“免密成功”</td>
+<td>用禁用密码的验证命令证明</td>
+</tr>
+<tr class="even">
+<td><code>git add .</code></td>
+<td>只 <code>git add</code> 本次文章或本次 skill 文件</td>
+</tr>
+<tr class="odd">
+<td>渲染真实仓库后误提交 <code>_site</code></td>
+<td>用 <code>/tmp</code> 副本预览，或明确排除生成产物</td>
+</tr>
+<tr class="even">
+<td>push 失败仍说已发布</td>
+<td>区分“本地已提交”和“远端已发布/部署完成”</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="交付说明" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="交付说明"><span class="header-section-number">1.8</span> 交付说明</h2>
+<p>最终回复要包含：</p>
+<ul>
+<li>文章标题或 skill 修改摘要。</li>
+<li>文件路径。</li>
+<li>commit hash。</li>
+<li>是否已 push；如果已 push，给出仓库或网站链接。</li>
+<li>验证方式：Quarto 渲染、敏感信息扫描、git 暂存区检查等。</li>
+<li>仍然存在的无关 dirty 文件，避免用户误以为工作区完全干净。</li>
+</ul>
 
 
 </section>
