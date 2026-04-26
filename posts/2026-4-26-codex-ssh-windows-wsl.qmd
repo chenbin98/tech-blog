@@ -1,0 +1,342 @@
+---
+title: "Codex App 通过 SSH 连接 Windows Server：WSL 方案完整指南"
+date: "2026-04-26"
+categories: [运维开发, AI 工具]
+tags: [Codex, SSH, Windows, WSL, Remote, OpenAI]
+description: "Codex App 的 Remote 功能依赖 Linux 类 Unix Shell，直接连接 Windows Server 会因 shell 不兼容而失败。本文提供通过 WSL 桥接的完整方案，涵盖环境安装、端口转发、SSH 免密配置和常见问题排查。"
+---
+
+## 问题背景
+
+Codex App 提供了 Remote 功能，允许通过 SSH 连接到远端机器进行 AI 辅助编码。但在尝试将 Windows Server 作为 Remote 主机时，会遇到一个根本性的兼容问题。
+
+具体表现如下：
+
+- Codex App 报错 `/bin/sh -lc` 执行失败
+- SSH 本身可以正常连接，但 Codex Remote 始终无法启动
+- 在 Windows PowerShell 环境下 `codex` 命令可用，但远程连接仍然失败
+
+这篇文章要解决的核心问题是：**如何让一个依赖 Linux shell 的工具，在 Windows Server 上正常运行。**
+
+为了安全，文中会隐藏真实 IP 地址、用户名等敏感信息，全部使用占位符代替。
+
+---
+
+## 原因分析
+
+### Codex Remote 依赖类 Unix Shell
+
+Codex App 在远端执行命令时，默认使用：
+
+```bash
+/bin/sh -lc "codex ..."
+```
+
+而 Windows 的默认 shell 是 PowerShell / cmd，两者在以下方面存在根本差异：
+
+| 维度 | Linux / WSL | Windows |
+|---|---|---|
+| 默认 Shell | `/bin/bash`, `/bin/sh` | `powershell.exe`, `cmd.exe` |
+| 启动脚本 | `~/.bashrc`, `~/.profile` | `$PROFILE`, 注册表 |
+| 路径格式 | `/home/user/...` | `C:\Users\...` |
+| 环境变量 | `export VAR=value` | `$env:VAR="value"` |
+
+👉 **结果**：Codex 尝试在 Windows SSH 会话中执行 `/bin/sh -lc`，但 Windows 上不存在这个路径，导致启动脚本执行失败。
+
+### Windows SSH ≠ Linux 环境
+
+即使基础的 SSH 连接可以成功：
+
+```bash
+ssh user@192.168.x.x
+# 连接正常，进入 PowerShell
+```
+
+Codex Remote 仍然需要 Linux 环境。这是因为 Codex 不仅依赖 shell 语法，还依赖 Linux 路径约定、环境变量传递方式、以及类 Unix 进程模型。
+
+**结论**：需要在 Windows 上提供一个 Linux 环境，WSL（Windows Subsystem for Linux）是最自然的选择。
+
+---
+
+## 解决方案
+
+### 整体架构
+
+```text
+Mac Codex App
+    ↓ SSH (Port 2222)
+Windows Server
+    ↓ 端口转发
+WSL Ubuntu（运行 Codex）
+```
+
+核心思路：让 SSH 连接到达 Windows 后，通过端口转发进入 WSL 中的 Ubuntu，在 WSL 内部运行 Codex。
+
+---
+
+### 第一步：安装 WSL
+
+在 Windows PowerShell 中执行：
+
+```powershell
+wsl --install -d Ubuntu
+```
+
+安装完成后重启系统，首次启动时设置 WSL 内的用户名和密码。
+
+> **注意**：WSL 1 和 WSL 2 均可，但 WSL 2 性能和兼容性更好。可通过 `wsl --set-version Ubuntu 2` 切换到 WSL 2。
+
+---
+
+### 第二步：在 WSL 中安装环境
+
+进入 WSL 终端，依次执行：
+
+```bash
+# 更新包列表
+sudo apt update
+
+# 安装 SSH 服务器和 curl
+sudo apt install -y openssh-server curl
+
+# 安装 nvm（Node Version Manager）
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
+source ~/.bashrc
+
+# 安装 Node.js LTS 版本
+nvm install --lts
+
+# 全局安装 Codex CLI
+npm i -g @openai/codex
+
+# 验证安装
+codex --version
+```
+
+---
+
+### 第三步：配置 WSL SSH 服务
+
+默认情况下 WSL 使用与 Windows 相同的 SSH 端口（22），为避免冲突，将 WSL SSH 改为 2222 端口：
+
+```bash
+# 修改 SSH 端口
+sudo sed -i 's/^#Port 22/Port 2222/' /etc/ssh/sshd_config
+
+# 重启 SSH 服务
+sudo service ssh restart
+
+# 获取 WSL 的 IP 地址
+hostname -I
+```
+
+记下 `hostname -I` 输出的 IP 地址（例如 `172.25.x.x`），后续端口转发需要用到。
+
+---
+
+### 第四步：配置 Windows 端口转发
+
+在 **Windows PowerShell（管理员模式）** 中执行：
+
+```powershell
+# 将 Windows 的 2222 端口转发到 WSL 的 2222 端口
+netsh interface portproxy add v4tov4 `
+    listenaddress=0.0.0.0 `
+    listenport=2222 `
+    connectaddress=<WSL_IP> `
+    connectport=2222
+
+# 添加防火墙规则，允许 2222 端口入站
+New-NetFirewallRule `
+    -DisplayName "WSL SSH 2222" `
+    -Direction Inbound `
+    -Action Allow `
+    -Protocol TCP `
+    -LocalPort 2222
+```
+
+> **注意**：`<WSL_IP>` 替换为上一步 `hostname -I` 获取的 WSL IP 地址。WSL 的 IP 在每次重启后可能变化，需要重新配置端口转发。
+
+---
+
+### 第五步：配置 Mac 端 SSH
+
+在 Mac 上编辑 `~/.ssh/config`，添加一个 Host 条目：
+
+```sshconfig
+Host win-wsl
+    HostName 192.168.x.x
+    User <windows_user>
+    Port 2222
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+```
+
+参数说明：
+
+| 参数 | 说明 |
+|---|---|
+| `HostName` | Windows Server 的 IP 地址 |
+| `User` | Windows 用户名（WSL 中对应的用户） |
+| `Port` | 2222（与端口转发一致） |
+| `IdentityFile` | 你的 SSH 私钥路径 |
+
+---
+
+### 第六步：配置 SSH 免密登录
+
+在 Mac 终端执行：
+
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub -p 2222 <user>@192.168.x.x
+```
+
+这会将会话中的公钥添加到 WSL 中对应用户的 `~/.ssh/authorized_keys`。
+
+验证免密登录：
+
+```bash
+ssh win-wsl
+# 应该无需输入密码直接进入 WSL
+```
+
+---
+
+### 第七步：在 Codex App 中配置 Remote 连接
+
+在 Codex App 中添加远程连接：
+
+| 配置项 | 值 |
+|---|---|
+| Display Name | `win-wsl` |
+| Host | `<user>@192.168.x.x` |
+| Port | `2222` |
+
+添加项目路径时注意路径格式：
+
+- **WSL 原生路径**：`/home/<user>/workshop/your_project`
+- **Windows 路径映射**：`/mnt/d/your_project`
+
+推荐使用 WSL 原生路径，性能更好。
+
+---
+
+### 第八步：验证连接
+
+```bash
+# 测试 SSH 连接
+ssh win-wsl
+
+# 在 WSL 中验证 Codex
+codex --version
+
+# 从 Codex App 发起 Remote 连接
+```
+
+如果一切正常，Codex App 应该能成功连接到 WSL 环境并开始 AI 辅助编码。
+
+---
+
+## 常见问题
+
+### 1. Connection refused
+
+**现象**：`ssh win-wsl` 报错 `Connection refused`
+
+**原因**：Windows 端口转发未配置，或 WSL SSH 服务未启动
+
+**排查**：
+
+```powershell
+# 检查端口转发规则
+netsh interface portproxy show all
+
+# 检查防火墙规则
+Get-NetFirewallRule -DisplayName "WSL SSH 2222"
+```
+
+```bash
+# 在 WSL 中检查 SSH 服务
+sudo service ssh status
+```
+
+### 2. 仍需输入密码
+
+**现象**：SSH 连接时仍然要求输入密码
+
+**原因**：SSH 公钥未正确添加到 WSL 的 `authorized_keys`，或私钥未加载到 ssh-agent
+
+**排查**：
+
+```bash
+# 在 Mac 上检查 ssh-agent
+ssh-add -l
+
+# 如果为空，添加私钥
+ssh-add ~/.ssh/id_ed25519
+
+# 在 WSL 中检查 authorized_keys
+cat ~/.ssh/authorized_keys
+```
+
+### 3. codex 命令找不到
+
+**现象**：SSH 连接成功，但执行 `codex --version` 提示 `command not found`
+
+**原因**：nvm 未在非交互式 shell 中加载
+
+**解决**：确保 `~/.bashrc` 中包含 nvm 初始化代码：
+
+```bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+```
+
+Codex 使用 `/bin/sh -lc` 执行命令，会加载 login shell 的配置文件，因此需要确保 nvm 在 `~/.profile` 或 `~/.bash_profile` 中也被加载。
+
+### 4. WSL IP 变化导致连接失败
+
+**现象**：之前能连上，重启后连接失败
+
+**原因**：WSL 2 使用虚拟网络，每次启动 IP 可能变化
+
+**解决**：每次启动后重新获取 IP 并更新端口转发：
+
+```powershell
+# 获取新 IP 后重新配置
+netsh interface portproxy delete v4tov4 listenaddress=0.0.0.0 listenport=2222
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=2222 connectaddress=<NEW_WSL_IP> connectport=2222
+```
+
+---
+
+## 总结
+
+### 关键要点
+
+1. **Codex Remote 依赖 Linux shell**：`/bin/sh -lc` 是硬需求，Windows PowerShell 无法替代
+2. **WSL 是桥接方案**：在 Windows 上提供完整的 Linux 环境
+3. **端口转发是必要条件**：将外部 SSH 请求从 Windows 转发到 WSL
+4. **SSH 免密是必要条件**：Codex Remote 需要无交互的 SSH 连接
+5. **PATH 必须在非交互 shell 可用**：nvm 等工具需要在 `~/.profile` 中初始化
+
+### 适用场景
+
+- 团队中有 Windows 服务器，但需要使用 Codex 等 Linux 依赖的 AI 编码工具
+- 需要在 Windows 环境下提供统一的开发环境
+- 远程协作场景下，统一使用 Linux 工具链
+
+### 扩展思路
+
+- 可以使用 WSL 2 的 `networkingMode=mirrored` 模式简化网络配置（Windows 11 22H2+）
+- 对于更复杂的场景，可以考虑在 Windows 上直接安装 Linux 虚拟机
+- 如果需要持久化 IP，可以配置 WSL 2 的固定 IP 脚本
+
+---
+
+## 参考文档
+
+- [Codex Remote Connections](https://developers.openai.com/codex/remote-connections)
+- [Codex CLI 文档](https://developers.openai.com/codex/cli)
+- [Codex Windows 支持](https://developers.openai.com/codex/windows)
+- [WSL 官方文档](https://learn.microsoft.com/en-us/windows/wsl/)
