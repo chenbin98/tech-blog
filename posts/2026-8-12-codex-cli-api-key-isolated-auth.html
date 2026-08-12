@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-05-11">
-<meta name="description" content="记录 Hugging Face ml-intern 的当前能力、技术边界，以及后续用于科研探索分析的可执行试用路径。">
+<meta name="dcterms.date" content="2026-08-12">
+<meta name="description" content="通过独立 CODEX_HOME 隔离 Codex CLI 的 API Key 认证，避免覆盖 Codex App 与默认 CLI 的 ChatGPT 订阅登录。">
 
-<title>Hugging Face ml-intern：一个面向科研探索的开源 ML 工程 Agent – Binchen’s Tech Blog</title>
+<title>Codex App 保持 ChatGPT 订阅登录，同时让 Codex CLI 使用 API Key – Binchen’s Tech Blog</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -162,19 +162,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#描述问题" id="toc-描述问题" class="nav-link active" data-scroll-target="#描述问题"><span class="header-section-number">1</span> 描述问题</a></li>
   <li><a href="#原因分析" id="toc-原因分析" class="nav-link" data-scroll-target="#原因分析"><span class="header-section-number">2</span> 原因分析</a>
   <ul class="collapse">
-  <li><a href="#文献优先而不是直接写训练脚本" id="toc-文献优先而不是直接写训练脚本" class="nav-link" data-scroll-target="#文献优先而不是直接写训练脚本"><span class="header-section-number">2.1</span> 1. 文献优先，而不是直接写训练脚本</a></li>
-  <li><a href="#hugging-face-生态工具比较完整" id="toc-hugging-face-生态工具比较完整" class="nav-link" data-scroll-target="#hugging-face-生态工具比较完整"><span class="header-section-number">2.2</span> 2. Hugging Face 生态工具比较完整</a></li>
-  <li><a href="#支持多种模型后端但本地模型需要外部推理服务" id="toc-支持多种模型后端但本地模型需要外部推理服务" class="nav-link" data-scroll-target="#支持多种模型后端但本地模型需要外部推理服务"><span class="header-section-number">2.3</span> 3. 支持多种模型后端，但本地模型需要外部推理服务</a></li>
-  <li><a href="#trace监控和可复盘性是内置考虑" id="toc-trace监控和可复盘性是内置考虑" class="nav-link" data-scroll-target="#trace监控和可复盘性是内置考虑"><span class="header-section-number">2.4</span> 4. Trace、监控和可复盘性是内置考虑</a></li>
-  <li><a href="#当前仍应按早期工具来使用" id="toc-当前仍应按早期工具来使用" class="nav-link" data-scroll-target="#当前仍应按早期工具来使用"><span class="header-section-number">2.5</span> 5. 当前仍应按早期工具来使用</a></li>
+  <li><a href="#codex-的认证方式决定计费来源" id="toc-codex-的认证方式决定计费来源" class="nav-link" data-scroll-target="#codex-的认证方式决定计费来源"><span class="header-section-number">2.1</span> Codex 的认证方式决定计费来源</a></li>
+  <li><a href="#默认认证缓存可能被多个-codex-客户端复用" id="toc-默认认证缓存可能被多个-codex-客户端复用" class="nav-link" data-scroll-target="#默认认证缓存可能被多个-codex-客户端复用"><span class="header-section-number">2.2</span> 默认认证缓存可能被多个 Codex 客户端复用</a></li>
+  <li><a href="#codex_home-可以建立独立认证空间" id="toc-codex_home-可以建立独立认证空间" class="nav-link" data-scroll-target="#codex_home-可以建立独立认证空间"><span class="header-section-number">2.3</span> <code>CODEX_HOME</code> 可以建立独立认证空间</a></li>
   </ul></li>
   <li><a href="#解决方法" id="toc-解决方法" class="nav-link" data-scroll-target="#解决方法"><span class="header-section-number">3</span> 解决方法</a>
   <ul class="collapse">
-  <li><a href="#第一步本地安装并确认-cli-可用" id="toc-第一步本地安装并确认-cli-可用" class="nav-link" data-scroll-target="#第一步本地安装并确认-cli-可用"><span class="header-section-number">3.1</span> 第一步：本地安装并确认 CLI 可用</a></li>
-  <li><a href="#第二步先做文献和数据集探索任务" id="toc-第二步先做文献和数据集探索任务" class="nav-link" data-scroll-target="#第二步先做文献和数据集探索任务"><span class="header-section-number">3.2</span> 第二步：先做文献和数据集探索任务</a></li>
-  <li><a href="#第三步再让它生成最小可运行实验" id="toc-第三步再让它生成最小可运行实验" class="nav-link" data-scroll-target="#第三步再让它生成最小可运行实验"><span class="header-section-number">3.3</span> 第三步：再让它生成最小可运行实验</a></li>
-  <li><a href="#第四步把长任务放到可追踪环境中运行" id="toc-第四步把长任务放到可追踪环境中运行" class="nav-link" data-scroll-target="#第四步把长任务放到可追踪环境中运行"><span class="header-section-number">3.4</span> 第四步：把长任务放到可追踪环境中运行</a></li>
-  <li><a href="#第五步保留人工审稿式复核" id="toc-第五步保留人工审稿式复核" class="nav-link" data-scroll-target="#第五步保留人工审稿式复核"><span class="header-section-number">3.5</span> 第五步：保留人工审稿式复核</a></li>
+  <li><a href="#第一步确认默认登录仍然是-chatgpt" id="toc-第一步确认默认登录仍然是-chatgpt" class="nav-link" data-scroll-target="#第一步确认默认登录仍然是-chatgpt"><span class="header-section-number">3.1</span> 第一步：确认默认登录仍然是 ChatGPT</a></li>
+  <li><a href="#第二步创建-api-key-专用目录" id="toc-第二步创建-api-key-专用目录" class="nav-link" data-scroll-target="#第二步创建-api-key-专用目录"><span class="header-section-number">3.2</span> 第二步：创建 API Key 专用目录</a></li>
+  <li><a href="#第三步安全读取-api-key-并登录隔离目录" id="toc-第三步安全读取-api-key-并登录隔离目录" class="nav-link" data-scroll-target="#第三步安全读取-api-key-并登录隔离目录"><span class="header-section-number">3.3</span> 第三步：安全读取 API Key 并登录隔离目录</a></li>
+  <li><a href="#第四步分别验证两套认证" id="toc-第四步分别验证两套认证" class="nav-link" data-scroll-target="#第四步分别验证两套认证"><span class="header-section-number">3.4</span> 第四步：分别验证两套认证</a></li>
+  <li><a href="#第五步启动-api-key-版-cli" id="toc-第五步启动-api-key-版-cli" class="nav-link" data-scroll-target="#第五步启动-api-key-版-cli"><span class="header-section-number">3.5</span> 第五步：启动 API Key 版 CLI</a></li>
+  <li><a href="#第六步建立不易输错的快捷命令" id="toc-第六步建立不易输错的快捷命令" class="nav-link" data-scroll-target="#第六步建立不易输错的快捷命令"><span class="header-section-number">3.6</span> 第六步：建立不易输错的快捷命令</a></li>
+  <li><a href="#第七步只退出-api-key-版-cli" id="toc-第七步只退出-api-key-版-cli" class="nav-link" data-scroll-target="#第七步只退出-api-key-版-cli"><span class="header-section-number">3.7</span> 第七步：只退出 API Key 版 CLI</a></li>
+  <li><a href="#进一步提高隔离等级" id="toc-进一步提高隔离等级" class="nav-link" data-scroll-target="#进一步提高隔离等级"><span class="header-section-number">3.8</span> 进一步提高隔离等级</a></li>
   </ul></li>
   <li><a href="#总结" id="toc-总结" class="nav-link" data-scroll-target="#总结"><span class="header-section-number">4</span> 总结</a></li>
   <li><a href="#参考链接" id="toc-参考链接" class="nav-link" data-scroll-target="#参考链接"><span class="header-section-number">5</span> 参考链接</a></li>
@@ -190,17 +191,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Hugging Face ml-intern：一个面向科研探索的开源 ML 工程 Agent</h1>
+<h1 class="title">Codex App 保持 ChatGPT 订阅登录，同时让 Codex CLI 使用 API Key</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">AI工具</div>
-    <div class="quarto-category">科研</div>
-    <div class="quarto-category">机器学习</div>
+    <div class="quarto-category">AI 工具</div>
+    <div class="quarto-category">开发环境</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    记录 Hugging Face ml-intern 的当前能力、技术边界，以及后续用于科研探索分析的可执行试用路径。
+    通过独立 CODEX_HOME 隔离 Codex CLI 的 API Key 认证，避免覆盖 Codex App 与默认 CLI 的 ChatGPT 订阅登录。
   </div>
 </div>
 
@@ -211,7 +211,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 11, 2026</p>
+      <p class="date">August 12, 2026</p>
     </div>
   </div>
   
@@ -225,28 +225,134 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="描述问题" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="描述问题"><span class="header-section-number">1</span> 描述问题</h2>
-<p>最近看到 Hugging Face 开源了 <a href="https://github.com/huggingface/ml-intern"><code>ml-intern</code></a>。它的定位不是普通聊天助手，而是一个面向机器学习工程任务的 agent：能够围绕 Hugging Face 生态阅读论文、查文档、找数据集、写代码、运行训练任务，并把结果交付到 Hub 或相关工作流中。</p>
-<p>这类工具对科研场景很有吸引力。很多科研探索并不是单纯写一段代码，而是一个连续链条：</p>
+<p>Codex 支持两种主要认证方式：</p>
 <ul>
-<li>先读文献，判断当前方法路线是否可靠；</li>
-<li>再确认数据集、模型、指标和训练 recipe；</li>
-<li>然后写实验脚本，做小规模验证；</li>
-<li>最后运行训练、记录日志、保存模型和结果。</li>
+<li>使用 ChatGPT 账号登录，消耗 ChatGPT 套餐包含的 Codex 额度；</li>
+<li>使用 OpenAI API Key 登录，由 OpenAI Platform 按 API 用量单独计费。</li>
 </ul>
-<p>传统代码助手通常只覆盖其中一段，例如补全代码或解释报错。<code>ml-intern</code> 值得关注的原因在于，它试图把“文献证据 → 数据核验 → 代码实现 → 云端运行 → 结果追踪”串成一个 ML 工程闭环。</p>
-<p>本文记录当前仓库中可以确认的能力，并给出后续用于科研探索分析时比较稳妥的试用方式。</p>
+<p>一个常见需求是让两种方式同时存在：Codex App 继续使用已经授权的 ChatGPT 订阅账号，而终端中的 Codex CLI 改用 API Key。对于登录需要组织管理员或他人协助授权的账号，最重要的要求不是“能否切换回来”，而是<strong>切换 CLI 时绝不能破坏当前登录状态</strong>。</p>
+<p>直接执行下面这类常见命令存在风险：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">codex</span> logout</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">printenv</span> OPENAI_API_KEY <span class="kw">|</span> <span class="ex">codex</span> login <span class="at">--with-api-key</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>问题不在于 ChatGPT 订阅与 API 计费会发生冲突，而在于本地客户端可能使用同一份默认认证缓存。<code>codex logout</code> 会清除默认认证；随后使用 API Key 登录，则会把默认认证方式替换为 API Key。即使 Codex App 当时没有立刻退出，后续重启或刷新凭据时也可能无法继续使用原来的订阅登录。</p>
+<p>本文给出一种更保守的做法：为 API Key 版 CLI 指定独立的 <code>CODEX_HOME</code>，使它拥有单独的认证文件和配置目录，不改动默认的 <code>~/.codex</code>。</p>
 </section>
 <section id="原因分析" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="原因分析"><span class="header-section-number">2</span> 原因分析</h2>
-<p>从仓库 README 和源码结构看，<code>ml-intern</code> 的核心判断是：<strong>机器学习任务的难点不只是写代码，而是把研究证据、数据、训练环境和交付链路连接起来。</strong></p>
-<section id="文献优先而不是直接写训练脚本" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="文献优先而不是直接写训练脚本"><span class="header-section-number">2.1</span> 1. 文献优先，而不是直接写训练脚本</h3>
-<p>仓库中的系统提示明确强调：在写 ML 代码前，应该先从文献开始。默认流程包括寻找 landmark papers、追踪 citation graph、阅读方法和实验章节、提取数据集与超参数，并把“某个 recipe 产生了什么结果”记录下来。</p>
-<p>这对科研探索很重要。很多失败实验不是因为代码写错，而是因为一开始就选错了数据集、指标或训练方案。<code>ml-intern</code> 内置的 research 工具被设计成一个独立上下文的研究子代理，可以调用论文、文档、GitHub 示例、数据集检查等只读工具，减少主上下文被大量检索输出污染。</p>
+<section id="codex-的认证方式决定计费来源" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="codex-的认证方式决定计费来源"><span class="header-section-number">2.1</span> Codex 的认证方式决定计费来源</h3>
+<p>OpenAI 官方认证文档说明，Codex 本地客户端支持两种 OpenAI 登录方式：</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>登录方式</th>
+<th>访问与计费方式</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sign in with ChatGPT</td>
+<td>使用 ChatGPT 订阅访问和相应套餐额度</td>
+</tr>
+<tr class="even">
+<td>Sign in with an API key</td>
+<td>使用 OpenAI Platform API 账户，按标准 API 价格计费</td>
+</tr>
+</tbody>
+</table>
+<p>API Key 认证适用于本地 CLI 和自动化工作流，但依赖 ChatGPT workspace 或 Codex Cloud 的部分功能可能受限。换句话说，两种登录的费用来源可以分开，真正需要处理的是本地凭据存放位置。</p>
 </section>
-<section id="hugging-face-生态工具比较完整" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="hugging-face-生态工具比较完整"><span class="header-section-number">2.2</span> 2. Hugging Face 生态工具比较完整</h3>
-<p>源码中的 <code>ToolRouter</code> 注册了多类内置工具，覆盖面明显偏向 ML 工程：</p>
+<section id="默认认证缓存可能被多个-codex-客户端复用" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="默认认证缓存可能被多个-codex-客户端复用"><span class="header-section-number">2.2</span> 默认认证缓存可能被多个 Codex 客户端复用</h3>
+<p>官方文档明确指出，Codex CLI 与 IDE 扩展会共享缓存的登录信息；在任一端退出后，另一端下次使用时也可能需要重新登录。认证信息通常保存在操作系统凭据存储中，或者默认目录下的：</p>
+<pre class="text"><code>~/.codex/auth.json</code></pre>
+<p>在一次 macOS 实机排查中还观察到：</p>
+<ol type="1">
+<li>默认运行 <code>codex login status</code> 显示 <code>Logged in using ChatGPT</code>；</li>
+<li>Codex App 运行的后端进程和终端 CLI 都是同一套 Codex 后端程序；</li>
+<li>默认 <code>~/.codex</code> 中存在当前 ChatGPT 登录的 <code>auth.json</code>；</li>
+<li>对一个全新的独立 <code>CODEX_HOME</code> 运行状态检查时，结果为 <code>Not logged in</code>；</li>
+<li>再次检查默认目录，原来的 ChatGPT 登录仍然有效。</li>
+</ol>
+<p>由此可以得出两个层次的判断：</p>
+<ul>
+<li><strong>官方确认的事实</strong>：CLI 与 IDE 扩展共享默认登录缓存，<code>CODEX_HOME</code> 是认证文件所在目录；</li>
+<li><strong>本机验证的判断</strong>：不要假设 Codex App 与默认 CLI 的认证一定完全独立，涉及难以恢复的账号时应主动隔离。</li>
+</ul>
+</section>
+<section id="codex_home-可以建立独立认证空间" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="codex_home-可以建立独立认证空间"><span class="header-section-number">2.3</span> <code>CODEX_HOME</code> 可以建立独立认证空间</h3>
+<p><code>CODEX_HOME</code> 用于指定 Codex 的工作目录。默认值是 <code>~/.codex</code>，而改成另一个目录后，Codex 会在那里查找或创建自己的认证与配置。</p>
+<p>OpenAI Codex 仓库维护者也说明，不同的 <code>CODEX_HOME</code> 被设计为相互独立，可用于分别保存不同认证。需要注意的是，不应复制或软链接 ChatGPT OAuth 的 <code>auth.json</code> 到多个目录，因为 OAuth 刷新令牌可能失效。本文的方案不复制现有认证，而是在新目录中独立登录 API Key，因此没有这个问题。</p>
+</section>
+</section>
+<section id="解决方法" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="解决方法"><span class="header-section-number">3</span> 解决方法</h2>
+<p>下面的步骤适用于 macOS 和 zsh。执行过程中<strong>不要运行普通的 <code>codex logout</code></strong>，也不要在默认目录中执行 API Key 登录。</p>
+<section id="第一步确认默认登录仍然是-chatgpt" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="第一步确认默认登录仍然是-chatgpt"><span class="header-section-number">3.1</span> 第一步：确认默认登录仍然是 ChatGPT</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">codex</span> login status</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>预期输出类似：</p>
+<pre class="text"><code>Logged in using ChatGPT</code></pre>
+<p>如果这里已经不是 ChatGPT 登录，应先停止操作并确认当前状态，不要继续覆盖认证。</p>
+</section>
+<section id="第二步创建-api-key-专用目录" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="第二步创建-api-key-专用目录"><span class="header-section-number">3.2</span> 第二步：创建 API Key 专用目录</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">"</span><span class="va">$HOME</span><span class="st">/.codex-api"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>这里的 <code>.codex-api</code> 与默认的 <code>.codex</code> 是两个不同目录：</p>
+<pre class="text"><code>~/.codex       # Codex App、默认 CLI 或 IDE 使用的现有登录
+~/.codex-api   # API Key 版 CLI 的独立认证空间</code></pre>
+</section>
+<section id="第三步安全读取-api-key-并登录隔离目录" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="第三步安全读取-api-key-并登录隔离目录"><span class="header-section-number">3.3</span> 第三步：安全读取 API Key 并登录隔离目录</h3>
+<p>不要把真实 API Key 直接写进命令或 shell 历史。使用 zsh 的静默输入：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">read</span> <span class="at">-s</span> <span class="st">"CODEX_API_KEY?请输入 OpenAI API Key: "</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">printf</span> <span class="st">'%s'</span> <span class="st">"</span><span class="va">$CODEX_API_KEY</span><span class="st">"</span> <span class="kw">|</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">env</span> CODEX_HOME=<span class="st">"</span><span class="va">$HOME</span><span class="st">/.codex-api"</span> codex login <span class="at">--with-api-key</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">unset</span> <span class="va">CODEX_API_KEY</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>这里最关键的不是变量名，而是每次涉及 API 认证的 <code>codex</code> 命令前都有：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> CODEX_HOME=<span class="st">"</span><span class="va">$HOME</span><span class="st">/.codex-api"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>unset</code> 只会删除当前终端中的临时环境变量，不会撤销已经缓存到隔离目录中的 CLI 登录。</p>
+</section>
+<section id="第四步分别验证两套认证" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="第四步分别验证两套认证"><span class="header-section-number">3.4</span> 第四步：分别验证两套认证</h3>
+<p>先检查 API Key 版 CLI：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> CODEX_HOME=<span class="st">"</span><span class="va">$HOME</span><span class="st">/.codex-api"</span> codex login status</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>预期输出：</p>
+<pre class="text"><code>Logged in using an API key</code></pre>
+<p>然后检查默认 ChatGPT 登录：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">codex</span> login status</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>预期仍然是：</p>
+<pre class="text"><code>Logged in using ChatGPT</code></pre>
+<p>只有两个检查都符合预期，才说明隔离登录成功。</p>
+</section>
+<section id="第五步启动-api-key-版-cli" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="第五步启动-api-key-版-cli"><span class="header-section-number">3.5</span> 第五步：启动 API Key 版 CLI</h3>
+<p>以后必须使用下面的命令启动按 API 计费的 CLI：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> CODEX_HOME=<span class="st">"</span><span class="va">$HOME</span><span class="st">/.codex-api"</span> codex</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>直接运行：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">codex</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>仍然进入默认认证空间，通常会继续使用 ChatGPT 订阅账号和订阅额度。</p>
+</section>
+<section id="第六步建立不易输错的快捷命令" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="第六步建立不易输错的快捷命令"><span class="header-section-number">3.6</span> 第六步：建立不易输错的快捷命令</h3>
+<p>可以在 <code>~/.zshrc</code> 中增加一个函数：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">codex-api()</span> <span class="kw">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">CODEX_HOME</span><span class="op">=</span><span class="st">"</span><span class="va">$HOME</span><span class="st">/.codex-api"</span> <span class="bu">command</span> codex <span class="st">"</span><span class="va">$@</span><span class="st">"</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>重新加载配置：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> <span class="st">"</span><span class="va">$HOME</span><span class="st">/.zshrc"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>此后使用：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">codex-api</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">codex-api</span> login status</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>为了避免混淆，可以把两种命令记成下面的映射：</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -255,187 +361,70 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </colgroup>
 <thead>
 <tr class="header">
-<th>能力</th>
-<th>当前证据</th>
-<th>适合的科研用途</th>
+<th>使用方式</th>
+<th>命令</th>
+<th>认证与计费</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>论文检索与阅读</td>
-<td><code>hf_papers</code> 支持 search、paper details、citation graph、read paper 等操作</td>
-<td>快速整理某一方法路线的代表论文与实验 recipe</td>
+<td>Codex App</td>
+<td>从桌面正常打开</td>
+<td>保持现有 ChatGPT 订阅登录</td>
 </tr>
 <tr class="even">
-<td>文档检索</td>
-<td><code>explore_hf_docs</code>、<code>fetch_hf_docs</code>、OpenAPI search</td>
-<td>避免使用过期的 Transformers、TRL、Datasets API</td>
+<td>默认终端 CLI</td>
+<td><code>codex</code></td>
+<td>默认 <code>~/.codex</code> 中的 ChatGPT 登录</td>
 </tr>
 <tr class="odd">
-<td>数据集检查</td>
-<td><code>hf_inspect_dataset</code> 调用 datasets-server API 查看 splits、schema、sample rows</td>
-<td>在训练前确认数据列、格式和样本内容</td>
-</tr>
-<tr class="even">
-<td>GitHub 示例搜索</td>
-<td><code>github_find_examples</code>、<code>github_read_file</code></td>
-<td>找当前库的真实示例脚本，而不是凭记忆写 API</td>
-</tr>
-<tr class="odd">
-<td>Hub 仓库操作</td>
-<td><code>hf_repo_files</code>、<code>hf_repo_git</code></td>
-<td>读取、上传、创建分支、创建 PR、管理模型/数据集/Space 仓库</td>
-</tr>
-<tr class="even">
-<td>训练运行</td>
-<td><code>hf_jobs</code></td>
-<td>将验证后的脚本提交到 Hugging Face Jobs 运行</td>
-</tr>
-<tr class="odd">
-<td>沙箱执行</td>
-<td><code>sandbox_create</code>、<code>bash</code>、<code>read</code>、<code>write</code>、<code>edit</code></td>
-<td>在隔离环境中先做小规模测试</td>
-</tr>
-<tr class="even">
-<td>计划与通知</td>
-<td><code>plan_tool</code>、<code>notify</code>、Slack gateway</td>
-<td>长任务中维护步骤，并在需要人工审批或出错时通知</td>
+<td>API 版终端 CLI</td>
+<td><code>codex-api</code></td>
+<td>独立 <code>.codex-api</code> 中的 API Key，按量计费</td>
 </tr>
 </tbody>
 </table>
-<p>这说明 <code>ml-intern</code> 不是只在提示词里说自己能做 ML，而是在工具层面围绕 Hugging Face 研究和工程流程做了专门设计。</p>
 </section>
-<section id="支持多种模型后端但本地模型需要外部推理服务" class="level3" data-number="2.3">
-<h3 data-number="2.3" class="anchored" data-anchor-id="支持多种模型后端但本地模型需要外部推理服务"><span class="header-section-number">2.3</span> 3. 支持多种模型后端，但本地模型需要外部推理服务</h3>
-<p>README 中的 CLI 用法支持交互模式和 headless 单次任务模式：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ml-intern</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ml-intern</span> <span class="st">"fine-tune llama on my dataset"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>模型后端可以使用 Anthropic、OpenAI、HF Router，也可以连接本地推理服务。需要注意的是，本地模型支持并不是直接从磁盘加载权重，而是通过 LiteLLM 访问 OpenAI-compatible HTTP endpoint。例如先启动 Ollama、vLLM、LM Studio 或 llama.cpp server，再使用类似下面的模型 ID：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ml-intern</span> <span class="at">--model</span> ollama/llama3.1:8b <span class="st">"inspect this dataset and propose an SFT recipe"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ml-intern</span> <span class="at">--model</span> vllm/meta-llama/Llama-3.1-8B-Instruct <span class="st">"summarize current GRPO examples"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>这个设计比较实际：agent 本身负责研究、规划和工具调用，模型推理由外部服务承担。</p>
+<section id="第七步只退出-api-key-版-cli" class="level3" data-number="3.7">
+<h3 data-number="3.7" class="anchored" data-anchor-id="第七步只退出-api-key-版-cli"><span class="header-section-number">3.7</span> 第七步：只退出 API Key 版 CLI</h3>
+<p>如果以后需要移除 API Key 认证，必须指定隔离目录：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> CODEX_HOME=<span class="st">"</span><span class="va">$HOME</span><span class="st">/.codex-api"</span> codex logout</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>不要误写成：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">codex</span> logout</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>后者作用于默认认证空间，可能清除需要保留的 ChatGPT 登录。</p>
 </section>
-<section id="trace监控和可复盘性是内置考虑" class="level3" data-number="2.4">
-<h3 data-number="2.4" class="anchored" data-anchor-id="trace监控和可复盘性是内置考虑"><span class="header-section-number">2.4</span> 4. Trace、监控和可复盘性是内置考虑</h3>
-<p>README 中提到，session 会默认上传到用户自己的私有 Hugging Face dataset，并使用 Agent Trace Viewer 查看 turns、tool calls 和 model responses。配置中也可以关闭 trace sharing 或修改目标仓库。</p>
-<p>这对科研探索有价值，因为 agent 运行过程本身就是实验记录的一部分。后续如果要复盘一次训练为什么失败、某个 dataset 为什么被选中、某篇论文中的 recipe 如何被转成脚本，trace 比最终答案更重要。</p>
-<p>不过，这也带来一个使用前必须确认的问题：是否允许把 agent 过程记录上传到 Hugging Face Hub。即使默认是私有 dataset，也应该在正式处理未公开数据或敏感项目之前检查配置。</p>
-</section>
-<section id="当前仍应按早期工具来使用" class="level3" data-number="2.5">
-<h3 data-number="2.5" class="anchored" data-anchor-id="当前仍应按早期工具来使用"><span class="header-section-number">2.5</span> 5. 当前仍应按早期工具来使用</h3>
-<p>仓库页面显示目前没有正式 GitHub release；<code>pyproject.toml</code> 中版本为 <code>0.1.0</code>。因此更稳妥的定位不是“直接替代研究助理”，而是“用于低风险探索任务的 ML agent 原型”。</p>
-<p>实际使用时，应把关键判断拆出来人工复核，尤其是：</p>
+<section id="进一步提高隔离等级" class="level3" data-number="3.8">
+<h3 data-number="3.8" class="anchored" data-anchor-id="进一步提高隔离等级"><span class="header-section-number">3.8</span> 进一步提高隔离等级</h3>
+<p>独立 <code>CODEX_HOME</code> 已经能隔离 Codex 的认证和配置。若账号重新授权极其困难，或者需要组织合规级别的隔离，还可以把 API Key 版 CLI 放在以下环境之一：</p>
 <ul>
-<li>论文结论是否真的支持推荐的训练 recipe；</li>
-<li>数据集字段和许可证是否适合当前研究；</li>
-<li>训练脚本是否保存模型、指标和日志；</li>
-<li>提交到 HF Jobs 前是否做过小规模测试；</li>
-<li>trace、token、私有数据是否符合隐私要求。</li>
+<li>单独的 macOS 用户账户；</li>
+<li>Docker 容器；</li>
+<li>虚拟机或远端开发主机。</li>
 </ul>
-</section>
-</section>
-<section id="解决方法" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="解决方法"><span class="header-section-number">3</span> 解决方法</h2>
-<p>后续如果尝试把 <code>ml-intern</code> 用于科研探索，我会从一个低风险、可复盘的小任务开始，而不是直接交给它完整论文实验。</p>
-<section id="第一步本地安装并确认-cli-可用" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="第一步本地安装并确认-cli-可用"><span class="header-section-number">3.1</span> 第一步：本地安装并确认 CLI 可用</h3>
-<p>按照 README，目前安装路径是：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/huggingface/ml-intern.git</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ml-intern</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> sync</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-e</span> .</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">ml-intern</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>如果需要使用云端模型或 Hub 能力，需要准备对应环境变量。这里不要把真实凭据写进脚本或博客，只保留变量名：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ANTHROPIC_API_KEY</span><span class="op">=</span><span class="st">"&lt;your-anthropic-api-key&gt;"</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">OPENAI_API_KEY</span><span class="op">=</span><span class="st">"&lt;your-openai-api-key&gt;"</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">HF_TOKEN</span><span class="op">=</span><span class="st">"&lt;your-hugging-face-token&gt;"</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">GITHUB_TOKEN</span><span class="op">=</span><span class="st">"&lt;your-github-token&gt;"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>如果只测试本地模型，可以先启动本地 OpenAI-compatible 服务，再指定模型：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ml-intern</span> <span class="at">--model</span> ollama/llama3.1:8b <span class="st">"summarize the capabilities of this repo"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="第二步先做文献和数据集探索任务" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="第二步先做文献和数据集探索任务"><span class="header-section-number">3.2</span> 第二步：先做文献和数据集探索任务</h3>
-<p>一个适合科研试用的任务应该足够具体，并且结果容易人工验证。例如：</p>
-<pre class="text"><code>Research recent papers on rice phenology modeling with deep learning.
-Find 3-5 representative methods, extract datasets, target variables,
-evaluation metrics, and whether code or data are available.
-Do not write training code yet. Return a table with evidence and gaps.</code></pre>
-<p>这个任务的目标不是立刻得到可发表结果，而是测试 <code>ml-intern</code> 是否能做到三件事：</p>
-<ol type="1">
-<li>把文献证据和方法结论对应起来；</li>
-<li>不把不存在的数据集或代码说成已经可用；</li>
-<li>清楚标出哪些信息需要人工继续核查。</li>
-</ol>
-</section>
-<section id="第三步再让它生成最小可运行实验" class="level3" data-number="3.3">
-<h3 data-number="3.3" class="anchored" data-anchor-id="第三步再让它生成最小可运行实验"><span class="header-section-number">3.3</span> 第三步：再让它生成最小可运行实验</h3>
-<p>如果第一步输出可靠，再进入代码阶段。提示词要要求它先验证数据格式，再写最小脚本：</p>
-<pre class="text"><code>Using the most feasible dataset from the previous research step,
-inspect the dataset schema and sample rows first.
-Then write a minimal baseline training script.
-Run a smoke test on a tiny subset.
-Do not launch a full training job until the smoke test passes.</code></pre>
-<p>这个顺序很关键。科研代码里最常见的问题是数据列名、split、label 编码、时间范围或空间范围不符合假设。<code>hf_inspect_dataset</code> 这类工具应该在写训练脚本前使用，而不是等报错后再补救。</p>
-</section>
-<section id="第四步把长任务放到可追踪环境中运行" class="level3" data-number="3.4">
-<h3 data-number="3.4" class="anchored" data-anchor-id="第四步把长任务放到可追踪环境中运行"><span class="header-section-number">3.4</span> 第四步：把长任务放到可追踪环境中运行</h3>
-<p>对需要 GPU 或较长时间的任务，可以让 <code>ml-intern</code> 使用 HF Jobs。但提交前要让它输出 pre-flight check：</p>
-<pre class="text"><code>Before launching the job, report:
-- reference implementation used
-- dataset columns verified
-- model and tokenizer verified
-- output model or artifact destination
-- timeout and hardware choice
-- monitoring or trace URL</code></pre>
-<p>这一步的目标是把 agent 的自动化行为变成可审查的实验计划，而不是让它直接消耗算力。</p>
-</section>
-<section id="第五步保留人工审稿式复核" class="level3" data-number="3.5">
-<h3 data-number="3.5" class="anchored" data-anchor-id="第五步保留人工审稿式复核"><span class="header-section-number">3.5</span> 第五步：保留人工审稿式复核</h3>
-<p>即使 <code>ml-intern</code> 能自动检索、写代码、跑实验，也不应该跳过科研判断。每次任务结束后，至少复核下面几项：</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>复核项</th>
-<th>判断标准</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>文献依据</td>
-<td>推荐方法是否来自真实论文，结果是否和 recipe 对应</td>
-</tr>
-<tr class="even">
-<td>数据可用性</td>
-<td>数据集是否真实存在，字段是否匹配，许可证是否允许使用</td>
-</tr>
-<tr class="odd">
-<td>代码正确性</td>
-<td>是否使用当前 API，是否有最小测试，是否保存输出</td>
-</tr>
-<tr class="even">
-<td>实验可复现性</td>
-<td>是否记录 commit、依赖、参数、随机种子和运行日志</td>
-</tr>
-<tr class="odd">
-<td>隐私与安全</td>
-<td>是否上传了不该公开的 trace、数据或 token</td>
-</tr>
-</tbody>
-</table>
+<p>这类方式不仅分离认证文件，也分离操作系统凭据存储和进程环境。</p>
 </section>
 </section>
 <section id="总结" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="总结"><span class="header-section-number">4</span> 总结</h2>
-<p><code>ml-intern</code> 当前最值得关注的地方，不是“又一个会写代码的 agent”，而是它把 ML 研究任务拆成了更接近真实科研流程的闭环：</p>
-<pre class="text"><code>文献检索 → recipe 抽取 → 数据集核验 → 代码实现 → 沙箱测试 → Jobs 运行 → Hub 交付 → trace 复盘</code></pre>
-<p>从仓库证据看，它已经具备比较完整的 Hugging Face 生态工具链：论文、文档、数据集、模型仓库、GitHub 示例、Jobs、沙箱、trace 和通知都被纳入同一个 agent loop。对后续科研探索来说，这很适合做“早期方法扫描、数据集可用性判断、baseline 脚本生成、小规模 smoke test、训练任务包装”等工作。</p>
-<p>但它仍然应该被保守使用。当前没有正式 release，很多行为依赖外部 token、云端服务和 agent 自动判断。最合适的使用策略是：先让它做低风险探索和可验证的中间产物，再逐步进入训练与交付；所有关键结论仍按科研审稿标准人工复核。</p>
+<p>ChatGPT 订阅登录和 OpenAI API Key 登录在计费上并不冲突，但在同一台电脑上直接切换默认 Codex 认证可能覆盖共享缓存。对于难以重新授权的账号，不能仅凭“App 当前没有退出”判断安全。</p>
+<p>最稳妥的本地方案是：</p>
+<pre class="text"><code>默认 ~/.codex       → 保留 ChatGPT 订阅登录
+独立 ~/.codex-api   → 保存 API Key 版 CLI 登录</code></pre>
+<p>下次遇到类似的多账号或多计费来源需求，可以遵循四条规则：</p>
+<ol type="1">
+<li>切换认证前先运行 <code>codex login status</code>；</li>
+<li>不在默认目录执行 <code>codex logout</code> 或 API Key 登录；</li>
+<li>为第二套认证设置独立 <code>CODEX_HOME</code>；</li>
+<li>登录后分别检查默认目录与隔离目录，确认两套状态均符合预期。</li>
+</ol>
+<p>这套方法的核心不是“登录后还能切回来”，而是从一开始就不修改需要保护的登录。</p>
 </section>
 <section id="参考链接" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="参考链接"><span class="header-section-number">5</span> 参考链接</h2>
 <ul>
-<li><a href="https://github.com/huggingface/ml-intern"><code>huggingface/ml-intern</code> GitHub 仓库</a></li>
-<li><a href="https://huggingface.co/changelog/agent-trace-viewer">Hugging Face Agent Trace Viewer 更新说明</a></li>
+<li><a href="https://learn.chatgpt.com/docs/auth">OpenAI Codex：Authentication</a></li>
+<li><a href="https://github.com/openai/codex">OpenAI Codex GitHub 仓库</a></li>
+<li><a href="https://github.com/openai/codex/issues/15410">关于独立 <code>CODEX_HOME</code> 认证空间的官方仓库说明</a></li>
 </ul>
 
 

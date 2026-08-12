@@ -2,6 +2,7 @@
   {
     "listing": "/posts/index.html",
     "items": [
+      "/posts/2026-8-12-codex-cli-api-key-isolated-auth.html",
       "/posts/2026-5-11-huggingface-ml-intern-research-agent.html",
       "/posts/2026-4-26-codex-ssh-windows-wsl.html",
       "/posts/2026-4-25-ssh-key-login-debug.html",
@@ -27,6 +28,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2026-8-12-codex-cli-api-key-isolated-auth.html",
       "/posts/2026-5-11-huggingface-ml-intern-research-agent.html",
       "/posts/2026-4-26-codex-ssh-windows-wsl.html",
       "/posts/2026-4-25-ssh-key-login-debug.html",
