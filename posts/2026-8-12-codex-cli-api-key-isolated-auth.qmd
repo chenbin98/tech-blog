@@ -1,0 +1,247 @@
+---
+title: "Codex App 保持 ChatGPT 订阅登录，同时让 Codex CLI 使用 API Key"
+date: "2026-08-12"
+categories: [AI 工具, 开发环境]
+tags: [Codex, Codex CLI, ChatGPT, OpenAI API, API Key, CODEX_HOME]
+description: "通过独立 CODEX_HOME 隔离 Codex CLI 的 API Key 认证，避免覆盖 Codex App 与默认 CLI 的 ChatGPT 订阅登录。"
+---
+
+## 描述问题
+
+Codex 支持两种主要认证方式：
+
+- 使用 ChatGPT 账号登录，消耗 ChatGPT 套餐包含的 Codex 额度；
+- 使用 OpenAI API Key 登录，由 OpenAI Platform 按 API 用量单独计费。
+
+一个常见需求是让两种方式同时存在：Codex App 继续使用已经授权的 ChatGPT 订阅账号，而终端中的 Codex CLI 改用 API Key。对于登录需要组织管理员或他人协助授权的账号，最重要的要求不是“能否切换回来”，而是**切换 CLI 时绝不能破坏当前登录状态**。
+
+直接执行下面这类常见命令存在风险：
+
+```bash
+codex logout
+printenv OPENAI_API_KEY | codex login --with-api-key
+```
+
+问题不在于 ChatGPT 订阅与 API 计费会发生冲突，而在于本地客户端可能使用同一份默认认证缓存。`codex logout` 会清除默认认证；随后使用 API Key 登录，则会把默认认证方式替换为 API Key。即使 Codex App 当时没有立刻退出，后续重启或刷新凭据时也可能无法继续使用原来的订阅登录。
+
+本文给出一种更保守的做法：为 API Key 版 CLI 指定独立的 `CODEX_HOME`，使它拥有单独的认证文件和配置目录，不改动默认的 `~/.codex`。
+
+## 原因分析
+
+### Codex 的认证方式决定计费来源
+
+OpenAI 官方认证文档说明，Codex 本地客户端支持两种 OpenAI 登录方式：
+
+| 登录方式 | 访问与计费方式 |
+|---|---|
+| Sign in with ChatGPT | 使用 ChatGPT 订阅访问和相应套餐额度 |
+| Sign in with an API key | 使用 OpenAI Platform API 账户，按标准 API 价格计费 |
+
+API Key 认证适用于本地 CLI 和自动化工作流，但依赖 ChatGPT workspace 或 Codex Cloud 的部分功能可能受限。换句话说，两种登录的费用来源可以分开，真正需要处理的是本地凭据存放位置。
+
+### 默认认证缓存可能被多个 Codex 客户端复用
+
+官方文档明确指出，Codex CLI 与 IDE 扩展会共享缓存的登录信息；在任一端退出后，另一端下次使用时也可能需要重新登录。认证信息通常保存在操作系统凭据存储中，或者默认目录下的：
+
+```text
+~/.codex/auth.json
+```
+
+在一次 macOS 实机排查中还观察到：
+
+1. 默认运行 `codex login status` 显示 `Logged in using ChatGPT`；
+2. Codex App 运行的后端进程和终端 CLI 都是同一套 Codex 后端程序；
+3. 默认 `~/.codex` 中存在当前 ChatGPT 登录的 `auth.json`；
+4. 对一个全新的独立 `CODEX_HOME` 运行状态检查时，结果为 `Not logged in`；
+5. 再次检查默认目录，原来的 ChatGPT 登录仍然有效。
+
+由此可以得出两个层次的判断：
+
+- **官方确认的事实**：CLI 与 IDE 扩展共享默认登录缓存，`CODEX_HOME` 是认证文件所在目录；
+- **本机验证的判断**：不要假设 Codex App 与默认 CLI 的认证一定完全独立，涉及难以恢复的账号时应主动隔离。
+
+### `CODEX_HOME` 可以建立独立认证空间
+
+`CODEX_HOME` 用于指定 Codex 的工作目录。默认值是 `~/.codex`，而改成另一个目录后，Codex 会在那里查找或创建自己的认证与配置。
+
+OpenAI Codex 仓库维护者也说明，不同的 `CODEX_HOME` 被设计为相互独立，可用于分别保存不同认证。需要注意的是，不应复制或软链接 ChatGPT OAuth 的 `auth.json` 到多个目录，因为 OAuth 刷新令牌可能失效。本文的方案不复制现有认证，而是在新目录中独立登录 API Key，因此没有这个问题。
+
+## 解决方法
+
+下面的步骤适用于 macOS 和 zsh。执行过程中**不要运行普通的 `codex logout`**，也不要在默认目录中执行 API Key 登录。
+
+### 第一步：确认默认登录仍然是 ChatGPT
+
+```bash
+codex login status
+```
+
+预期输出类似：
+
+```text
+Logged in using ChatGPT
+```
+
+如果这里已经不是 ChatGPT 登录，应先停止操作并确认当前状态，不要继续覆盖认证。
+
+### 第二步：创建 API Key 专用目录
+
+```bash
+mkdir -p "$HOME/.codex-api"
+```
+
+这里的 `.codex-api` 与默认的 `.codex` 是两个不同目录：
+
+```text
+~/.codex       # Codex App、默认 CLI 或 IDE 使用的现有登录
+~/.codex-api   # API Key 版 CLI 的独立认证空间
+```
+
+### 第三步：安全读取 API Key 并登录隔离目录
+
+不要把真实 API Key 直接写进命令或 shell 历史。使用 zsh 的静默输入：
+
+```bash
+read -s "CODEX_API_KEY?请输入 OpenAI API Key: "
+echo
+
+printf '%s' "$CODEX_API_KEY" |
+  env CODEX_HOME="$HOME/.codex-api" codex login --with-api-key
+
+unset CODEX_API_KEY
+```
+
+这里最关键的不是变量名，而是每次涉及 API 认证的 `codex` 命令前都有：
+
+```bash
+env CODEX_HOME="$HOME/.codex-api"
+```
+
+`unset` 只会删除当前终端中的临时环境变量，不会撤销已经缓存到隔离目录中的 CLI 登录。
+
+### 第四步：分别验证两套认证
+
+先检查 API Key 版 CLI：
+
+```bash
+env CODEX_HOME="$HOME/.codex-api" codex login status
+```
+
+预期输出：
+
+```text
+Logged in using an API key
+```
+
+然后检查默认 ChatGPT 登录：
+
+```bash
+codex login status
+```
+
+预期仍然是：
+
+```text
+Logged in using ChatGPT
+```
+
+只有两个检查都符合预期，才说明隔离登录成功。
+
+### 第五步：启动 API Key 版 CLI
+
+以后必须使用下面的命令启动按 API 计费的 CLI：
+
+```bash
+env CODEX_HOME="$HOME/.codex-api" codex
+```
+
+直接运行：
+
+```bash
+codex
+```
+
+仍然进入默认认证空间，通常会继续使用 ChatGPT 订阅账号和订阅额度。
+
+### 第六步：建立不易输错的快捷命令
+
+可以在 `~/.zshrc` 中增加一个函数：
+
+```bash
+codex-api() {
+  CODEX_HOME="$HOME/.codex-api" command codex "$@"
+}
+```
+
+重新加载配置：
+
+```bash
+source "$HOME/.zshrc"
+```
+
+此后使用：
+
+```bash
+codex-api
+codex-api login status
+```
+
+为了避免混淆，可以把两种命令记成下面的映射：
+
+| 使用方式 | 命令 | 认证与计费 |
+|---|---|---|
+| Codex App | 从桌面正常打开 | 保持现有 ChatGPT 订阅登录 |
+| 默认终端 CLI | `codex` | 默认 `~/.codex` 中的 ChatGPT 登录 |
+| API 版终端 CLI | `codex-api` | 独立 `.codex-api` 中的 API Key，按量计费 |
+
+### 第七步：只退出 API Key 版 CLI
+
+如果以后需要移除 API Key 认证，必须指定隔离目录：
+
+```bash
+env CODEX_HOME="$HOME/.codex-api" codex logout
+```
+
+不要误写成：
+
+```bash
+codex logout
+```
+
+后者作用于默认认证空间，可能清除需要保留的 ChatGPT 登录。
+
+### 进一步提高隔离等级
+
+独立 `CODEX_HOME` 已经能隔离 Codex 的认证和配置。若账号重新授权极其困难，或者需要组织合规级别的隔离，还可以把 API Key 版 CLI 放在以下环境之一：
+
+- 单独的 macOS 用户账户；
+- Docker 容器；
+- 虚拟机或远端开发主机。
+
+这类方式不仅分离认证文件，也分离操作系统凭据存储和进程环境。
+
+## 总结
+
+ChatGPT 订阅登录和 OpenAI API Key 登录在计费上并不冲突，但在同一台电脑上直接切换默认 Codex 认证可能覆盖共享缓存。对于难以重新授权的账号，不能仅凭“App 当前没有退出”判断安全。
+
+最稳妥的本地方案是：
+
+```text
+默认 ~/.codex       → 保留 ChatGPT 订阅登录
+独立 ~/.codex-api   → 保存 API Key 版 CLI 登录
+```
+
+下次遇到类似的多账号或多计费来源需求，可以遵循四条规则：
+
+1. 切换认证前先运行 `codex login status`；
+2. 不在默认目录执行 `codex logout` 或 API Key 登录；
+3. 为第二套认证设置独立 `CODEX_HOME`；
+4. 登录后分别检查默认目录与隔离目录，确认两套状态均符合预期。
+
+这套方法的核心不是“登录后还能切回来”，而是从一开始就不修改需要保护的登录。
+
+## 参考链接
+
+- [OpenAI Codex：Authentication](https://learn.chatgpt.com/docs/auth)
+- [OpenAI Codex GitHub 仓库](https://github.com/openai/codex)
+- [关于独立 `CODEX_HOME` 认证空间的官方仓库说明](https://github.com/openai/codex/issues/15410)
