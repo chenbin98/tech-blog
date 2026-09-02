@@ -1,13 +1,14 @@
 [
   {
-    "listing": "/posts/index.html",
+    "listing": "/index.html",
     "items": [
+      "/posts/2026-9-2-codex-agriculture-research-skills-guide.html",
       "/posts/2026-8-12-codex-cli-api-key-isolated-auth.html",
       "/posts/2026-5-11-huggingface-ml-intern-research-agent.html",
       "/posts/2026-4-26-codex-ssh-windows-wsl.html",
       "/posts/2026-4-25-ssh-key-login-debug.html",
-      "/posts/2026-4-24-research-git-branch-management.html",
       "/posts/2026-4-24-drone-rice-growth-stage-inversion.html",
+      "/posts/2026-4-24-research-git-branch-management.html",
       "/posts/2026-4-12-git-worktree-venv-guide.html",
       "/posts/2026-4-3-git-worktree-advanced.html",
       "/posts/2026-4-1-meteo-data-workflow.html",
@@ -26,14 +27,15 @@
     ]
   },
   {
-    "listing": "/index.html",
+    "listing": "/posts/index.html",
     "items": [
+      "/posts/2026-9-2-codex-agriculture-research-skills-guide.html",
       "/posts/2026-8-12-codex-cli-api-key-isolated-auth.html",
       "/posts/2026-5-11-huggingface-ml-intern-research-agent.html",
       "/posts/2026-4-26-codex-ssh-windows-wsl.html",
       "/posts/2026-4-25-ssh-key-login-debug.html",
-      "/posts/2026-4-24-drone-rice-growth-stage-inversion.html",
       "/posts/2026-4-24-research-git-branch-management.html",
+      "/posts/2026-4-24-drone-rice-growth-stage-inversion.html",
       "/posts/2026-4-12-git-worktree-venv-guide.html",
       "/posts/2026-4-3-git-worktree-advanced.html",
       "/posts/2026-4-1-meteo-data-workflow.html",
