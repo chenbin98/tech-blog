@@ -1,0 +1,319 @@
+---
+title: "Codex 农业科研 Skill 工具箱：遥感 GIS、建模分析、论文图件与文献写作"
+date: "2026-09-02"
+categories: [AI 工具, 科研, 农业建模]
+tags: [Codex, Agent Skills, 遥感, GIS, 数据分析, 科学写作]
+description: "整理 13 个已安装 Codex Skill 的能力边界、选择方法、基本用法和组合提示词，形成面向农业科研工作的日常速查手册。"
+---
+
+## 描述问题
+
+在农业科研中，一个任务往往横跨多个环节：下载和处理 Sentinel 或 Landsat 影像，进行矢量和栅格空间分析，整理田间试验数据，建立产量预测模型，制作论文图件，再检索文献并撰写论文。Codex 可以通过 Skill 获得这些任务的专门工作流，但 Skill 增多以后，很容易出现三个问题：
+
+1. 忘记某个 Skill 的准确名称，不知道下次应该调用哪一个；
+2. 同类 Skill 功能重叠，不清楚应该单独使用还是组合使用；
+3. 把“安装 Skill”误解为“已经安装全部 Python、GIS 和外部服务依赖”。
+
+目前这套科研工具箱包含 13 个核心 Skill，覆盖空间遥感、农业建模、论文图件、文献检索和科学写作。本文将它们整理成一个可长期查询的速查手册，并给出可以直接复制到 Codex 的中文提示词。
+
+## 原因分析
+
+### Skill 是工作流说明，不等于软件依赖
+
+Skill 的核心是 `SKILL.md` 及其配套脚本、参考资料和模板。它告诉 Codex：任务何时适用、应该按什么顺序执行、要检查哪些风险，以及输出应达到什么标准。
+
+安装 `geomaster` 并不会自动在所有项目中安装 GDAL、Rasterio、GeoPandas、Google Earth Engine、PyTorch 和全部空间分析包；安装 `scikit-learn` Skill 也不代表每个项目环境都已经具有 `scikit-learn`。实际 Python 依赖仍应在具体项目的虚拟环境中按需安装和锁定版本。
+
+这种分离是有益的：Skill 可以全局复用，而每个项目保持独立、可复现的依赖环境。
+
+### Codex 会匹配 Skill，但复杂任务最好显式点名
+
+Codex 可以根据 Skill 的名称和描述自动判断是否适用。对于边界清晰的任务，例如“检查 GeoDataFrame 的 CRS”，通常会匹配 `geopandas`。但跨环节任务可能同时符合多个 Skill，显式指定能够减少歧义：
+
+```text
+请使用 geomaster、geopandas 和 scientific-visualization：
+检查这套 Sentinel-2 地块数据的投影、计算 NDVI，
+按地块汇总并制作可用于论文的空间分布图。
+```
+
+也可以使用 `$skill-name` 的形式直接点名：
+
+```text
+$paper-lookup 检索 2021—2026 年水稻甲烷排放与产量协同效应研究，
+记录数据库、检索式、检索日期、DOI 和开放全文状态。
+```
+
+### 不应在每项任务中调用全部 Skill
+
+Skill 的价值在于提供任务边界，而不是数量越多越好。一次普通的矢量空间连接不需要同时调用文献综述和论文写作；一篇论文的引言检索也不需要加载遥感处理工作流。更稳妥的方法是先选择一个主 Skill，再补充一至三个承担检查、建模或交付任务的辅助 Skill。
+
+## 解决方法
+
+### 一、快速选择：任务对应哪个 Skill
+
+| 当前任务 | 首选 Skill | 常用搭配 |
+|---|---|---|
+| 遥感影像、栅格、STAC、GEE、空间机器学习 | `geomaster` | `geopandas`、`scientific-visualization` |
+| 矢量数据、CRS、空间连接、叠加、几何修复 | `geopandas` | `geomaster` |
+| 建模前的数据质量和结构检查 | `exploratory-data-analysis` | `statistical-analysis` |
+| 处理间比较、假设检验、效应量、功效分析 | `statistical-analysis` | `statsmodels` |
+| 产量预测、分类回归、特征工程、交叉验证 | `scikit-learn` | `exploratory-data-analysis` |
+| 强调系数解释、统计推断、GLM、混合模型或 ARIMA | `statsmodels` | `statistical-analysis` |
+| 物候序列、时序分类、异常检测、变化点 | `aeon` | `scikit-learn`、`geomaster` |
+| 论文级多面板图、配色、可访问性和导出审计 | `scientific-visualization` | `matplotlib` |
+| 精细控制坐标轴、布局、图元和输出格式 | `matplotlib` | `scientific-visualization` |
+| 查论文、DOI、引用关系、开放全文 | `paper-lookup` | `academic-research-suite` |
+| 深度研究、系统综述、论文全流程或审稿模拟 | `academic-research-suite` | `paper-lookup`、`scientific-writing` |
+| 基于已有证据起草、修改和审计论文 | `scientific-writing` | `scientific-critical-thinking` |
+| 检查因果外推、混杂、偏倚和证据强度 | `scientific-critical-thinking` | `statistical-analysis`、`scientific-writing` |
+
+### 二、空间遥感：`geomaster` 与 `geopandas`
+
+#### `geomaster 1.1`
+
+`geomaster` 是整个空间遥感组的总入口，覆盖 Sentinel、Landsat、MODIS、SAR 和高光谱数据，以及栅格/矢量运算、光谱指数、地形分析、空间统计、点云、路网和地球观测机器学习。它还包含 STAC、Cloud-Optimized GeoTIFF 和 Planetary Computer 等云原生工作流。
+
+适合在任务同时涉及数据获取、影像处理和空间建模时使用：
+
+```text
+使用 geomaster，为水稻种植区设计 Sentinel-2 时序处理流程。
+先核对数据源、云掩膜、空间分辨率和时间窗口，
+再计算 NDVI/EVI，并输出可复现的 STAC 查询和栅格处理代码。
+不要假定所有依赖已经安装，先报告环境检查结果。
+```
+
+#### `geopandas 1.1`
+
+`geopandas` 聚焦 Python 矢量数据分析。它尤其强调 CRS 语义、测距/面积所用投影、跨日期变更、反子午线、几何有效性、空间连接、overlay、clip、dissolve，以及 GeoPackage、Arrow 和 PostGIS I/O。
+
+当问题的核心是“矢量结果是否正确”时，应优先调用它：
+
+```text
+使用 geopandas 审计地块矢量与采样点的空间连接。
+先检查 CRS、坐标范围、无效几何和重复要素；
+面积计算必须选择适当的投影坐标系。
+先输出审计报告，不要直接覆盖原始数据。
+```
+
+两者的关系可以概括为：`geomaster` 负责完整地理空间路线，`geopandas` 负责矢量计算的精确实现和正确性检查。
+
+### 三、农业建模：从数据检查到统计推断
+
+#### `exploratory-data-analysis 1.1`
+
+该 Skill 用于建模前的受控本地 EDA，重点包括文件清单、字段类型、缺失模式、异常值、数据泄漏、变换敏感性和分析报告骨架。它不会自动删除异常值、填补缺失值、标准化数据或覆盖原文件。
+
+```text
+使用 exploratory-data-analysis 检查这份水稻产量与温室气体数据。
+先生成文件和字段清单，再报告缺失模式、重复记录、异常范围、
+潜在标签泄漏和分组结构。不要自动插补、删行或修改原始文件。
+```
+
+#### `statistical-analysis 1.1`
+
+这个 Skill 面向“应该使用什么统计方法”。它覆盖检验选择、正态性和方差齐性检查、非参数替代方法、效应量、置信区间、功效分析、回归诊断和贝叶斯替代方案。
+
+```text
+使用 statistical-analysis 比较不同灌溉处理的产量、CH4 和 N2O。
+根据试验设计选择检验，检查模型假设，报告效应量和置信区间，
+区分统计显著性与农业实际意义，不要只给 p 值。
+```
+
+#### `scikit-learn 1.2`
+
+`scikit-learn` 适用于预测导向的监督学习、聚类、降维、预处理、交叉验证和超参数选择。其核心价值是要求把预处理放进 Pipeline、只在训练集上拟合变换，并明确随机种子和评价指标，从而减少数据泄漏。
+
+```text
+使用 scikit-learn 建立水稻产量预测基线。
+把缺失值处理、类别编码和特征缩放放入 Pipeline；
+按照地点和年份设计避免空间、时间泄漏的验证方案，
+比较线性基线与树模型，并保存随机种子和评价指标。
+```
+
+#### `statsmodels 1.2`
+
+`statsmodels` 适合需要参数估计、标准误、置信区间、残差诊断和系数表的研究。其覆盖 OLS、WLS、GLM、离散结果、时间序列等模型；当研究问题强调解释和推断，而不是只追求预测精度时，应优先考虑它。
+
+```text
+使用 statsmodels 分析跨地点、跨季节的产量响应。
+先说明响应变量分布和模型族选择依据，检查残差、异方差和共线性，
+报告系数、95% 置信区间和稳健性分析。
+如果设计需要随机效应，先确认当前模型是否支持所需结构。
+```
+
+#### `aeon 1.0`
+
+`aeon` 专门处理时间序列机器学习，包括分类、回归、聚类、预测、异常检测、分割、相似性搜索和时序距离。它特别适合作物物候曲线、遥感指数时间序列、传感器序列和变化点问题。
+
+```text
+使用 aeon 对多地块 NDVI 时间序列进行物候阶段分类。
+先检查序列长度、采样间隔、缺测和标签定义，
+建立简单基线后再比较时序专用算法；
+验证时按地块或年份分组，避免同一地块进入训练集和测试集。
+```
+
+### 四、论文图件：`scientific-visualization` 与 `matplotlib`
+
+#### `scientific-visualization 1.1`
+
+这个 Skill 决定“图应该如何表达证据”：选择诚实编码、表示不确定性和缺失值、检查色彩和灰度可辨性、设计多面板布局、记录输出尺寸和元数据，并针对目标期刊检查导出文件。它不会为了图更漂亮而隐藏点、连接缺失观测或改变数据。
+
+```text
+使用 scientific-visualization 重新设计这组处理效应图。
+目标是论文双栏宽度的多面板图；保留原始观测点、样本量、
+不确定性和缺失信息，检查色盲与灰度可辨性，
+导出 SVG、PDF 和 600 dpi PNG，并读回验证尺寸和字体。
+```
+
+#### `matplotlib 1.1`
+
+`matplotlib` 负责具体绘图实现和精细控制，包括 Figure/Axes 对象、subplot mosaic、GridSpec、坐标轴、注释、图例、样式和 PNG/PDF/SVG 导出。日常建议使用面向对象接口，而不是把复杂图完全写成全局 `pyplot` 状态。
+
+```text
+使用 matplotlib 的面向对象接口实现这张图。
+把数据计算与绘图函数分开，使用 subplot_mosaic 组织面板，
+统一字号、线宽和颜色，并提供可独立运行的导出脚本。
+```
+
+二者的分工是：`scientific-visualization` 负责科学表达、审计和交付标准，`matplotlib` 负责实现细节。
+
+### 五、文献与写作：从检索到证据审计
+
+#### `paper-lookup 2.0`
+
+`paper-lookup` 可访问 PubMed、PMC、Europe PMC、bioRxiv、medRxiv、arXiv、OpenAlex、Crossref、Semantic Scholar、CORE 和 Unpaywall 等 11 个接口，用于主题检索、DOI/PMID/arXiv 查询、引文关系和开放全文定位。
+
+它强调记录检索参数、数据库、日期、标识符和结果数量，并检查“HTTP 成功但返回内容实际失败”这类静默错误。该 Skill 不覆盖 CNKI 和需要机构账号的 Web of Science，因此这些来源仍需单独处理。
+
+```text
+使用 paper-lookup 检索 2020—2026 年稻田水分管理、产量、CH4 和 N2O 研究。
+先定义检索边界，选择合适数据库，不要无差别请求所有接口；
+按 DOI 去重，记录检索式、日期、数据库、命中数和开放全文状态。
+候选论文交给我判断，不要代替我做最终纳入决定。
+```
+
+#### `academic-research-suite 0.1.6`
+
+这是一个独立来源的 Codex 研究套件，不属于 K-Dense 仓库。它根据任务路由到深度研究、论文写作、论文评审、完整研究—论文流水线或实验规划工作流，并强调不要一次加载整个套件。
+
+可以直接使用自然语言，也可以使用普通文本别名：
+
+```text
+ars-lit-review：围绕稻田甲烷减排与产量权衡开展文献检索和证据综合。
+先给出研究问题、检索范围和证据缺口，不要编造缺失引用。
+```
+
+```text
+ars-plan：根据已确认的研究问题、结果表和文献矩阵，
+规划一篇农业与环境方向论文的论证结构。
+```
+
+如果只是提供一个宽泛题目，它会先帮助收敛研究问题，而不是立即生成完整论文。
+
+#### `scientific-writing 2.0`
+
+`scientific-writing` 用于根据已有证据起草、修改和审计稿件。它要求区分起草、来源核验和作者最终批准，检查方法与结果一致性、引文与论断绑定、报告规范、作者责任、AI 披露、数据声明和开放科学内容。
+
+```text
+使用 scientific-writing 修改这一节 Results。
+只使用我提供的表格、图件和已核验文献；
+不要增加不存在的事实或参考文献。
+逐项核对样本量、单位、效应方向、显著性和图表编号，
+并把无法核验的论断标为 unverified。
+```
+
+#### `scientific-critical-thinking 1.2`
+
+这个 Skill 用于评估研究设计、混杂、偏倚、统计有效性和证据强度。它适合在解释模型结果、筛选论文或投稿前做“反方审查”，但不能替代领域专家和作者的科学判断。
+
+```text
+使用 scientific-critical-thinking 审查以下结论：
+“间歇灌溉在所有稻作区都能同时提高产量并减少温室气体排放。”
+区分论文直接证据、合理推断和过度外推，
+检查样本代表性、混杂因素、结果指标和替代解释。
+```
+
+### 六、四套推荐组合
+
+#### 遥感产量预测
+
+```text
+使用 geomaster、geopandas、exploratory-data-analysis、scikit-learn
+和 scientific-visualization，建立基于 Sentinel-2 与气象数据的产量预测流程。
+先审计空间范围、时间窗口、CRS、缺测和数据泄漏，
+再建立基线模型，最后输出带不确定性和空间误差分布的论文图件。
+```
+
+#### 农业田间试验分析
+
+```text
+使用 exploratory-data-analysis、statistical-analysis、statsmodels
+和 scientific-critical-thinking 分析多地点多季节试验。
+保留原始值和缺失状态，说明固定效应与随机效应，
+检查模型假设、效应量、置信区间和结论外推边界。
+```
+
+#### 作物物候时间序列
+
+```text
+使用 geomaster、aeon、scikit-learn 和 scientific-visualization，
+分析多年份 NDVI/EVI 时序并识别关键物候阶段。
+验证必须按年份和地块分组，报告缺测处理、时间对齐、
+基线模型、泛化误差和失败案例。
+```
+
+#### 文献综述与论文写作
+
+```text
+使用 paper-lookup、academic-research-suite、scientific-critical-thinking
+和 scientific-writing。先建立可复现检索记录和候选文献表，
+由我完成摘要/全文纳入判断后，再进行证据综合和论文写作。
+所有关键论断必须绑定已核验来源，不能用流畅文字填补证据空白。
+```
+
+### 七、查看安装状态和版本
+
+这些 Skill 默认位于用户级 Codex Skill 目录：
+
+```bash
+ls ~/.codex/skills
+```
+
+查看某个 Skill 的名称、描述和版本：
+
+```bash
+sed -n '1,25p' ~/.codex/skills/geomaster/SKILL.md
+sed -n '1,25p' ~/.codex/skills/paper-lookup/SKILL.md
+```
+
+批量检查本文列出的目录是否存在：
+
+```bash
+for skill in \
+  geomaster geopandas exploratory-data-analysis statistical-analysis \
+  scikit-learn statsmodels aeon scientific-visualization matplotlib \
+  paper-lookup academic-research-suite scientific-writing \
+  scientific-critical-thinking; do
+  test -f "$HOME/.codex/skills/$skill/SKILL.md" \
+    && echo "OK  $skill" \
+    || echo "MISS $skill"
+done
+```
+
+Skill 更新以后，建议新建一个 Codex 任务，让新的 Skill 清单和描述进入会话。不要为了满足某个 Skill 的全部示例而把所有依赖装进全局 Python；应先进入具体项目，再使用 `uv`、`conda` 或项目已有的依赖管理方式安装所需库。
+
+## 总结
+
+这 13 个 Skill 可以按照四条主线记忆：
+
+- 空间遥感：`geomaster` 管完整空间路线，`geopandas` 管矢量分析正确性；
+- 农业建模：`exploratory-data-analysis` 先检查数据，`statistical-analysis` 选择统计方法，`scikit-learn` 做预测，`statsmodels` 做推断，`aeon` 处理时间序列；
+- 论文图件：`scientific-visualization` 管科学表达和审计，`matplotlib` 管精细实现；
+- 文献写作：`paper-lookup` 找证据，`academic-research-suite` 组织研究流程，`scientific-writing` 形成稿件，`scientific-critical-thinking` 检查结论边界。
+
+日常使用时遵循一个简单原则：**先选择一个主 Skill，再增加少量辅助 Skill，并在提示词中写清输入、输出、禁止动作和验证要求。** 这样既能发挥专门工作流的优势，也能避免多个 Skill 同时介入造成任务范围膨胀。
+
+## 参考链接
+
+- [Scientific Agent Skills 仓库](https://github.com/K-Dense-AI/scientific-agent-skills)
+- [Agent Skills 开放规范](https://agentskills.io/)
